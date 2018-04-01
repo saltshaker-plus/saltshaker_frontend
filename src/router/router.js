@@ -112,13 +112,6 @@ export const appRouter = [
                 component: () => import('@/views/my-components/text-editor/text-editor.vue')
             },
             {
-                path: 'md-editor',
-                icon: 'pound',
-                name: 'md-editor',
-                title: 'Markdown编辑器',
-                component: () => import('@/views/my-components/markdown-editor/markdown-editor.vue')
-            },
-            {
                 path: 'image-editor',
                 icon: 'crop',
                 name: 'image-editor',
@@ -221,6 +214,27 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'index', title: '错误页面', name: 'errorpage_index', component: () => import('@/views/error-page/error-page.vue') }
+        ]
+    },
+    {
+        path: '/user',
+        icon: 'person-stalker',
+        name: 'user',
+        title: '用户管理',
+        component: Main,
+        children: [
+            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/tables/user.vue') }
+        ]
+    },
+    {
+        path: '/system',
+        icon: 'settings',
+        title: '系统管理',
+        name: 'system',
+        component: Main,
+        children: [
+            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'index', title: '权限管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
         ]
     }
 ];
