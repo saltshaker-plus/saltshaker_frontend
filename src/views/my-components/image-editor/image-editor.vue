@@ -44,7 +44,7 @@
                     <Row :gutter="10">
                         <Col span="14" class="image-editor-con2">
                             <div class="cropper">
-                                <img id="cropimg2" src="../../../images/cropper-test.png" alt="">
+                                <img id="cropimg2" src="../../../images/logo.png" alt="">
                             </div>
                         </Col>
                         <Col span="10" class="image-editor-con2">
@@ -79,7 +79,7 @@
                 <Row :gutter="10">
                     <Col span="12" class="image-editor-con3">
                         <div class="cropper3">
-                            <img id="cropimg3" src="../../../images/cropper-test.png" alt="">
+                            <img id="cropimg3" src="../../../images/logo.png" alt="">
                         </div>
                     </Col>
                     <Col span="6" class="image-editor-con3">
