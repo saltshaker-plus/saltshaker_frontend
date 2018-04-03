@@ -57,7 +57,7 @@ module.exports = merge(webpackBaseConfig, {
         // }),
         new CopyWebpackPlugin([
             {
-                from: 'td_icon.ico'
+                from: 'icon.ico'
             },
             {
                 from: 'src/styles/fonts',
@@ -66,17 +66,14 @@ module.exports = merge(webpackBaseConfig, {
             {
                 from: 'src/views/main-components/theme-switch/theme'
             },
-            {
-                from: 'src/views/my-components/text-editor/tinymce'
-            }
         ], {
             ignore: [
                 'text-editor.vue'
             ]
         }),
         new HtmlWebpackPlugin({
-            title: 'iView admin v' + package.version,
-            favicon: './td_icon.ico',
+            title: 'Saltshaker Plus' + package.version,
+            favicon: 'src/images/icon.ico',
             filename: '../index.html',
             template: '!!ejs-loader!./src/template/index.ejs',
             inject: false

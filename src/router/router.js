@@ -37,12 +37,6 @@ export const page500 = {
     component: () => import('@/views/error-page/500.vue')
 };
 
-export const preview = {
-    path: '/preview',
-    name: 'preview',
-    component: () => import('@/views/form/article-publish/preview.vue')
-};
-
 export const locking = {
     path: '/locking',
     name: 'locking',
@@ -98,19 +92,33 @@ export const appRouter = [
         ]
     },
     {
+        path: '/user',
+        icon: 'person-stalker',
+        name: 'user',
+        title: '用户管理',
+        component: Main,
+        children: [
+            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/tables/user.vue') }
+        ]
+    },
+    {
+        path: '/system',
+        icon: 'settings',
+        title: '系统管理',
+        name: 'system',
+        component: Main,
+        children: [
+            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'index', title: '权限管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
+        ]
+    },
+    {
         path: '/component',
         icon: 'social-buffer',
         name: 'component',
         title: '组件',
         component: Main,
         children: [
-            {
-                path: 'text-editor',
-                icon: 'compose',
-                name: 'text-editor',
-                title: '富文本编辑器',
-                component: () => import('@/views/my-components/text-editor/text-editor.vue')
-            },
             {
                 path: 'image-editor',
                 icon: 'crop',
@@ -126,34 +134,12 @@ export const appRouter = [
                 component: () => import('@/views/my-components/draggable-list/draggable-list.vue')
             },
             {
-                path: 'area-linkage',
-                icon: 'ios-more',
-                name: 'area-linkage',
-                title: '城市级联',
-                component: () => import('@/views/my-components/area-linkage/area-linkage.vue')
-            },
-            {
                 path: 'file-upload',
                 icon: 'android-upload',
                 name: 'file-upload',
                 title: '文件上传',
                 component: () => import('@/views/my-components/file-upload/file-upload.vue')
             },
-            {
-                path: 'count-to',
-                icon: 'arrow-graph-up-right',
-                name: 'count-to',
-                title: '数字渐变',
-                // component: () => import('@/views/my-components/count-to/count-to.vue')
-                component: () => import('@/views/my-components/count-to/count-to.vue')
-            },
-            {
-                path: 'split-pane-page',
-                icon: 'ios-pause',
-                name: 'split-pane-page',
-                title: 'split-pane',
-                component: () => import('@/views/my-components/split-pane/split-pane-page.vue')
-            }
         ]
     },
     {
@@ -163,23 +149,10 @@ export const appRouter = [
         title: '表单编辑',
         component: Main,
         children: [
-            { path: 'artical-publish', title: '文章发布', name: 'artical-publish', icon: 'compose', component: () => import('@/views/form/article-publish/article-publish.vue') },
             { path: 'workflow', title: '工作流', name: 'workflow', icon: 'arrow-swap', component: () => import('@/views/form/work-flow/work-flow.vue') }
 
         ]
     },
-    // {
-    //     path: '/charts',
-    //     icon: 'ios-analytics',
-    //     name: 'charts',
-    //     title: '图表',
-    //     component: Main,
-    //     children: [
-    //         { path: 'pie', title: '饼状图', name: 'pie', icon: 'ios-pie', component: resolve => { require('@/views/access/access.vue') },
-    //         { path: 'histogram', title: '柱状图', name: 'histogram', icon: 'stats-bars', component: resolve => { require('@/views/access/access.vue') }
-
-    //     ]
-    // },
     {
         path: '/tables',
         icon: 'ios-grid-view',
@@ -214,27 +187,6 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'index', title: '错误页面', name: 'errorpage_index', component: () => import('@/views/error-page/error-page.vue') }
-        ]
-    },
-    {
-        path: '/user',
-        icon: 'person-stalker',
-        name: 'user',
-        title: '用户管理',
-        component: Main,
-        children: [
-            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/tables/user.vue') }
-        ]
-    },
-    {
-        path: '/system',
-        icon: 'settings',
-        title: '系统管理',
-        name: 'system',
-        component: Main,
-        children: [
-            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/error-page/error-page.vue') },
-            { path: 'index', title: '权限管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
         ]
     }
 ];
