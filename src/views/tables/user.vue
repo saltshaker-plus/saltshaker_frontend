@@ -9,18 +9,44 @@
             <Col span="24">
                 <Card>
                     <Row :gutter="10">
+                        <Select style="width:200px">
+                        </Select>
+                        <div style="float: right;" >
+                            <Button type="primary" >创建用户</Button>
+                            <Button type="primary">刷新</Button>
+                          </div>
+                    </Row>
+                    <Row>
+                        <hr class="hr-margin" color="#e3e8ee" size="0.5">
+                    </Row>
+                    <Row :gutter="10">
+                        <div style="float: right;">
+                            <Input>
+                                <Button slot="append" icon="ios-search"></Button>
+                            </Input>
+                        </div>
                         <div style="margin-bottom: -10px;">
-                            <Button type="primary" @click="exportData(1)"><Icon type="ios-download-outline"></Icon> 导出原数据</Button>
+                            <Button type="primary" @click="exportData(1)">导出数据</Button>
+                            <Poptip placement="bottom-end">
+                                <Button type="primary">自定义列</Button>
+                                <!--<div class="api" slot="content">-->
+                                  <!--<ul>-->
+                                    <!--<li v-for="(c, i) in nColumns" v-if="i > 0" :key="i">-->
+                                      <!--<Checkbox :value="nColumnsExcept.indexOf(c.key) === -1" @on-change="columnsExcept(c.key)">{{ c.title }}</Checkbox>-->
+                                    <!--</li>-->
+                                  <!--</ul>-->
+                                <!--</div>-->
+                            </Poptip>
                         </div>
                         <!--
                         <Button type="primary" size="large" @click="exportData(2)"><Icon type="ios-download-outline"></Icon> Export sorting and filtered data</Button>
                         <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> Export custom data</Button>
                         -->
                         <br>
-                        <Table :border="showBorder" :loading="loading" :data="tableData1" :columns="tableColumns1" stripe ref="table"></Table>
+                        <Table :border="showBorder" :loading="loading" :data="tableData&&tableData" :columns="tableColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
-                                <Page :total="20" :current="1" show-total show-elevator @on-change="changePage"></Page>
+                                <Page :total=count :current="1" show-total show-elevator @on-change="changePage"></Page>
                             </div>
                         </div>
                     </Row>
@@ -34,10 +60,11 @@
     export default {
         data () {
             return {
-                tableData1: this.mockTableData1(),
+                tableData: this.TableData(),
+                count: this.count,
                 showBorder: true,
                 loading: false,
-                tableColumns1: [
+                tableColumns: [
                     {
                         type: 'selection',
                         width: 60,
@@ -51,22 +78,72 @@
                     {
                         title: 'Product',
                         key: 'product',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', params.row.product);
+                        }
                     },
                     {
                         title: 'Role',
-                        key: 'Role',
-                        sortable: true
+                        key: 'role',
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('Poptip', {
+                                props: {
+                                    trigger: 'hover',
+                                    placement: 'bottom'
+                                }
+                            }, [
+                                h('Tag', params.row.role.length),
+                                h('div', {
+                                    slot: 'content'
+                                }, [
+                                    h('ul', this.tableData[params.index].role.map(item => {
+                                        return h('li', {
+                                            style: {
+                                                textAlign: 'center',
+                                                padding: '4px'
+                                            }
+                                        }, item);
+                                    }))
+                                ])
+                            ]);
+                        }
                     },
                     {
                         title: 'ACL',
                         key: 'acl',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', params.row.acl);
+                        }
                     },
                     {
                         title: 'Groups',
                         key: 'groups',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('Poptip', {
+                                props: {
+                                    trigger: 'hover',
+                                    placement: 'bottom'
+                                }
+                            }, [
+                                h('Tag', params.row.groups.length),
+                                h('div', {
+                                    slot: 'content'
+                                }, [
+                                    h('ul', this.tableData[params.index].groups.map(item => {
+                                        return h('li', {
+                                            style: {
+                                                textAlign: 'center',
+                                                padding: '4px'
+                                            }
+                                        }, item);
+                                    }))
+                                ])
+                            ]);
+                        }
                     },
                     {
                         title: 'Action',
@@ -85,7 +162,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(params.index)
+                                            this.show(params.index);
                                         }
                                     }
                                 }, 'View'),
@@ -96,7 +173,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(params.index)
+                                            this.remove(params.index);
                                         }
                                     }
                                 }, 'Delete')
@@ -104,69 +181,27 @@
                         }
                     }
                 ]
-            }
+            };
         },
         methods: {
-            mockTableData1 () {
+            TableData () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                let data = [];
-                // let users;
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(res => {
-                  let users = res.data['users']['user'];
-//                  console.log(users);
-//                  for (var i=0; i< users.length; i++){
-//                    data.push(users[i])
-//                  }
-//                  return data
-                  }, err => { console.log(err.data); });
-
-                data.push({
-                "id": "u-7a1eb74c33b911e8aa5f000c298454d8",
-                "acl": [],
-                "role": [
-                    "r-9e3be2ca318f11e8ab56000c298454d8"
-                ],
-                "groups": "",
-                "product": "",
-                "username": "admin"
-            },
-            {
-                "id": "u-3fb93c4a33bd11e8aa5f000c298454d8",
-                "acl": [
-                    "a-897e48cc31b811e8ab56000c298454d8"
-                ],
-                "role": [
-                    "r-35d85a1a333311e8aa5f000c298454d8"
-                ],
-                "groups": [
-                    "g-142120c8323411e8ab56000c298454d8",
-                    "g-191b9cc0323411e8ab56000c298454d8"
-                ],
-                "product": "",
-                "username": "jyp"
-            })
-                return data
-            },
-            formatDate (date) {
-                const y = date.getFullYear();
-                let m = date.getMonth() + 1;
-                m = m < 10 ? '0' + m : m;
-                let d = date.getDate();
-                d = d < 10 ? ('0' + d) : d;
-                return y + '-' + m + '-' + d;
+                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
+                    res => { this.tableData = res.data['users']['user']; this.count = res.data['users']['user'].length; },
+                    err => { console.log(err); });
+                return this.tableData;
             },
             changePage () {
-                // The simulated data is changed directly here, and the actual usage scenario should fetch the data from the server
-                this.tableData1 = this.mockTableData1();
+                this.tableData = this.TableData();
             },
             show (index) {
                 this.$Modal.info({
                     title: 'User Info',
-                    content: `Name：${this.tableData1[index].name}<br>Portrayal：${this.tableData1[index].portrayal}<br>Sampling Time：${this.tableData1[index].time}<br>Updated Time：${this.tableData1[index].update}`
-                })
+                    content: `Username：${this.tableData[index].username}<br>Product：${this.tableData[index].product}<br>Role：${this.tableData[index].role}<br>ACL：${this.tableData[index].acl}<br>Groups：${this.tableData[index].groups}`
+                });
             },
             remove (index) {
-                this.tableData1.splice(index, 1);
+                this.tableData.splice(index, 1);
             },
             exportData (type) {
                 if (type === 1) {
@@ -181,11 +216,17 @@
                 } else if (type === 3) {
                     this.$refs.table.exportCsv({
                         filename: 'Custom data',
-                        columns: this.tableColumns1.filter((col, index) => index < 4),
-                        data: this.tableData1.filter((data, index) => index < 4)
+                        columns: this.tableColumns.filter((col, index) => index < 4),
+                        data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
             }
         }
-    }
+    };
 </script>
+<style scoped>
+.hr-margin{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+</style>
