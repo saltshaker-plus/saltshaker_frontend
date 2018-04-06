@@ -22,7 +22,7 @@
                     </Row>
                     <Row :gutter="10">
                         <div style="float: right;">
-                            <Input>
+                            <Input v-model.trim="nSearchVal" @on-change="search">
                                 <Button slot="append" icon="ios-search"></Button>
                             </Input>
                         </div>
@@ -47,7 +47,7 @@
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="tableColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
-                                <Page :total=count :current="1" show-total show-elevator @on-change="changePage"></Page>
+                                <Page :total="pageCount" :current="pageCurrent" :page-size="pageSize" show-total show-elevator @on-change="changePage"></Page>
                             </div>
                         </div>
                     </Row>
@@ -58,13 +58,30 @@
 </template>
 
 <script>
+    export const nCopy = function (data) {
+        return JSON.parse(JSON.stringify(data));
+    };
+    function sortString (key, order) {
+        return function (a, b) {
+            var v1 = a[key];
+            var v2 = b[key];
+            if (order === 'desc') {
+                return v1 < v2 ? 1 : -1;
+            } else {
+                return v1 > v2 ? 1 : -1;
+            }
+        };
+    };
     export default {
         data () {
             return {
                 nLocalColExcept: [],
                 productData: this.productList(),
                 tableData: this.tableList(),
-                count: this.count,
+                pageSize: 10,
+                pageCurrent: 1,
+                pageCount: this.pageCount,
+                nSearchVal: '',
                 showBorder: true,
                 loading: false,
                 tableColumns: [
@@ -173,6 +190,10 @@
             },
             nColExcept: {
                 type: Array
+            },
+            nData: {
+                type: Array,
+                require: true
             }
         },
         computed: {
@@ -180,18 +201,42 @@
                 return this.nColExcept || this.nLocalColExcept;
             }
         },
+        watch: {
+            nData () {
+                this.nInit();
+            },
+            currentPage () {
+                this.getPageData();
+            },
+            nSortData () {
+                this.getPageData();
+            }
+        },
         methods: {
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
-                    res => { this.tableData = res.data['users']['user']; this.count = res.data['users']['user'].length; },
-                    err => { console.log(err); });
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.tableData = res.data['users']['user'];
+                            this.pageCount = res.data['users']['user'].length;
+                        } else {
+                            this.nerror('Get User Failure', res.data['message']);
+                        }
+                    },
+                    err => { this.nerror('Get User Failure', err); });
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
-                    res => { this.productData = res.data['products']['product']; },
-                    err => { console.log(err); });
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.productData = res.data['products']['product'];
+                        } else {
+                            this.nerror('Get Product Failure', res.data['message']);
+                        }
+                    },
+                    err => { this.nerror('Get Product Failure', err); });
             },
             success (info) {
                 this.$Message.success(info);
@@ -263,7 +308,8 @@
             exportData (type) {
                 if (type === 1) {
                     this.$refs.table.exportCsv({
-                        filename: 'The original data'
+                        filename: 'The original data',
+                        data: this.nData
                     });
                 } else if (type === 2) {
                     this.$refs.table.exportCsv({
@@ -277,7 +323,90 @@
                         data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
+            },
+            nInit () {
+                if (this.selectFlag()) {
+                    this.tableData.unshift({
+                        title: '',
+                        key: 'checked',
+                        width: 60,
+                        render: (h, params) => {
+                            return h('Checkbox', {
+                                props: {
+                                    value: this.nSelected.indexOf(params.row.index) >= 0
+                                },
+                                on: {
+                                    'on-change': (value) => {
+                                        if (value) {
+                                            this.nSelected.push(params.row.index);
+                                        } else {
+                                            let i = this.nSelected.indexOf(params.row.index);
+                                            if (i >= 0) {
+                                                this.nSelected.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                this.pageCurrent = 1;
+                this.getPageData();
+            },
+            selectFlag () {
+                if (this.nSelected) {
+                    for (let v of this.tableColumns) {
+                        if (v.key === 'checked') {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            },
+            search () {
+                this.pageCurrent = 1;
+                this.getPageData();
+            },
+            getFilterData () {
+                let searchVal = this.nSearchVal;
+                console.log(searchVal)
+                console.log(this.nData)
+                let data = nCopy(this.nData);
+                if (this.nSortData) {
+                    let key = this.nSortData.key;
+                    let order = this.nSortData.order;
+                    if (this.nSortData.order === 'normal') {
+                        this.nSortData = null;
+                    } else {
+                        let func = sortString(key, order);
+                        data.sort(func);
+                    }
+                }
+                if (this.nSearchVal) {
+                    let ret = [];
+                    data.map(x => {
+                        for (let i in this.tableColumns) {
+                            let key = this.tableColumns[i].key;
+                            if (x[key] && (x[key] + '').indexOf(searchVal) >= 0) {
+                                ret.push(x);
+                                break;
+                            }
+                        }
+                    });
+                    return ret;
+                }
+                return data;
+            },
+            getPageData () {
+                this.tableData = this.getFilterData();
+                let data = nCopy(this.tableData);
+                this.tableData = data.splice((this.pageCurrent - 1) * this.pageSize, this.pageSize);
             }
+        },
+        created () {
+            this.nInit();
         }
     };
 </script>
