@@ -10,10 +10,11 @@
                 <Card>
                     <Row :gutter="10">
                         <Select style="width:200px">
+                            <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
                         <div style="float: right;" >
                             <Button type="primary" >创建用户</Button>
-                            <Button type="primary">刷新</Button>
+                            <Button type="primary" @click="refresh()">刷新</Button>
                           </div>
                     </Row>
                     <Row>
@@ -27,15 +28,15 @@
                         </div>
                         <div style="margin-bottom: -10px;">
                             <Button type="primary" @click="exportData(1)">导出数据</Button>
-                            <Poptip placement="bottom-end">
+                            <Poptip placement="bottom-start">
                                 <Button type="primary">自定义列</Button>
-                                <!--<div class="api" slot="content">-->
-                                  <!--<ul>-->
-                                    <!--<li v-for="(c, i) in nColumns" v-if="i > 0" :key="i">-->
-                                      <!--<Checkbox :value="nColumnsExcept.indexOf(c.key) === -1" @on-change="columnsExcept(c.key)">{{ c.title }}</Checkbox>-->
-                                    <!--</li>-->
-                                  <!--</ul>-->
-                                <!--</div>-->
+                                <div slot="content">
+                                  <ul>
+                                    <li v-for="(c, i) in tableColumns" v-if="i > 0" :key="i">
+                                      <Checkbox :value="nColumnsExcept.indexOf(c.key) === -1" @on-change="columnsExcept(c.key)">{{ c.title }}</Checkbox>
+                                    </li>
+                                  </ul>
+                                </div>
                             </Poptip>
                         </div>
                         <!--
@@ -43,7 +44,7 @@
                         <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> Export custom data</Button>
                         -->
                         <br>
-                        <Table :border="showBorder" :loading="loading" :data="tableData&&tableData" :columns="tableColumns"  stripe ref="table"></Table>
+                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="tableColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
                                 <Page :total=count :current="1" show-total show-elevator @on-change="changePage"></Page>
@@ -60,7 +61,9 @@
     export default {
         data () {
             return {
-                tableData: this.TableData(),
+                nLocalColExcept: [],
+                productData: this.productList(),
+                tableData: this.tableList(),
                 count: this.count,
                 showBorder: true,
                 loading: false,
@@ -80,7 +83,7 @@
                         key: 'product',
                         sortable: true,
                         render: (h, params) => {
-                            return h('div', params.row.product);
+                            return h('div', params.row.product.map(item => { return item.name; }));
                         }
                     },
                     {
@@ -88,26 +91,7 @@
                         key: 'role',
                         sortable: true,
                         render: (h, params) => {
-                            return h('Poptip', {
-                                props: {
-                                    trigger: 'hover',
-                                    placement: 'bottom'
-                                }
-                            }, [
-                                h('Tag', params.row.role.length),
-                                h('div', {
-                                    slot: 'content'
-                                }, [
-                                    h('ul', this.tableData[params.index].role.map(item => {
-                                        return h('li', {
-                                            style: {
-                                                textAlign: 'center',
-                                                padding: '4px'
-                                            }
-                                        }, item);
-                                    }))
-                                ])
-                            ]);
+                            return h('div', params.row.role.map(item => { return item.name; }));
                         }
                     },
                     {
@@ -115,7 +99,7 @@
                         key: 'acl',
                         sortable: true,
                         render: (h, params) => {
-                            return h('div', params.row.acl);
+                            return h('div', params.row.acl.map(item => { return item.name + ','; }));
                         }
                     },
                     {
@@ -139,7 +123,7 @@
                                                 textAlign: 'center',
                                                 padding: '4px'
                                             }
-                                        }, item);
+                                        }, item.name);
                                     }))
                                 ])
                             ]);
@@ -173,7 +157,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(params.index);
+                                            this.remove(params.index, params.row.id);
                                         }
                                     }
                                 }, 'Delete')
@@ -183,25 +167,98 @@
                 ]
             };
         },
+        props: {
+            nSelected: {
+                type: Array
+            },
+            nColExcept: {
+                type: Array
+            }
+        },
+        computed: {
+            nColumnsExcept () {
+                return this.nColExcept || this.nLocalColExcept;
+            }
+        },
         methods: {
-            TableData () {
+            tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
                     res => { this.tableData = res.data['users']['user']; this.count = res.data['users']['user'].length; },
                     err => { console.log(err); });
-                return this.tableData;
+            },
+            productList () {
+                this.axios.defaults.withCredentials = true; // 带着cookie
+                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                    res => { this.productData = res.data['products']['product']; },
+                    err => { console.log(err); });
+            },
+            success (info) {
+                this.$Message.success(info);
+            },
+            warning (info) {
+                this.$Message.warning(info);
+            },
+            error (info) {
+                this.$Message.error(info);
+            },
+            nsuccess (title, info) {
+                this.$Notice.success({
+                    title: title,
+                    desc: info,
+                    duration: 10
+                });
+            },
+            nwarning (title, info) {
+                this.$Notice.warning({
+                    title: title,
+                    desc: info,
+                    duration: 10
+                });
+            },
+            nerror (title, info) {
+                this.$Notice.error({
+                    title: title,
+                    desc: info,
+                    duration: 10
+                });
+            },
+            refresh () {
+                this.tableList();
+            },
+            columnsExcept (key) {
+                let index = this.nColumnsExcept.indexOf(key);
+                if (index === -1) {
+                    this.nColumnsExcept.push(key);
+                } else {
+                    this.nColumnsExcept.splice(index, 1);
+                }
             },
             changePage () {
-                this.tableData = this.TableData();
+                this.tableData = this.tableList();
             },
             show (index) {
                 this.$Modal.info({
                     title: 'User Info',
-                    content: `Username：${this.tableData[index].username}<br>Product：${this.tableData[index].product}<br>Role：${this.tableData[index].role}<br>ACL：${this.tableData[index].acl}<br>Groups：${this.tableData[index].groups}`
+                    content: `Username：${this.tableData[index].username}<br>
+                              Product：${this.tableData[index].product.map(item => { return item.name; })}<br>
+                              Role：${this.tableData[index].role.map(item => { return item.name; })}<br>
+                              ACL：${this.tableData[index].acl.map(item => { return item.name; })}<br>
+                              Groups：${this.tableData[index].groups.map(item => { return item.name; })}`
                 });
             },
-            remove (index) {
-                this.tableData.splice(index, 1);
+            remove (index, id) {
+                this.axios.defaults.withCredentials = true; // 带着cookie
+                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + id).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.tableData.splice(index, 1);
+                            this.success('Delete Success');
+                        } else {
+                            this.nerror('Delete Failure', res.data['message']);
+                        }
+                    },
+                    err => { this.nerror('Delete Failure', err); });
             },
             exportData (type) {
                 if (type === 1) {
