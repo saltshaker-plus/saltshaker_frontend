@@ -58,6 +58,7 @@
 </template>
 
 <script>
+
     export const nCopy = function (data) {
         return JSON.parse(JSON.stringify(data));
     };
@@ -86,65 +87,19 @@
                 loading: false,
                 tableColumns: [
                     {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        title: 'User',
-                        key: 'username',
+                        title: 'Name',
+                        key: 'name',
                         sortable: true
                     },
                     {
-                        title: 'Product',
-                        key: 'product',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.product.map(item => { return item.name; }));
-                        }
+                        title: 'Tag',
+                        key: 'tag',
+                        sortable: true
                     },
                     {
-                        title: 'Role',
-                        key: 'role',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.role.map(item => { return item.name; }));
-                        }
-                    },
-                    {
-                        title: 'ACL',
-                        key: 'acl',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.acl.map(item => { return item.name + ','; }));
-                        }
-                    },
-                    {
-                        title: 'Groups',
-                        key: 'groups',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('Poptip', {
-                                props: {
-                                    trigger: 'hover',
-                                    placement: 'bottom'
-                                }
-                            }, [
-                                h('Tag', params.row.groups.length),
-                                h('div', {
-                                    slot: 'content'
-                                }, [
-                                    h('ul', this.tableData[params.index].groups.map(item => {
-                                        return h('li', {
-                                            style: {
-                                                textAlign: 'center',
-                                                padding: '4px'
-                                            }
-                                        }, item.name);
-                                    }))
-                                ])
-                            ]);
-                        }
+                        title: 'Description',
+                        key: 'description',
+                        sortable: true
                     },
                     {
                         title: 'Action',
@@ -215,11 +170,11 @@
         methods: {
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
+                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['users']['user'];
-                            this.pageCount = res.data['users']['user'].length;
+                            this.tableData = res.data['roles']['role'];
+                            this.pageCount = res.data['roles']['role'].length;
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -284,12 +239,10 @@
             },
             show (index) {
                 this.$Modal.info({
-                    title: 'User Info',
-                    content: `Username：${this.tableData[index].username}<br>
-                              Product：${this.tableData[index].product.map(item => { return item.name; })}<br>
-                              Role：${this.tableData[index].role.map(item => { return item.name; })}<br>
-                              ACL：${this.tableData[index].acl.map(item => { return item.name; })}<br>
-                              Groups：${this.tableData[index].groups.map(item => { return item.name; })}`
+                    title: 'Role Info',
+                    content: `Name：${this.tableData[index].name}<br>
+                              Tag：${this.tableData[index].tag}<br>
+                              Description：${this.tableData[index].description}`
                 });
             },
             remove (index, id) {

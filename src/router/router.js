@@ -92,13 +92,23 @@ export const appRouter = [
         ]
     },
     {
+        path: '/group',
+        icon: 'android-list',
+        name: 'group',
+        title: '组管理',
+        component: Main,
+        children: [
+            { path: 'index', title: '组管理', name: 'group_index', component: () => import('@/views/tables/role.vue') }
+        ]
+    },
+    {
         path: '/user',
         icon: 'person-stalker',
         name: 'user',
         title: '用户管理',
         component: Main,
         children: [
-            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/tables/user.vue') }
+            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
         ]
     },
     {
@@ -108,8 +118,8 @@ export const appRouter = [
         name: 'system',
         component: Main,
         children: [
-            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/error-page/error-page.vue') },
-            { path: 'index', title: '权限管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
+            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/tables/role.vue') },
+            { path: 'index', title: 'ALC管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
         ]
     },
     {
