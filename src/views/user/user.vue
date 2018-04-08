@@ -313,7 +313,7 @@
                             this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get User Failur', err); });
+                    err => { this.nerror('Get User Failure', err.response.data['message']); });
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -323,10 +323,10 @@
                             this.productData = res.data['products']['product'];
                             this.userInfo.product = res.data['products']['product'];
                         } else {
-                            this.nerror('Get Product Failure', res.data['message']);
+                            this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Product Failure', err); });
+                    err => { this.nerror('Get Product Failure', err.response.data['message']); });
             },
             roleList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -335,10 +335,10 @@
                         if (res.data['status'] === true) {
                             this.userInfo.role = res.data['roles']['role'];
                         } else {
-                            this.nerror('Get Role Failure', res.data['message']);
+                            this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Role Failure', err); });
+                    err => { this.nerror('Get Role Failure', err.response.data['message']); });
             },
             alcList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -347,10 +347,10 @@
                         if (res.data['status'] === true) {
                             this.userInfo.acl = res.data['acls']['acl'];
                         } else {
-                            this.nerror('Get ACL Failure', res.data['message']);
+                            this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get ACL Failure', err); });
+                    err => { this.nerror('Get ACL Failure', err.response.data['message']); });
             },
             groupList (productId) {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -359,10 +359,10 @@
                         if (res.data['status'] === true) {
                             this.userInfo.groups = res.data['groups']['group'];
                         } else {
-                            this.nerror('Get Group Failure', res.data['message']);
+                            this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Group Failure', err); });
+                    err => { this.nerror('Get Group Failure', err.response.data['message']); });
             },
             // 重新定义错误消息
             nerror (title, info) {
