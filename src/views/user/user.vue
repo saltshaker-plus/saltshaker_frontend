@@ -32,7 +32,7 @@
                                 <Button type="primary">自定义列</Button>
                                 <div slot="content">
                                   <ul>
-                                    <li v-for="(c, i) in tableColumns" v-if="i > 0" :key="i">
+                                    <li v-for="(c, i) in nColumns" v-if="i > 0" :key="i">
                                       <Checkbox :value="nColumnsExcept.indexOf(c.key) === -1" @on-change="columnsExcept(c.key)">{{ c.title }}</Checkbox>
                                     </li>
                                   </ul>
@@ -44,10 +44,11 @@
                         <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> Export custom data</Button>
                         -->
                         <br>
-                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="tableColumns"  stripe ref="table"></Table>
+                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
                                 <Page :total="pageCount" :current="pageCurrent" :page-size="pageSize" show-total show-elevator @on-change="changePage"></Page>
+                                <!--<Page :total="nFilterData.length" :current="nPage.current" :page-size="nPage.size" @on-change="changePage" show-total ></Page>-->
                             </div>
                         </div>
                     </Row>
@@ -137,7 +138,7 @@
                     role: this.roleList(),
                     alc: this.alcList()
                 },
-                tableColumns: [
+                nColumns: [
                     {
                         type: 'selection',
                         width: 60,
@@ -285,20 +286,20 @@
                 require: true
             }
         },
-        computed: {
-            nColumnsExcept () {
-                return this.nColExcept || this.nLocalColExcept;
-            }
-        },
         watch: {
             nData () {
                 this.nInit();
+            }
+        },
+        computed: {
+            nColumnsExcept () {
+                return this.nColExcept || this.nLocalColExcept;
             },
-            currentPage () {
-                this.getPageData();
-            },
-            nSortData () {
-                this.getPageData();
+            // 过滤列
+            filterColumns () {
+                return this.nColumns.filter(x => {
+                    return this.nColumnsExcept.indexOf(x.key) === -1;
+                });
             }
         },
         methods: {
@@ -307,8 +308,8 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['users']['user'];
                             this.pageCount = res.data['users']['user'].length;
+                            this.tableData = res.data['users']['user'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -384,8 +385,11 @@
                     this.nColumnsExcept.splice(index, 1);
                 }
             },
-            changePage () {
-                this.tableData = this.tableList();
+            changePage (page) {
+                let list = []
+                list = this.tableData.splice(0, this.pageCount);
+                console.log(this.tableData)
+                this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
             // 显示行信息
             show (index) {
@@ -428,14 +432,14 @@
                 } else if (type === 3) {
                     this.$refs.table.exportCsv({
                         filename: 'Custom data',
-                        columns: this.tableColumns.filter((col, index) => index < 4),
+                        columns: this.nColumns.filter((col, index) => index < 4),
                         data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
             },
             nInit () {
                 if (this.selectFlag()) {
-                    this.tableData.unshift({
+                    this.nColumns.unshift({
                         title: '',
                         key: 'checked',
                         width: 60,
@@ -465,7 +469,7 @@
             },
             selectFlag () {
                 if (this.nSelected) {
-                    for (let v of this.tableColumns) {
+                    for (let v of this.nColumns) {
                         if (v.key === 'checked') {
                             return false;
                         }
@@ -481,8 +485,7 @@
             getFilterData () {
                 let searchVal = this.nSearchVal;
                 console.log(searchVal);
-                console.log(this.nData);
-                let data = nCopy(this.nData);
+                let data = this.tableData;
                 if (this.nSortData) {
                     let key = this.nSortData.key;
                     let order = this.nSortData.order;
@@ -495,9 +498,10 @@
                 }
                 if (this.nSearchVal) {
                     let ret = [];
+                    console.log(this.nColumns)
                     data.map(x => {
-                        for (let i in this.tableColumns) {
-                            let key = this.tableColumns[i].key;
+                        for (let i in this.nColumns) {
+                            let key = this.nColumns[i].key;
                             if (x[key] && (x[key] + '').indexOf(searchVal) >= 0) {
                                 ret.push(x);
                                 break;
@@ -510,10 +514,10 @@
             },
             getPageData () {
                 this.tableData = this.getFilterData();
-                let data = nCopy(this.tableData);
+                let data = this.tableData;
                 this.tableData = data.splice((this.pageCurrent - 1) * this.pageSize, this.pageSize);
             },
-
+            // 表单提交及重置
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
