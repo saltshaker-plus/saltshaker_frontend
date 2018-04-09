@@ -58,8 +58,7 @@
 </template>
 
 <script>
-
-    export const nCopy = function (data) {
+    function nCopy (data) {
         return JSON.parse(JSON.stringify(data));
     };
     function sortString (key, order) {
@@ -149,6 +148,10 @@
             nData: {
                 type: Array,
                 require: true
+            },
+            nColumns: {
+                type: Array,
+                required: true
             }
         },
         computed: {

@@ -388,7 +388,6 @@
             changePage (page) {
                 let list = []
                 list = this.tableData.splice(0, this.pageCount);
-                console.log(this.tableData)
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
             // 显示行信息
@@ -484,8 +483,7 @@
             },
             getFilterData () {
                 let searchVal = this.nSearchVal;
-                console.log(searchVal);
-                let data = this.tableData;
+                let data = nCopy(this.tableData);
                 if (this.nSortData) {
                     let key = this.nSortData.key;
                     let order = this.nSortData.order;
@@ -498,7 +496,6 @@
                 }
                 if (this.nSearchVal) {
                     let ret = [];
-                    console.log(this.nColumns)
                     data.map(x => {
                         for (let i in this.nColumns) {
                             let key = this.nColumns[i].key;
@@ -532,6 +529,7 @@
             }
         },
         created () {
+            this.tableList();
             this.nInit();
         }
     };

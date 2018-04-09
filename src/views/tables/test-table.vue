@@ -8,11 +8,17 @@
         <Row class="margin-top-10">
             <p :total=ff>dddd{{ results }}</p>
         </Row>
+        <my></my>
     </div>
 </template>
 
 <script>
     export default {
+        components: {
+            my: {
+                template: '<div>A custom component!</div>'
+            }
+        },
         data () {
             return {
                 results: this.results,
