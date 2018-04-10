@@ -92,6 +92,16 @@ export const appRouter = [
         ]
     },
     {
+        path: '/sls',
+        icon: 'steam',
+        name: 'group',
+        title: 'SLS部署',
+        component: Main,
+        children: [
+            { path: 'index', title: 'SLS部署', name: 'sls_index', component: () => import('@/views/execute/sls.vue') }
+        ]
+    },
+    {
         path: '/group',
         icon: 'android-list',
         name: 'group',
