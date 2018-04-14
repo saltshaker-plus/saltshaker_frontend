@@ -9,11 +9,8 @@
             <Col span="24">
                 <Card>
                     <Row :gutter="10">
-                        <Select style="width:200px">
-                            <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                        </Select>
                         <div style="float: right;" >
-                            <Button type="primary" >创建用户</Button>
+                            <Button type="primary" @click="add('formValidate')">创建产品</Button>
                             <Button type="primary" @click="refresh()">刷新</Button>
                           </div>
                     </Row>
@@ -39,10 +36,6 @@
                                 </div>
                             </Poptip>
                         </div>
-                        <!--
-                        <Button type="primary" size="large" @click="exportData(2)"><Icon type="ios-download-outline"></Icon> Export sorting and filtered data</Button>
-                        <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> Export custom data</Button>
-                        -->
                         <br>
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
@@ -65,29 +58,45 @@
             </div>
         </Modal>
         <Modal v-model="formView" title="编辑">
-            <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
-                <FormItem label="用户名" prop="name">
+            <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="125">
+                <FormItem label="产品线名" prop="name">
                     <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
                 </FormItem>
-                <FormItem label="产品线" prop="product">
-                    <CheckboxGroup v-model="formValidate.product">
-                        <Checkbox v-for="item in userInfo.product" :key="item.id" :label="item.name" @click="groupList(item.id)"></Checkbox>
-                    </CheckboxGroup>
+                <FormItem label="描述" prop="description">
+                    <Input v-model="formValidate.description" placeholder="输入描述"></Input>
                 </FormItem>
-                <FormItem label="组">
-                    <CheckboxGroup v-model="formValidate.groups">
-                         <Checkbox v-for="item in userInfo.groups" :key="item.id" :label="item.name"></Checkbox>
-                    </CheckboxGroup>
+                <FormItem label="Master ID" prop="salt_master_id">
+                    <Input v-model="formValidate.salt_master_id" placeholder="输入Master ID"></Input>
                 </FormItem>
-                <FormItem label="角色">
-                    <CheckboxGroup v-model="formValidate.role">
-                        <Checkbox v-for="item in userInfo.role" :key="item.id" :label="item.name"></Checkbox>
-                    </CheckboxGroup>
+                <FormItem label="Master API 地址" prop="salt_master_url">
+                    <Input v-model="formValidate.salt_master_url" placeholder="输入Master API 地址"></Input>
                 </FormItem>
-                <FormItem label="ACL">
-                    <CheckboxGroup v-model="formValidate.acl">
-                        <Checkbox v-for="item in userInfo.acl" :key="item.id" :label="item.name"></Checkbox>
-                    </CheckboxGroup>
+                <FormItem label="Master API 用户名" prop="salt_master_user">
+                    <Input v-model="formValidate.salt_master_user" placeholder="输入Master API 用户名"></Input>
+                </FormItem>
+                <FormItem label="Master API 密码" prop="salt_master_password">
+                    <Input v-model="formValidate.salt_master_password" placeholder="输入Master API 密码"></Input>
+                </FormItem>
+                <FormItem label="文件服务器">
+                    <RadioGroup v-model="formValidate.file_server">
+                        <Radio label="gitfs">GitLab</Radio>
+                        <Radio label="rsync">Rsync</Radio>
+                    </RadioGroup>
+                </FormItem>
+                <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab 地址" prop="gitlab_url">
+                    <Input v-model="formValidate.gitlab_url" placeholder="输入GitLab 地址"></Input>
+                </FormItem>
+                <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab API 版本" prop="api_version">
+                    <Input v-model="formValidate.api_version" placeholder="输入GitLab API 版本"></Input>
+                </FormItem>
+                <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab Token" prop="private_token">
+                    <Input v-model="formValidate.private_token" placeholder="输入GitLab Token"></Input>
+                </FormItem>
+                <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab State 项目" prop="state_project">
+                    <Input v-model="formValidate.state_project" placeholder="输入GitLab State 项目"></Input>
+                </FormItem>
+                <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab Pillar 项目" prop="pillar_project">
+                    <Input v-model="formValidate.pillar_project" placeholder="输入GitLab Pillar 项目"></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -117,7 +126,6 @@
         data () {
             return {
                 nLocalColExcept: [],
-                productData: this.productList(),
                 tableData: this.tableList(),
                 pageSize: 10,
                 pageCurrent: 1,
@@ -132,78 +140,68 @@
                 delName: '',
                 // 编辑数据
                 formView: false,
-                userInfo: {
-                    product: [],
-                    groups: [],
-                    role: this.roleList(),
-                    alc: this.alcList()
-                },
+                id: '',
+                optionType: '',
                 nColumns: [
                     {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        title: '用户',
-                        key: 'username',
+                        title: '产品线',
+                        key: 'name',
                         sortable: true
                     },
                     {
-                        title: '产品线',
-                        key: 'product',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.product.map(item => { return item.name; }));
-                        }
+                        title: '描述',
+                        key: 'description',
+                        sortable: true
                     },
                     {
-                        title: '角色',
-                        key: 'role',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.role.map(item => { return item.name; }));
-                        }
+                        title: 'Master ID',
+                        key: 'salt_master_id',
+                        sortable: true
                     },
                     {
-                        title: 'ACL',
-                        key: 'acl',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.acl.map(item => { return item.name + ','; }));
-                        }
+                        title: 'Master API 地址',
+                        key: 'salt_master_url',
+                        sortable: true
                     },
                     {
-                        title: '组',
-                        key: 'groups',
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('Poptip', {
-                                props: {
-                                    trigger: 'hover',
-                                    placement: 'bottom'
-                                }
-                            }, [
-                                h('Tag', params.row.groups.length),
-                                h('div', {
-                                    slot: 'content'
-                                }, [
-                                    h('ul', this.tableData[params.index].groups.map(item => {
-                                        return h('li', {
-                                            style: {
-                                                textAlign: 'center',
-                                                padding: '4px'
-                                            }
-                                        }, item.name);
-                                    }))
-                                ])
-                            ]);
-                        }
+                        title: 'Master API 用户名',
+                        key: 'salt_master_user',
+                        sortable: true
+                    },
+                    {
+                        title: '文件服务器',
+                        key: 'file_server',
+                        sortable: true
+                    },
+                    {
+                        title: 'GitLab 地址',
+                        key: 'gitlab_url',
+                        sortable: true
+                    },
+                    {
+                        title: 'GitLab API 版本',
+                        key: 'api_version',
+                        sortable: true
+                    },
+                    {
+                        title: 'GitLab Token',
+                        key: 'private_token',
+                        sortable: true
+                    },
+                    {
+                        title: 'GitLab State 项目',
+                        key: 'state_project',
+                        sortable: true
+                    },
+                    {
+                        title: 'GitLab Pillar 项目',
+                        key: 'pillar_project',
+                        sortable: true
                     },
                     {
                         title: '操作',
                         key: 'action',
-                        width: 170,
+                        width: 123,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -217,41 +215,36 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(params.index);
-                                        }
-                                    }
-                                }, '详情'),
-                                h('Button', {
-                                    props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
                                             this.formView = true;
-                                            this.delId = params.row.id;
-                                            this.delIndex = params.index;
-                                            this.delName = params.row.username;
+                                            this.optionType = 'edit';
+                                            this.id = params.row.id;
+                                            this.formValidate = params.row;
                                         }
                                     }
                                 }, '编辑'),
-                                h('Button', {
+                                h('Poptip', {
                                     props: {
-                                        type: 'error',
-                                        size: 'small'
+                                        confirm: true,
+                                        title: '确定要删除 ' + params.row.name + ' 吗?',
+                                        transfer: true,
+                                        placement: 'top-end'
                                     },
                                     on: {
-                                        click: () => {
+                                        'on-ok': () => {
                                             this.delModal = true;
                                             this.delId = params.row.id;
                                             this.delIndex = params.index;
-                                            this.delName = params.row.username;
+                                            this.del();
                                         }
                                     }
-                                }, '删除')
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'error',
+                                            size: 'small'
+                                        }
+                                    }, '删除')
+                                ])
                             ]);
                         }
                     }
@@ -259,17 +252,56 @@
                 // 表单验证
                 formValidate: {
                     name: '',
-                    product: [],
-                    groups: [],
-                    role: [],
-                    alc: []
+                    description: '',
+                    salt_master_id: '',
+                    salt_master_url: '',
+                    salt_master_user: '',
+                    salt_master_password: '',
+                    file_server: 'gitfs',
+                    gitlab_url: '',
+                    api_version: '',
+                    private_token: '',
+                    state_project: '',
+                    pillar_project: '',
+                    oauth_token: '',
+                    http_password: '',
+                    http_username: '',
+                    password: '',
+                    email: ''
                 },
                 ruleValidate: {
                     name: [
-                        { required: true, message: '用户名不能为空', trigger: 'blur' }
+                        { required: true, message: '产品线名不能为空', trigger: 'blur' }
                     ],
-                    product: [
-                        { required: true, type: 'array', min: 1, message: '至少选择一项', trigger: 'change' }
+                    description: [
+                        { required: true, message: '描述不能为空', trigger: 'blur' }
+                    ],
+                    salt_master_id: [
+                        { required: true, message: 'Master ID不能为空', trigger: 'blur' }
+                    ],
+                    salt_master_url: [
+                        { required: true, message: 'Master API 地址不能为空', trigger: 'blur' }
+                    ],
+                    salt_master_user: [
+                        { required: true, message: 'Master API 用户名不能为空', trigger: 'blur' }
+                    ],
+                    salt_master_password: [
+                        { required: true, message: 'Master API 密码不能为空', trigger: 'blur' }
+                    ],
+                    gitlab_url: [
+                        { required: true, message: 'GitLab 地址不能为空', trigger: 'blur' }
+                    ],
+                    api_version: [
+                        { required: true, message: 'GitLab API 版本不能为空', trigger: 'blur' }
+                    ],
+                    private_token: [
+                        { required: true, message: 'GitLab Token不能为空', trigger: 'blur' }
+                    ],
+                    state_project: [
+                        { required: true, message: 'GitLab State 项目不能为空', trigger: 'blur' }
+                    ],
+                    pillar_project: [
+                        { required: true, message: 'GitLab Pillar 项目不能为空', trigger: 'blur' }
                     ]
                 }
             };
@@ -305,65 +337,16 @@
         methods: {
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
+                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.pageCount = res.data['users']['user'].length;
-                            this.tableData = res.data['users']['user'];
+                            this.pageCount = res.data['products']['product'].length;
+                            this.tableData = res.data['products']['product'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
                     },
                     err => { this.nerror('Get User Failure', err.response.data['message']); });
-            },
-            productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
-                            this.userInfo.product = res.data['products']['product'];
-                        } else {
-                            this.nerror('Get User Failure', res.data['message']);
-                        }
-                    },
-                    err => { this.nerror('Get Product Failure', err.response.data['message']); });
-            },
-            roleList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.userInfo.role = res.data['roles']['role'];
-                        } else {
-                            this.nerror('Get User Failure', res.data['message']);
-                        }
-                    },
-                    err => { this.nerror('Get Role Failure', err.response.data['message']); });
-            },
-            alcList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl').then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.userInfo.acl = res.data['acls']['acl'];
-                        } else {
-                            this.nerror('Get User Failure', res.data['message']);
-                        }
-                    },
-                    err => { this.nerror('Get ACL Failure', err.response.data['message']); });
-            },
-            groupList (productId) {
-                this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/groups?product_id=' + productId).then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.userInfo.groups = res.data['groups']['group'];
-                        } else {
-                            this.nerror('Get User Failure', res.data['message']);
-                        }
-                    },
-                    err => { this.nerror('Get Group Failure', err.response.data['message']); });
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -386,35 +369,30 @@
                 }
             },
             changePage (page) {
-                let list = []
+                let list = [];
                 list = this.tableData.splice(0, this.pageCount);
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
-            },
-            // 显示行信息
-            show (index) {
-                this.$Modal.info({
-                    title: 'User Info',
-                    content: `Username：${this.tableData[index].username}<br>
-                              Product：${this.tableData[index].product.map(item => { return item.name; })}<br>
-                              Role：${this.tableData[index].role.map(item => { return item.name; })}<br>
-                              ACL：${this.tableData[index].acl.map(item => { return item.name; })}<br>
-                              Groups：${this.tableData[index].groups.map(item => { return item.name; })}`
-                });
             },
             // 删除数据
             del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + this.delId).then(
+                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/product/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData.splice(this.delIndex, 1);
                             this.$Message.success('删除成功！');
+                            this.tableList();
                         } else {
                             this.nerror('Delete Failure', res.data['message']);
                         }
                     },
                     err => { this.nerror('Delete Failure', err); });
                 this.delModal = false;
+            },
+            add (name) {
+                this.$refs[name].resetFields();
+                this.optionType = 'add';
+                this.formView = true;
             },
             // 导出表格数据
             exportData (type) {
@@ -518,7 +496,43 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.$Message.success('成功！');
+                        this.axios.defaults.withCredentials = true; // 带着cookie
+                        if (this.formValidate.file_server === 'rsync') {
+                            this.formValidate.gitlab_url = '';
+                            this.formValidate.api_version = '';
+                            this.formValidate.private_token = '';
+                            this.formValidate.state_project = '';
+                            this.formValidate.pillar_project = '';
+                        };
+                        // 编辑
+                        if (this.optionType === 'edit') {
+                            this.axios.put('http://192.168.44.128:5000/saltshaker/api/v1.0/product/' + this.id,
+                                this.formValidate).then(
+                                res => {
+                                    if (res.data['status'] === true) {
+                                        this.formView = false;
+                                        this.$Message.success('成功！');
+                                        this.tableList();
+                                    } else {
+                                        this.nerror('Edit User Failure', res.data['message']);
+                                    }
+                                },
+                                err => { this.nerror('Edit User Failure', err.response.data['message']); });
+                        } else {
+                            // 添加
+                            this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/product',
+                                this.formValidate).then(
+                                res => {
+                                    if (res.data['status'] === true) {
+                                        this.formView = false;
+                                        this.$Message.success('成功！');
+                                        this.tableList();
+                                    } else {
+                                        this.nerror('Add User Failure', res.data['message']);
+                                    }
+                                },
+                                err => { this.nerror('Add User Failure', err.response.data['message']); });
+                        }
                     } else {
                         this.$Message.error('请检查表单数据！');
                     }

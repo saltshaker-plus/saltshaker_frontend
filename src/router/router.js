@@ -61,54 +61,78 @@ export const otherRouter = {
 // 作为Main组件的子页面展示并且在左侧菜单显示的路由写在appRouter里
 export const appRouter = [
     {
-        path: '/access',
-        icon: 'key',
-        name: 'access',
-        title: '权限管理',
+        path: '/minion',
+        icon: 'ios-keypad',
+        name: 'minion',
+        title: 'Minion管理',
         component: Main,
         children: [
-            { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
+            { path: 'status', title: '状态信息', name: 'status', component: () => import('@/views/execute/sls.vue') },
+            { path: 'key', title: 'Key管理', name: 'key', component: () => import('@/views/execute/sls.vue') },
+            { path: 'grains', title: 'Grains', name: 'grains', component: () => import('@/views/execute/sls.vue') }
         ]
     },
     {
-        path: '/access-test',
-        icon: 'lock-combination',
-        title: '权限测试页',
-        name: 'accesstest',
-        access: 0,
+        path: '/job',
+        icon: 'arrow-swap',
+        name: 'job',
+        title: 'Job管理',
         component: Main,
         children: [
-            { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
+            { path: 'history', title: 'Job历史', name: 'history', component: () => import('@/views/execute/sls.vue') },
+            { path: 'manage', title: 'Job管理', name: 'manage', component: () => import('@/views/execute/sls.vue') }
         ]
     },
     {
-        path: '/international',
-        icon: 'earth',
-        title: {i18n: 'international'},
-        name: 'international',
+        path: '/group',
+        icon: 'social-buffer',
+        name: 'group',
+        title: '分组管理',
         component: Main,
         children: [
-            { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
+            { path: 'group', title: '分组管理', name: 'group_index', component: () => import('@/views/role/role.vue') }
         ]
     },
     {
         path: '/sls',
         icon: 'steam',
-        name: 'group',
-        title: 'SLS部署',
+        name: 'sls',
+        title: 'SLS管理',
         component: Main,
         children: [
-            { path: 'index', title: 'SLS部署', name: 'sls_index', component: () => import('@/views/execute/sls.vue') }
+            { path: 'pillar', title: 'Pillar SLS', name: 'pillar', component: () => import('@/views/execute/sls.vue') },
+            { path: 'state', title: 'State SLS', name: 'state', component: () => import('@/views/execute/sls.vue') }
         ]
     },
     {
-        path: '/group',
-        icon: 'android-list',
-        name: 'group',
-        title: '组管理',
+        path: '/执行命令',
+        icon: 'ios-play',
+        name: 'execute',
+        title: '执行命令',
         component: Main,
         children: [
-            { path: 'index', title: '组管理', name: 'group_index', component: () => import('@/views/role/role.vue') }
+            { path: 'shell', title: 'Shell命令', name: 'shell', component: () => import('@/views/execute/sls.vue') },
+            { path: 'models', title: 'Models命令', name: 'models', component: () => import('@/views/execute/sls.vue') }
+        ]
+    },
+    {
+        path: '/product',
+        icon: 'person-stalker',
+        name: 'product',
+        title: '产品管理',
+        component: Main,
+        children: [
+            { path: '', title: '产品管理', name: 'product_index', icon: 'social-dropbox', component: () => import('@/views/product/product.vue') }
+        ]
+    },
+    {
+        path: '/acl',
+        icon: 'person-stalker',
+        name: 'funnel',
+        title: 'ACL管理',
+        component: Main,
+        children: [
+            { path: '', title: 'ACL管理', name: 'acl', icon: 'funnel', component: () => import('@/views/user/user.vue') }
         ]
     },
     {
@@ -118,7 +142,7 @@ export const appRouter = [
         title: '用户管理',
         component: Main,
         children: [
-            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
+            { path: '', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
         ]
     },
     {
@@ -128,8 +152,10 @@ export const appRouter = [
         name: 'system',
         component: Main,
         children: [
-            { path: 'index', title: '角色管理', name: 'role_index', icon: 'android-send', component: () => import('@/views/role/role.vue') },
-            { path: 'index', title: 'ALC管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/error-page/error-page.vue') }
+            { path: 'role', title: '角色管理', name: 'role', component: () => import('@/views/role/role.vue') },
+            { path: 'token', title: 'Token管理', name: 'token',component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'log', title: '操作日志', name: 'log', component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'tools', title: '系统工具', name: 'tools', component: () => import('@/views/error-page/error-page.vue') }
         ]
     },
     {
@@ -197,6 +223,37 @@ export const appRouter = [
         children: [
             { path: 'mutative-router', title: '动态路由', name: 'mutative-router', icon: 'link', component: () => import('@/views/advanced-router/mutative-router.vue') },
             { path: 'argument-page', title: '带参页面', name: 'argument-page', icon: 'android-send', component: () => import('@/views/advanced-router/argument-page.vue') }
+        ]
+    },
+    {
+        path: '/access',
+        icon: 'key',
+        name: 'access',
+        title: '权限管理',
+        component: Main,
+        children: [
+            { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
+        ]
+    },
+    {
+        path: '/access-test',
+        icon: 'lock-combination',
+        title: '权限测试页',
+        name: 'accesstest',
+        access: 0,
+        component: Main,
+        children: [
+            { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
+        ]
+    },
+    {
+        path: '/international',
+        icon: 'earth',
+        title: {i18n: 'international'},
+        name: 'international',
+        component: Main,
+        children: [
+            { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
         ]
     },
     {
