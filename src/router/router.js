@@ -154,7 +154,7 @@ export const appRouter = [
         children: [
             { path: 'role', title: '角色管理', name: 'role', component: () => import('@/views/role/role.vue') },
             { path: 'token', title: 'Token管理', name: 'token',component: () => import('@/views/error-page/error-page.vue') },
-            { path: 'log', title: '操作日志', name: 'log', component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'log', title: '操作日志', name: 'log', component: () => import('@/views/audit_log/audit_log.vue') },
             { path: 'tools', title: '系统工具', name: 'tools', component: () => import('@/views/error-page/error-page.vue') }
         ]
     },
