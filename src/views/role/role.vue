@@ -92,7 +92,7 @@
                 pageCount: this.pageCount,
                 nSearchVal: '',
                 showBorder: true,
-                loading: false,
+                loading: true,
                 // 删除数据
                 delModal: false,
                 delId: '',
@@ -106,7 +106,18 @@
                     {
                         title: '角色名',
                         key: 'name',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Tooltip', {
+                                    props: {
+                                        content: params.row.id,
+                                        transfer: true,
+                                        placement: 'top-start'
+                                    }
+                                }, params.row.name)
+                            ]);
+                        }
                     },
                     {
                         title: '描述',
@@ -226,10 +237,20 @@
                             this.pageCount = res.data['roles']['role'].length;
                             this.tableData = res.data['roles']['role'];
                         } else {
-                            this.nerror('Get Failure', res.data['message']);
-                        }
+                            this.nerror('Get Role Failure', res.data['message']);
+                        };
+                        this.loading = false;
                     },
-                    err => { this.nerror('Get Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Role Failure', errInfo);
+                        this.loading = false;
+                    });
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -241,6 +262,7 @@
             },
             // 刷新表格数据
             refresh () {
+                this.loading = true;
                 this.tableList();
             },
             columnsExcept (key) {
@@ -269,7 +291,15 @@
                             this.nerror('Delete Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Delete Failure', err); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Delete Failure', errInfo);
+                    });
                 this.delModal = false;
             },
             add (name) {
@@ -393,7 +423,15 @@
                                         this.nerror('Edit Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Edit Failure', err.response.data['message']); });
+                                err => {
+                                    let errInfo = '';
+                                    try {
+                                        errInfo = err.response.data['message'];
+                                    } catch (error) {
+                                        errInfo = err;
+                                    }
+                                    this.nerror('Edit Failure', errInfo);
+                                });
                         } else {
                             // 添加
                             this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/role',
@@ -407,7 +445,15 @@
                                         this.nerror('Add Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Add Failure', err.response.data['message']); });
+                                err => {
+                                    let errInfo = '';
+                                    try {
+                                        errInfo = err.response.data['message'];
+                                    } catch (error) {
+                                        errInfo = err;
+                                    }
+                                    this.nerror('Add Failure', errInfo);
+                                });
                         }
                     } else {
                         this.$Message.error('请检查表单数据！');
@@ -418,10 +464,6 @@
                 this.$refs[name].resetFields();
             }
         },
-        created () {
-            this.tableList();
-            this.nInit();
-        }
     };
 </script>
 <style scoped>

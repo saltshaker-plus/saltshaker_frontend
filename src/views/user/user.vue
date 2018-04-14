@@ -124,7 +124,7 @@
                 pageCount: this.pageCount,
                 nSearchVal: '',
                 showBorder: true,
-                loading: false,
+                loading: true,
                 // 删除数据
                 delModal: false,
                 delId: '',
@@ -140,14 +140,20 @@
                 },
                 nColumns: [
                     {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
                         title: '用户',
                         key: 'username',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Tooltip', {
+                                    props: {
+                                        content: params.row.id,
+                                        transfer: true,
+                                        placement: 'top-start'
+                                    }
+                                }, params.row.username)
+                            ]);
+                        }
                     },
                     {
                         title: '产品线',
@@ -207,20 +213,6 @@
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'primary',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.show(params.index);
-                                        }
-                                    }
-                                }, '详情'),
                                 h('Button', {
                                     props: {
                                         type: 'primary',
@@ -312,9 +304,19 @@
                             this.tableData = res.data['users']['user'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
-                        }
+                        };
+                        this.loading = false;
                     },
-                    err => { this.nerror('Get User Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get User Failure', errInfo);
+                        this.loading = false;
+                    });
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -327,7 +329,15 @@
                             this.nerror('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Product Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Product Failure', errInfo);
+                    });
             },
             roleList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -336,10 +346,18 @@
                         if (res.data['status'] === true) {
                             this.userInfo.role = res.data['roles']['role'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nerror('Get Role Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Role Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Role Failure', errInfo);
+                    });
             },
             alcList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -348,10 +366,18 @@
                         if (res.data['status'] === true) {
                             this.userInfo.acl = res.data['acls']['acl'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nerror('Get ACL Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get ACL Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get ALC Failure', errInfo);
+                    });
             },
             groupList (productId) {
                 this.axios.defaults.withCredentials = true; // 带着cookie
@@ -360,10 +386,18 @@
                         if (res.data['status'] === true) {
                             this.userInfo.groups = res.data['groups']['group'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nerror('Get Group Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Group Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Group Failure', errInfo);
+                    });
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -375,6 +409,7 @@
             },
             // 刷新表格数据
             refresh () {
+                this.loading = true;
                 this.tableList();
             },
             columnsExcept (key) {
@@ -389,17 +424,6 @@
                 let list = []
                 list = this.tableData.splice(0, this.pageCount);
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
-            },
-            // 显示行信息
-            show (index) {
-                this.$Modal.info({
-                    title: 'User Info',
-                    content: `Username：${this.tableData[index].username}<br>
-                              Product：${this.tableData[index].product.map(item => { return item.name; })}<br>
-                              Role：${this.tableData[index].role.map(item => { return item.name; })}<br>
-                              ACL：${this.tableData[index].acl.map(item => { return item.name; })}<br>
-                              Groups：${this.tableData[index].groups.map(item => { return item.name; })}`
-                });
             },
             // 删除数据
             del () {

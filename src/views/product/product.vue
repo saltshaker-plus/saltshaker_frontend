@@ -132,7 +132,7 @@
                 pageCount: this.pageCount,
                 nSearchVal: '',
                 showBorder: true,
-                loading: false,
+                loading: true,
                 // 删除数据
                 delModal: false,
                 delId: '',
@@ -146,7 +146,18 @@
                     {
                         title: '产品线',
                         key: 'name',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Tooltip', {
+                                    props: {
+                                        content: params.row.id,
+                                        transfer: true,
+                                        placement: 'top-start'
+                                    }
+                                }, params.row.name)
+                            ]);
+                        }
                     },
                     {
                         title: '描述',
@@ -343,10 +354,20 @@
                             this.pageCount = res.data['products']['product'].length;
                             this.tableData = res.data['products']['product'];
                         } else {
-                            this.nerror('Get Failure', res.data['message']);
-                        }
+                            this.nerror('Get Product Failure', res.data['message']);
+                        };
+                        this.loading = false;
                     },
-                    err => { this.nerror('Get Failure', err.response.data['message']); });
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Product Failure', errInfo);
+                        this.loading = false;
+                    });
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -358,6 +379,7 @@
             },
             // 刷新表格数据
             refresh () {
+                this.loading = true;
                 this.tableList();
             },
             columnsExcept (key) {
