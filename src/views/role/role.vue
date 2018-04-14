@@ -9,11 +9,8 @@
             <Col span="24">
                 <Card>
                     <Row :gutter="10">
-                        <Select style="width:200px">
-                            <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                        </Select>
                         <div style="float: right;" >
-                            <Button type="primary" >创建用户</Button>
+                            <Button type="primary" @click="add('formValidate')">创建角色</Button>
                             <Button type="primary" @click="refresh()">刷新</Button>
                           </div>
                     </Row>
@@ -32,19 +29,15 @@
                                 <Button type="primary">自定义列</Button>
                                 <div slot="content">
                                   <ul>
-                                    <li v-for="(c, i) in tableColumns" v-if="i > 0" :key="i">
+                                    <li v-for="(c, i) in nColumns" v-if="i > 0" :key="i">
                                       <Checkbox :value="nColumnsExcept.indexOf(c.key) === -1" @on-change="columnsExcept(c.key)">{{ c.title }}</Checkbox>
                                     </li>
                                   </ul>
                                 </div>
                             </Poptip>
                         </div>
-                        <!--
-                        <Button type="primary" size="large" @click="exportData(2)"><Icon type="ios-download-outline"></Icon> Export sorting and filtered data</Button>
-                        <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> Export custom data</Button>
-                        -->
                         <br>
-                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="tableColumns"  stripe ref="table"></Table>
+                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
                                 <Page :total="pageCount" :current="pageCurrent" :page-size="pageSize" show-total show-elevator @on-change="changePage"></Page>
@@ -54,6 +47,23 @@
                 </Card>
             </Col>
         </Row>
+        <Modal v-model="formView" title="编辑">
+            <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
+                <FormItem label="角色名" prop="name">
+                    <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
+                </FormItem>
+                <FormItem label="描述" prop="description">
+                    <Input v-model="formValidate.description" placeholder="输入描述"></Input>
+                </FormItem>
+                <FormItem label="标识" prop="tag">
+                    <Input v-model="formValidate.tag" placeholder="输入标识"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
+                <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -76,7 +86,6 @@
         data () {
             return {
                 nLocalColExcept: [],
-                productData: this.productList(),
                 tableData: this.tableList(),
                 pageSize: 10,
                 pageCurrent: 1,
@@ -84,26 +93,35 @@
                 nSearchVal: '',
                 showBorder: true,
                 loading: false,
-                tableColumns: [
+                // 删除数据
+                delModal: false,
+                delId: '',
+                delIndex: '',
+                delName: '',
+                // 编辑数据
+                formView: false,
+                id: '',
+                optionType: '',
+                nColumns: [
                     {
-                        title: 'Name',
+                        title: '角色名',
                         key: 'name',
                         sortable: true
                     },
                     {
-                        title: 'Tag',
-                        key: 'tag',
-                        sortable: true
-                    },
-                    {
-                        title: 'Description',
+                        title: '描述',
                         key: 'description',
                         sortable: true
                     },
                     {
-                        title: 'Action',
+                        title: '标识',
+                        key: 'tag',
+                        sortable: true
+                    },
+                    {
+                        title: '操作',
                         key: 'action',
-                        width: 150,
+                        width: 123,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -117,25 +135,58 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(params.index);
+                                            this.formView = true;
+                                            this.optionType = 'edit';
+                                            this.id = params.row.id;
+                                            this.formValidate = params.row;
                                         }
                                     }
-                                }, 'View'),
-                                h('Button', {
+                                }, '编辑'),
+                                h('Poptip', {
                                     props: {
-                                        type: 'error',
-                                        size: 'small'
+                                        confirm: true,
+                                        title: '确定要删除 ' + params.row.name + ' 吗?',
+                                        transfer: true,
+                                        placement: 'top-end'
                                     },
                                     on: {
-                                        click: () => {
-                                            this.remove(params.index, params.row.id);
+                                        'on-ok': () => {
+                                            this.delModal = true;
+                                            this.delId = params.row.id;
+                                            this.delIndex = params.index;
+                                            this.del();
                                         }
                                     }
-                                }, 'Delete')
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'error',
+                                            size: 'small'
+                                        }
+                                    }, '删除')
+                                ])
                             ]);
                         }
                     }
-                ]
+                ],
+                // 表单验证
+                formValidate: {
+                    name: '',
+                    description: '',
+                    tag: ''
+                },
+                ruleValidate: {
+                    name: [
+                        { required: true, message: '角色名不能为空', trigger: 'blur' }
+                    ],
+                    description: [
+                        { required: true, message: '描述不能为空', trigger: 'blur' }
+                    ],
+                    tag: [
+                        { required: true, message: '标识不能为空', trigger: 'blur' }
+
+                    ]
+                }
             };
         },
         props: {
@@ -148,26 +199,22 @@
             nData: {
                 type: Array,
                 require: true
-            },
-            nColumns: {
-                type: Array,
-                required: true
-            }
-        },
-        computed: {
-            nColumnsExcept () {
-                return this.nColExcept || this.nLocalColExcept;
             }
         },
         watch: {
             nData () {
                 this.nInit();
+            }
+        },
+        computed: {
+            nColumnsExcept () {
+                return this.nColExcept || this.nLocalColExcept;
             },
-            currentPage () {
-                this.getPageData();
-            },
-            nSortData () {
-                this.getPageData();
+            // 过滤列
+            filterColumns () {
+                return this.nColumns.filter(x => {
+                    return this.nColumnsExcept.indexOf(x.key) === -1;
+                });
             }
         },
         methods: {
@@ -176,49 +223,15 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['roles']['role'];
                             this.pageCount = res.data['roles']['role'].length;
+                            this.tableData = res.data['roles']['role'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nerror('Get Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get User Failure', err); });
+                    err => { this.nerror('Get Failure', err.response.data['message']); });
             },
-            productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
-                        } else {
-                            this.nerror('Get Product Failure', res.data['message']);
-                        }
-                    },
-                    err => { this.nerror('Get Product Failure', err); });
-            },
-            success (info) {
-                this.$Message.success(info);
-            },
-            warning (info) {
-                this.$Message.warning(info);
-            },
-            error (info) {
-                this.$Message.error(info);
-            },
-            nsuccess (title, info) {
-                this.$Notice.success({
-                    title: title,
-                    desc: info,
-                    duration: 10
-                });
-            },
-            nwarning (title, info) {
-                this.$Notice.warning({
-                    title: title,
-                    desc: info,
-                    duration: 10
-                });
-            },
+            // 重新定义错误消息
             nerror (title, info) {
                 this.$Notice.error({
                     title: title,
@@ -226,6 +239,7 @@
                     duration: 10
                 });
             },
+            // 刷新表格数据
             refresh () {
                 this.tableList();
             },
@@ -237,30 +251,33 @@
                     this.nColumnsExcept.splice(index, 1);
                 }
             },
-            changePage () {
-                this.tableData = this.tableList();
+            changePage (page) {
+                let list = [];
+                list = this.tableData.splice(0, this.pageCount);
+                this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
-            show (index) {
-                this.$Modal.info({
-                    title: 'Role Info',
-                    content: `Name：${this.tableData[index].name}<br>
-                              Tag：${this.tableData[index].tag}<br>
-                              Description：${this.tableData[index].description}`
-                });
-            },
-            remove (index, id) {
+            // 删除数据
+            del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + id).then(
+                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/role/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData.splice(index, 1);
-                            this.success('Delete Success');
+                            this.tableData.splice(this.delIndex, 1);
+                            this.$Message.success('删除成功！');
+                            this.tableList();
                         } else {
                             this.nerror('Delete Failure', res.data['message']);
                         }
                     },
                     err => { this.nerror('Delete Failure', err); });
+                this.delModal = false;
             },
+            add (name) {
+                this.$refs[name].resetFields();
+                this.optionType = 'add';
+                this.formView = true;
+            },
+            // 导出表格数据
             exportData (type) {
                 if (type === 1) {
                     this.$refs.table.exportCsv({
@@ -275,14 +292,14 @@
                 } else if (type === 3) {
                     this.$refs.table.exportCsv({
                         filename: 'Custom data',
-                        columns: this.tableColumns.filter((col, index) => index < 4),
+                        columns: this.nColumns.filter((col, index) => index < 4),
                         data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
             },
             nInit () {
                 if (this.selectFlag()) {
-                    this.tableData.unshift({
+                    this.nColumns.unshift({
                         title: '',
                         key: 'checked',
                         width: 60,
@@ -312,7 +329,7 @@
             },
             selectFlag () {
                 if (this.nSelected) {
-                    for (let v of this.tableColumns) {
+                    for (let v of this.nColumns) {
                         if (v.key === 'checked') {
                             return false;
                         }
@@ -327,9 +344,7 @@
             },
             getFilterData () {
                 let searchVal = this.nSearchVal;
-                console.log(searchVal)
-                console.log(this.nData)
-                let data = nCopy(this.nData);
+                let data = nCopy(this.tableData);
                 if (this.nSortData) {
                     let key = this.nSortData.key;
                     let order = this.nSortData.order;
@@ -343,8 +358,8 @@
                 if (this.nSearchVal) {
                     let ret = [];
                     data.map(x => {
-                        for (let i in this.tableColumns) {
-                            let key = this.tableColumns[i].key;
+                        for (let i in this.nColumns) {
+                            let key = this.nColumns[i].key;
                             if (x[key] && (x[key] + '').indexOf(searchVal) >= 0) {
                                 ret.push(x);
                                 break;
@@ -357,11 +372,54 @@
             },
             getPageData () {
                 this.tableData = this.getFilterData();
-                let data = nCopy(this.tableData);
+                let data = this.tableData;
                 this.tableData = data.splice((this.pageCurrent - 1) * this.pageSize, this.pageSize);
+            },
+            // 表单提交及重置
+            handleSubmit (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.axios.defaults.withCredentials = true; // 带着cookie
+                        // 编辑
+                        if (this.optionType === 'edit') {
+                            this.axios.put('http://192.168.44.128:5000/saltshaker/api/v1.0/role/' + this.id,
+                                this.formValidate).then(
+                                res => {
+                                    if (res.data['status'] === true) {
+                                        this.formView = false;
+                                        this.$Message.success('成功！');
+                                        this.tableList();
+                                    } else {
+                                        this.nerror('Edit Failure', res.data['message']);
+                                    }
+                                },
+                                err => { this.nerror('Edit Failure', err.response.data['message']); });
+                        } else {
+                            // 添加
+                            this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/role',
+                                this.formValidate).then(
+                                res => {
+                                    if (res.data['status'] === true) {
+                                        this.formView = false;
+                                        this.$Message.success('成功！');
+                                        this.tableList();
+                                    } else {
+                                        this.nerror('Add Failure', res.data['message']);
+                                    }
+                                },
+                                err => { this.nerror('Add Failure', err.response.data['message']); });
+                        }
+                    } else {
+                        this.$Message.error('请检查表单数据！');
+                    }
+                });
+            },
+            handleReset (name) {
+                this.$refs[name].resetFields();
             }
         },
         created () {
+            this.tableList();
             this.nInit();
         }
     };

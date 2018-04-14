@@ -343,10 +343,10 @@
                             this.pageCount = res.data['products']['product'].length;
                             this.tableData = res.data['products']['product'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nerror('Get Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get User Failure', err.response.data['message']); });
+                    err => { this.nerror('Get Failure', err.response.data['message']); });
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -514,10 +514,10 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Edit User Failure', res.data['message']);
+                                        this.nerror('Edit Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Edit User Failure', err.response.data['message']); });
+                                err => { this.nerror('Edit Failure', err.response.data['message']); });
                         } else {
                             // 添加
                             this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/product',
@@ -528,10 +528,10 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Add User Failure', res.data['message']);
+                                        this.nerror('Add Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Add User Failure', err.response.data['message']); });
+                                err => { this.nerror('Add Failure', err.response.data['message']); });
                         }
                     } else {
                         this.$Message.error('请检查表单数据！');
