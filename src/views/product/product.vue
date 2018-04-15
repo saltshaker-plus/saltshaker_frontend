@@ -19,7 +19,7 @@
                     </Row>
                     <Row :gutter="10">
                         <div style="float: right;">
-                            <Input v-model.trim="nSearchVal" @on-change="search">
+                            <Input v-model.trim="nSearchVal">
                                 <Button slot="append" icon="ios-search"></Button>
                             </Input>
                         </div>
@@ -70,15 +70,6 @@
                 </Card>
             </Col>
         </Row>
-        <Modal
-            v-model="delModal"
-            title="删除确认"
-            width=300>
-            <p style="text-align:center">确认删除 <b>{{delName}}</b> 吗？</p>
-            <div slot="footer">
-                <Button type="error" size="large" long @click="del">删除</Button>
-            </div>
-        </Modal>
         <Modal v-model="formView" :title="optionTypeName">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="125">
                 <FormItem label="产品线名" prop="name">
@@ -156,10 +147,8 @@
                 showBorder: true,
                 loading: true,
                 // 删除数据
-                delModal: false,
                 delId: '',
                 delIndex: '',
-                delName: '',
                 // 编辑数据
                 formView: false,
                 id: '',
@@ -267,7 +256,6 @@
                                     },
                                     on: {
                                         'on-ok': () => {
-                                            this.delModal = true;
                                             this.delId = params.row.id;
                                             this.delIndex = params.index;
                                             this.del();
@@ -386,7 +374,6 @@
                             errInfo = err;
                         }
                         this.nerror('Get Product Failure', errInfo);
-                        this.loading = false;
                     });
             },
             // 重新定义错误消息
@@ -429,8 +416,15 @@
                             this.nerror('Delete Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Delete Failure', err); });
-                this.delModal = false;
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Delete Failure', errInfo);
+                    });
             },
             add (name) {
                 this.$refs[name].resetFields();
@@ -483,7 +477,15 @@
                                         this.nerror('Edit Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Edit Failure', err.response.data['message']); });
+                                err => {
+                                    let errInfo = '';
+                                    try {
+                                        errInfo = err.response.data['message'];
+                                    } catch (error) {
+                                        errInfo = err;
+                                    }
+                                    this.nerror('Edit Failure', errInfo);
+                                });
                         } else {
                             // 添加
                             this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/product',
@@ -497,7 +499,15 @@
                                         this.nerror('Add Failure', res.data['message']);
                                     }
                                 },
-                                err => { this.nerror('Add Failure', err.response.data['message']); });
+                                err => {
+                                    let errInfo = '';
+                                    try {
+                                        errInfo = err.response.data['message'];
+                                    } catch (error) {
+                                        errInfo = err;
+                                    }
+                                    this.nerror('Add Failure', errInfo);
+                                });
                         }
                     } else {
                         this.$Message.error('请检查表单数据！');
@@ -507,10 +517,6 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             }
-        },
-        created () {
-            this.tableList();
-            this.nInit();
         }
     };
 </script>

@@ -94,10 +94,8 @@
                 showBorder: true,
                 loading: true,
                 // 删除数据
-                delModal: false,
                 delId: '',
                 delIndex: '',
-                delName: '',
                 // 编辑数据
                 formView: false,
                 id: '',
@@ -163,7 +161,6 @@
                                     },
                                     on: {
                                         'on-ok': () => {
-                                            this.delModal = true;
                                             this.delId = params.row.id;
                                             this.delIndex = params.index;
                                             this.del();
@@ -301,7 +298,6 @@
                         }
                         this.nerror('Delete Failure', errInfo);
                     });
-                this.delModal = false;
             },
             add (name) {
                 this.$refs[name].resetFields();
