@@ -132,7 +132,7 @@ export const appRouter = [
         title: 'ACL管理',
         component: Main,
         children: [
-            { path: '', title: 'ACL管理', name: 'acl', icon: 'funnel', component: () => import('@/views/user/user.vue') }
+            { path: '', title: 'ACL管理', name: 'acl', icon: 'funnel', component: () => import('@/views/acl/acl.vue') }
         ]
     },
     {
