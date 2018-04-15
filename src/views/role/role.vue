@@ -47,7 +47,7 @@
                 </Card>
             </Col>
         </Row>
-        <Modal v-model="formView" title="编辑">
+        <Modal v-model="formView" :title="optionTypeName">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
                 <FormItem label="角色名" prop="name">
                     <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
@@ -148,6 +148,7 @@
                                         click: () => {
                                             this.formView = true;
                                             this.optionType = 'edit';
+                                            this.optionTypeName = '编辑';
                                             this.id = params.row.id;
                                             this.formValidate = params.row;
                                         }
@@ -305,6 +306,7 @@
             add (name) {
                 this.$refs[name].resetFields();
                 this.optionType = 'add';
+                this.optionTypeName = '添加';
                 this.formView = true;
             },
             // 导出表格数据

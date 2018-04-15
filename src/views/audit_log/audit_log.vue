@@ -14,7 +14,7 @@
                         </Select>
                         <div style="float: right;" >
                             <Button type="primary" @click="refresh()">刷新</Button>
-                          </div>
+                        </div>
                     </Row>
                     <Row>
                         <hr class="hr-margin" color="#e3e8ee" size="0.5">
@@ -37,6 +37,29 @@
                                   </ul>
                                 </div>
                             </Poptip>
+                            <Dropdown>
+                                <Button type="primary">
+                                    显示条数
+                                    <Icon type="arrow-down-b"></Icon>
+                                </Button>
+                                <DropdownMenu slot="list">
+                                    <DropdownItem>
+                                        <div @click="customPage(5)">5</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(10)">10</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(50)">50</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(100)">100</div>
+                                    </DropdownItem>
+                                    <DropdownItem divided>
+                                        <div @click="customPage(pageCount)">全部</div>
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
                         </div>
                         <br>
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
@@ -80,6 +103,7 @@
                 nSearchVal: '',
                 showBorder: true,
                 loading: true,
+                nData: [],
                 nColumns: [
                     {
                         title: '用户',
@@ -114,25 +138,12 @@
                 ]
             };
         },
-        props: {
-            nSelected: {
-                type: Array
-            },
-            nColExcept: {
-                type: Array
-            },
-            nData: {
-                type: Array,
-                require: true
-            }
-        },
         watch: {
-            nData () {
-                this.nInit();
-            },
             // 监控产品线变化
             productId () {
                 this.loading = true;
+                this.pageCurrent = 1;
+                this.pageSize = 10;
                 this.tableList();
             }
         },
@@ -148,15 +159,27 @@
             }
         },
         methods: {
+            // 更改显示条数
+            customPage (num) {
+                this.pageSize = num;
+                let list = [];
+                list = nCopy(this.nData);
+                list.splice(this.pageSize, this.pageCount);
+                this.tableData = list;
+                // 初始化到第一页
+                this.pageCurrent = 1;
+            },
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/log?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.pageCount = res.data['audit_logs']['audit_log'].length;
                             this.tableData = res.data['audit_logs']['audit_log'];
+                            this.pageCount = this.tableData.length;
+                            this.nData = nCopy(this.tableData);
+                            this.tableData.splice(this.pageSize, this.pageCount);
                         } else {
-                            this.nerror('Get Failure', res.data['message']);
+                            this.nerror('Get Log Failure', res.data['message']);
                         };
                         this.loading = false;
                     },
@@ -215,7 +238,8 @@
             },
             changePage (page) {
                 let list = [];
-                list = this.tableData.splice(0, this.pageCount);
+                list = nCopy(this.nData);
+                this.pageCurrent = page;
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
             // 导出表格数据
@@ -238,84 +262,6 @@
                     });
                 }
             },
-            nInit () {
-                if (this.selectFlag()) {
-                    this.nColumns.unshift({
-                        title: '',
-                        key: 'checked',
-                        width: 60,
-                        render: (h, params) => {
-                            return h('Checkbox', {
-                                props: {
-                                    value: this.nSelected.indexOf(params.row.index) >= 0
-                                },
-                                on: {
-                                    'on-change': (value) => {
-                                        if (value) {
-                                            this.nSelected.push(params.row.index);
-                                        } else {
-                                            let i = this.nSelected.indexOf(params.row.index);
-                                            if (i >= 0) {
-                                                this.nSelected.splice(i, 1);
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-                this.pageCurrent = 1;
-                this.getPageData();
-            },
-            selectFlag () {
-                if (this.nSelected) {
-                    for (let v of this.nColumns) {
-                        if (v.key === 'checked') {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            },
-            search () {
-                this.pageCurrent = 1;
-                this.getPageData();
-            },
-            getFilterData () {
-                let searchVal = this.nSearchVal;
-                let data = nCopy(this.tableData);
-                if (this.nSortData) {
-                    let key = this.nSortData.key;
-                    let order = this.nSortData.order;
-                    if (this.nSortData.order === 'normal') {
-                        this.nSortData = null;
-                    } else {
-                        let func = sortString(key, order);
-                        data.sort(func);
-                    }
-                }
-                if (this.nSearchVal) {
-                    let ret = [];
-                    data.map(x => {
-                        for (let i in this.nColumns) {
-                            let key = this.nColumns[i].key;
-                            if (x[key] && (x[key] + '').indexOf(searchVal) >= 0) {
-                                ret.push(x);
-                                break;
-                            }
-                        }
-                    });
-                    return ret;
-                }
-                return data;
-            },
-            getPageData () {
-                this.tableData = this.getFilterData();
-                let data = this.tableData;
-                this.tableData = data.splice((this.pageCurrent - 1) * this.pageSize, this.pageSize);
-            }
         }
     };
 </script>

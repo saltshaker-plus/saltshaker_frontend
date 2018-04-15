@@ -35,13 +35,35 @@
                                   </ul>
                                 </div>
                             </Poptip>
+                            <Dropdown>
+                                <Button type="primary">
+                                    显示条数
+                                    <Icon type="arrow-down-b"></Icon>
+                                </Button>
+                                <DropdownMenu slot="list">
+                                    <DropdownItem>
+                                        <div @click="customPage(5)">5</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(10)">10</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(50)">50</div>
+                                    </DropdownItem>
+                                    <DropdownItem>
+                                        <div @click="customPage(100)">100</div>
+                                    </DropdownItem>
+                                    <DropdownItem divided>
+                                        <div @click="customPage(pageCount)">全部</div>
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
                         </div>
                         <br>
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
                         <div style="margin:10px 0px 10px 10px;overflow: hidden">
                             <div style="float: right;">
                                 <Page :total="pageCount" :current="pageCurrent" :page-size="pageSize" show-total show-elevator @on-change="changePage"></Page>
-                                <!--<Page :total="nFilterData.length" :current="nPage.current" :page-size="nPage.size" @on-change="changePage" show-total ></Page>-->
                             </div>
                         </div>
                     </Row>
@@ -57,7 +79,7 @@
                 <Button type="error" size="large" long @click="del">删除</Button>
             </div>
         </Modal>
-        <Modal v-model="formView" title="编辑">
+        <Modal v-model="formView" :title="optionTypeName">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="125">
                 <FormItem label="产品线名" prop="name">
                     <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
@@ -142,6 +164,8 @@
                 formView: false,
                 id: '',
                 optionType: '',
+                optionTypeName: '',
+                nData: [],
                 nColumns: [
                     {
                         title: '产品线',
@@ -228,6 +252,7 @@
                                         click: () => {
                                             this.formView = true;
                                             this.optionType = 'edit';
+                                            this.optionTypeName = '编辑';
                                             this.id = params.row.id;
                                             this.formValidate = params.row;
                                         }
@@ -317,23 +342,6 @@
                 }
             };
         },
-        props: {
-            nSelected: {
-                type: Array
-            },
-            nColExcept: {
-                type: Array
-            },
-            nData: {
-                type: Array,
-                require: true
-            }
-        },
-        watch: {
-            nData () {
-                this.nInit();
-            }
-        },
         computed: {
             nColumnsExcept () {
                 return this.nColExcept || this.nLocalColExcept;
@@ -346,13 +354,25 @@
             }
         },
         methods: {
+            // 更改显示条数
+            customPage (num) {
+                this.pageSize = num;
+                let list = [];
+                list = nCopy(this.nData);
+                list.splice(this.pageSize, this.pageCount);
+                this.tableData = list;
+                // 初始化到第一页
+                this.pageCurrent = 1;
+            },
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.pageCount = res.data['products']['product'].length;
                             this.tableData = res.data['products']['product'];
+                            this.pageCount = this.tableData.length;
+                            this.nData = nCopy(this.tableData);
+                            this.tableData.splice(this.pageSize, this.pageCount);
                         } else {
                             this.nerror('Get Product Failure', res.data['message']);
                         };
@@ -392,7 +412,8 @@
             },
             changePage (page) {
                 let list = [];
-                list = this.tableData.splice(0, this.pageCount);
+                list = nCopy(this.nData);
+                this.pageCurrent = page;
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
             // 删除数据
@@ -414,6 +435,7 @@
             add (name) {
                 this.$refs[name].resetFields();
                 this.optionType = 'add';
+                this.optionTypeName = '添加';
                 this.formView = true;
             },
             // 导出表格数据
@@ -435,84 +457,6 @@
                         data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
-            },
-            nInit () {
-                if (this.selectFlag()) {
-                    this.nColumns.unshift({
-                        title: '',
-                        key: 'checked',
-                        width: 60,
-                        render: (h, params) => {
-                            return h('Checkbox', {
-                                props: {
-                                    value: this.nSelected.indexOf(params.row.index) >= 0
-                                },
-                                on: {
-                                    'on-change': (value) => {
-                                        if (value) {
-                                            this.nSelected.push(params.row.index);
-                                        } else {
-                                            let i = this.nSelected.indexOf(params.row.index);
-                                            if (i >= 0) {
-                                                this.nSelected.splice(i, 1);
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-                this.pageCurrent = 1;
-                this.getPageData();
-            },
-            selectFlag () {
-                if (this.nSelected) {
-                    for (let v of this.nColumns) {
-                        if (v.key === 'checked') {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-                return false;
-            },
-            search () {
-                this.pageCurrent = 1;
-                this.getPageData();
-            },
-            getFilterData () {
-                let searchVal = this.nSearchVal;
-                let data = nCopy(this.tableData);
-                if (this.nSortData) {
-                    let key = this.nSortData.key;
-                    let order = this.nSortData.order;
-                    if (this.nSortData.order === 'normal') {
-                        this.nSortData = null;
-                    } else {
-                        let func = sortString(key, order);
-                        data.sort(func);
-                    }
-                }
-                if (this.nSearchVal) {
-                    let ret = [];
-                    data.map(x => {
-                        for (let i in this.nColumns) {
-                            let key = this.nColumns[i].key;
-                            if (x[key] && (x[key] + '').indexOf(searchVal) >= 0) {
-                                ret.push(x);
-                                break;
-                            }
-                        }
-                    });
-                    return ret;
-                }
-                return data;
-            },
-            getPageData () {
-                this.tableData = this.getFilterData();
-                let data = this.tableData;
-                this.tableData = data.splice((this.pageCurrent - 1) * this.pageSize, this.pageSize);
             },
             // 表单提交及重置
             handleSubmit (name) {
