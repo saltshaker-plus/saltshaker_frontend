@@ -310,10 +310,10 @@
             },
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
+                this.axios.get(this.Global.serverSrc + 'user').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['users']['user'];
+                            this.tableData = res.data['data'];
                             this.pageCount = this.tableData.length;
                             this.nData = nCopy(this.tableData);
                             this.tableData.splice(this.pageSize, this.pageCount);
@@ -335,11 +335,11 @@
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
-                            this.userInfo.product = res.data['products']['product'];
+                            this.productData = res.data['data'];
+                            this.userInfo.product = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -356,10 +356,10 @@
             },
             roleList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
+                this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.role = res.data['roles']['role'];
+                            this.userInfo.role = res.data['data'];
                         } else {
                             this.nerror('Get Role Failure', res.data['message']);
                         }
@@ -374,12 +374,12 @@
                         this.nerror('Get Role Failure', errInfo);
                     });
             },
-            alcList () {
+            alcList (productId) {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl').then(
+                this.axios.get(this.Global.serverSrc + 'acl?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.acl = res.data['acls']['acl'];
+                            this.userInfo.acl = res.data['data'];
                         } else {
                             this.nerror('Get ACL Failure', res.data['message']);
                         }
@@ -396,10 +396,10 @@
             },
             groupList (productId) {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/groups?product_id=' + productId).then(
+                this.axios.get(this.Global.serverSrc + 'groups?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.groups = res.data['groups']['group'];
+                            this.userInfo.groups = res.data['data'];
                         } else {
                             this.nerror('Get Group Failure', res.data['message']);
                         }
@@ -450,7 +450,7 @@
             // 删除数据
             del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + this.delId).then(
+                this.axios.delete(this.Global.serverSrc + 'user/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData.splice(this.delIndex, 1);
@@ -501,7 +501,7 @@
                         this.axios.defaults.withCredentials = true; // 带着cookie
                         // 编辑
                         if (this.optionType === 'edit') {
-                            this.axios.put('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + this.id,
+                            this.axios.put(this.Global.serverSrc + 'user/' + this.id,
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {
@@ -523,7 +523,7 @@
                                 });
                         } else {
                             // 添加
-                            this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/user',
+                            this.axios.post(this.Global.serverSrc + 'user',
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {

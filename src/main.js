@@ -10,7 +10,9 @@ import VueI18n from 'vue-i18n';
 import util from './libs/util';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
+import global from './config/Global.vue';
 
+Vue.prototype.Global = global;
 Vue.use(VueAxios, axios);
 
 Vue.use(VueI18n);

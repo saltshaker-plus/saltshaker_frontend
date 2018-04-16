@@ -316,7 +316,7 @@
         methods: {
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
+                this.axios.get(this.Global.serverSrc + 'user').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.pageCount = res.data['data'].length;
@@ -329,7 +329,7 @@
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
@@ -342,7 +342,7 @@
             },
             roleList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
+                this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.userInfo.role = res.data['data'];
@@ -354,7 +354,7 @@
             },
             alcList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl').then(
+                this.axios.get(this.Global.serverSrc + 'acl').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.userInfo.acl = res.data['data'];
@@ -366,7 +366,7 @@
             },
             groupList (productId) {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/groups?product_id=' + productId).then(
+                this.axios.get(this.Global.serverSrc + 'groups?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.userInfo.groups = res.data['data'];
@@ -415,7 +415,7 @@
             // 删除数据
             del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/user/' + this.delId).then(
+                this.axios.delete(this.Global.serverSrc + 'user/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData.splice(this.delIndex, 1);

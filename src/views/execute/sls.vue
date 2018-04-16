@@ -76,7 +76,7 @@
         methods: {
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['products']['product'];
@@ -98,7 +98,7 @@
             },
             branch () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/gitlab/branch?product_id=' + this.productId + '&project_type=state_project').then(
+                this.axios.get(this.Global.serverSrc + 'gitlab/branch?product_id=' + this.productId + '&project_type=state_project').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.branchData = res.data['branchs']['branch'];
@@ -119,7 +119,7 @@
             },
             file () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/gitlab/file?product_id=' + this.productId + '&project_type=state_project&path=/&branch=' + this.branchName).then(
+                this.axios.get(this.Global.serverSrc + 'gitlab/file?product_id=' + this.productId + '&project_type=state_project&path=/&branch=' + this.branchName).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.fileTree = res.data['files']['file'];

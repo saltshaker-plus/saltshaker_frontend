@@ -229,7 +229,7 @@
         methods: {
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
+                this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.pageCount = res.data['data'].length;
@@ -279,7 +279,7 @@
             // 删除数据
             del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/role/' + this.delId).then(
+                this.axios.delete(this.Global.serverSrc + 'role/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData.splice(this.delIndex, 1);
@@ -410,7 +410,7 @@
                         this.axios.defaults.withCredentials = true; // 带着cookie
                         // 编辑
                         if (this.optionType === 'edit') {
-                            this.axios.put('http://192.168.44.128:5000/saltshaker/api/v1.0/role/' + this.id,
+                            this.axios.put(this.Global.serverSrc + 'role/' + this.id,
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {
@@ -432,7 +432,7 @@
                                 });
                         } else {
                             // 添加
-                            this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/role',
+                            this.axios.post(this.Global.serverSrc + 'role',
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {

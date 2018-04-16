@@ -171,7 +171,7 @@
             },
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/log?product_id=' + this.productId).then(
+                this.axios.get(this.Global.serverSrc + 'log?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData = res.data['data'];
@@ -201,7 +201,7 @@
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];

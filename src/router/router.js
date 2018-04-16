@@ -90,7 +90,7 @@ export const appRouter = [
         title: '分组管理',
         component: Main,
         children: [
-            { path: 'group', title: '分组管理', name: 'group_index', component: () => import('@/views/role/role.vue') }
+            { path: 'group', title: '分组管理', name: 'group_index', component: () => import('@/views/groups/groups.vue') }
         ]
     },
     {

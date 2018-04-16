@@ -326,7 +326,7 @@
             },
             tableList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl?product_id=' + this.productId).then(
+                this.axios.get(this.Global.serverSrc + 'acl?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData = res.data['data'];
@@ -356,7 +356,7 @@
             },
             productList () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
+                this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
@@ -412,7 +412,7 @@
             // 删除数据
             del () {
                 this.axios.defaults.withCredentials = true; // 带着cookie
-                this.axios.delete('http://192.168.44.128:5000/saltshaker/api/v1.0/acl/' + this.delId).then(
+                this.axios.delete(this.Global.serverSrc + 'acl/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.tableData.splice(this.delIndex, 1);
@@ -472,7 +472,7 @@
                             'deny': this.formValidate.deny.split('\n')
                         };
                         if (this.optionType === 'edit') {
-                            this.axios.put('http://192.168.44.128:5000/saltshaker/api/v1.0/acl/' + this.id,
+                            this.axios.put(this.Global.serverSrc + 'acl/' + this.id,
                                 postData).then(
                                 res => {
                                     if (res.data['status'] === true) {
@@ -494,7 +494,7 @@
                                 });
                         } else {
                             // 添加
-                            this.axios.post('http://192.168.44.128:5000/saltshaker/api/v1.0/acl',
+                            this.axios.post(this.Global.serverSrc + 'acl',
                                 postData).then(
                                 res => {
                                     if (res.data['status'] === true) {
