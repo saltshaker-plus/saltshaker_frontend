@@ -174,7 +174,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/log?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['audit_logs']['audit_log'];
+                            this.tableData = res.data['data'];
                             this.pageCount = this.tableData.length;
                             this.nData = nCopy(this.tableData);
                             this.tableData.splice(this.pageSize, this.pageCount);
@@ -187,10 +187,15 @@
                         let errInfo = '';
                         try {
                             errInfo = err.response.data['message'];
+                            if (err.response.status === 404) {
+                                this.tableData = [];
+                            } else {
+                                this.nerror('Get Log Failure', errInfo);
+                            }
                         } catch (error) {
                             errInfo = err;
+                            this.nerror('Get Log Failure', errInfo);
                         }
-                        this.nerror('Get Log Failure', errInfo);
                         this.loading = false;
                     });
             },
@@ -199,7 +204,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
+                            this.productData = res.data['data'];
                             this.productId = this.productData[0].id;
                         } else {
                             this.nerror('Get Product Failure', res.data['message']);

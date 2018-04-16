@@ -232,8 +232,8 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.pageCount = res.data['roles']['role'].length;
-                            this.tableData = res.data['roles']['role'];
+                            this.pageCount = res.data['data'].length;
+                            this.tableData = res.data['data'];
                         } else {
                             this.nerror('Get Role Failure', res.data['message']);
                         };

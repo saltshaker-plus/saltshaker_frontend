@@ -357,7 +357,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['products']['product'];
+                            this.tableData = res.data['data'];
                             this.pageCount = this.tableData.length;
                             this.nData = nCopy(this.tableData);
                             this.tableData.splice(this.pageSize, this.pageCount);

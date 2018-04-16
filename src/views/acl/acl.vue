@@ -11,7 +11,7 @@
                     <Row :gutter="10">
                         <Select style="width:200px" v-model="productId">
                                 <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                            </Select>
+                        </Select>
                         <div style="float: right;" >
                             <Button type="primary" @click="add('formValidate')">创建ACL</Button>
                             <Button type="primary" @click="refresh()">刷新</Button>
@@ -81,6 +81,11 @@
                 <FormItem label="描述" prop="description">
                     <Input v-model="formValidate.description" placeholder="输入描述"></Input>
                 </FormItem>
+                <FormItem label="产品线" prop="productId">
+                    <Select v-model="formValidate.productId" placeholder="选择产品线">
+                        <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                    </Select>
+                </FormItem>
                 <FormItem label="允许" prop="allow">
                     <Input v-model="formValidate.allow" type="textarea" :autosize="{minRows: 2,maxRows: 5}"  placeholder="输入允许信息"></Input>
                 </FormItem>
@@ -115,7 +120,7 @@
         data () {
             return {
                 nLocalColExcept: [],
-                tableData: this.tableList(),
+                tableData: [],
                 productData: this.productList(),
                 productId: '',
                 pageSize: 10,
@@ -234,6 +239,7 @@
                                             this.id = params.row.id;
                                             this.formValidate.name = params.row.name;
                                             this.formValidate.description = params.row.description;
+                                            this.formValidate.productId = params.row.product_id;
                                             this.formValidate.allow = params.row.allow.join('\n');
                                             this.formValidate.deny = params.row.deny.join('\n');
                                         }
@@ -269,6 +275,7 @@
                 formValidate: {
                     name: '',
                     description: '',
+                    productId: '',
                     allow: '',
                     deny: ''
 
@@ -279,6 +286,9 @@
                     ],
                     description: [
                         { required: true, message: '描述不能为空', trigger: 'blur' }
+                    ],
+                    productId: [
+                        { required: true, message: '产品线不能为空', trigger: 'change' }
                     ]
                 }
             };
@@ -319,7 +329,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.tableData = res.data['acls']['acl'];
+                            this.tableData = res.data['data'];
                             this.pageCount = this.tableData.length;
                             this.nData = nCopy(this.tableData);
                             this.tableData.splice(this.pageSize, this.pageCount);
@@ -332,10 +342,15 @@
                         let errInfo = '';
                         try {
                             errInfo = err.response.data['message'];
+                            if (err.response.status === 404) {
+                                this.tableData = [];
+                            } else {
+                                this.nerror('Get ACL Failure', errInfo);
+                            }
                         } catch (error) {
                             errInfo = err;
+                            this.nerror('Get ACL Failure', errInfo);
                         }
-                        this.nerror('Get ACL Failure', errInfo);
                         this.loading = false;
                     });
             },
@@ -344,7 +359,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
+                            this.productData = res.data['data'];
                             this.productId = this.productData[0].id;
                         } else {
                             this.nerror('Get Product Failure', res.data['message']);
@@ -363,6 +378,13 @@
             // 重新定义错误消息
             nerror (title, info) {
                 this.$Notice.error({
+                    title: title,
+                    desc: info,
+                    duration: 10
+                });
+            },
+            ninfo (title, info) {
+                this.$Notice.info({
                     title: title,
                     desc: info,
                     duration: 10
@@ -445,6 +467,7 @@
                         let postData = {
                             'name': this.formValidate.name,
                             'description': this.formValidate.description,
+                            'product_id': this.formValidate.productId,
                             'allow': this.formValidate.allow.split('\n'),
                             'deny': this.formValidate.deny.split('\n')
                         };

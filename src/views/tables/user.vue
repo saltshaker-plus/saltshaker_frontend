@@ -319,8 +319,8 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/user').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.pageCount = res.data['users']['user'].length;
-                            this.tableData = res.data['users']['user'];
+                            this.pageCount = res.data['data'].length;
+                            this.tableData = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -332,8 +332,8 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
-                            this.userInfo.product = res.data['products']['product'];
+                            this.productData = res.data['data'];
+                            this.userInfo.product = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -345,7 +345,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/role').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.role = res.data['roles']['role'];
+                            this.userInfo.role = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -357,7 +357,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/acl').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.acl = res.data['acls']['acl'];
+                            this.userInfo.acl = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
@@ -369,7 +369,7 @@
                 this.axios.get('http://192.168.44.128:5000/saltshaker/api/v1.0/groups?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.userInfo.groups = res.data['groups']['group'];
+                            this.userInfo.groups = res.data['data'];
                         } else {
                             this.nerror('Get User Failure', res.data['message']);
                         }
