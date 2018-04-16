@@ -353,7 +353,6 @@
                 this.pageCurrent = 1;
             },
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -405,7 +404,6 @@
             },
             // 删除数据
             del () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.delete(this.Global.serverSrc + 'product/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -456,7 +454,6 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.axios.defaults.withCredentials = true; // 带着cookie
                         if (this.formValidate.file_server === 'rsync') {
                             this.formValidate.gitlab_url = '';
                             this.formValidate.api_version = '';

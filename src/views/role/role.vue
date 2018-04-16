@@ -228,7 +228,6 @@
         },
         methods: {
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -278,7 +277,6 @@
             },
             // 删除数据
             del () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.delete(this.Global.serverSrc + 'role/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -407,7 +405,6 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.axios.defaults.withCredentials = true; // 带着cookie
                         // 编辑
                         if (this.optionType === 'edit') {
                             this.axios.put(this.Global.serverSrc + 'role/' + this.id,

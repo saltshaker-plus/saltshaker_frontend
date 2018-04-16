@@ -18,6 +18,9 @@ Vue.use(VueAxios, axios);
 Vue.use(VueI18n);
 Vue.use(iView);
 
+// axios带着cookie 请求
+axios.defaults.withCredentials = true;
+
 new Vue({
     el: '#app',
     router: router,

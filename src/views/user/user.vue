@@ -309,7 +309,6 @@
                 this.pageCurrent = 1;
             },
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'user').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -334,7 +333,6 @@
                     });
             },
             productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -355,7 +353,6 @@
                     });
             },
             roleList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -375,7 +372,6 @@
                     });
             },
             alcList (productId) {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'acl?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -395,7 +391,6 @@
                     });
             },
             groupList (productId) {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'groups?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -449,7 +444,6 @@
             },
             // 删除数据
             del () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.delete(this.Global.serverSrc + 'user/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -498,7 +492,6 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.axios.defaults.withCredentials = true; // 带着cookie
                         // 编辑
                         if (this.optionType === 'edit') {
                             this.axios.put(this.Global.serverSrc + 'user/' + this.id,

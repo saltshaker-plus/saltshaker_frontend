@@ -75,7 +75,6 @@
         },
         methods: {
             productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -97,7 +96,6 @@
                     });
             },
             branch () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'gitlab/branch?product_id=' + this.productId + '&project_type=state_project').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -118,7 +116,6 @@
                     });
             },
             file () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'gitlab/file?product_id=' + this.productId + '&project_type=state_project&path=/&branch=' + this.branchName).then(
                     res => {
                         if (res.data['status'] === true) {

@@ -325,7 +325,6 @@
                 this.pageCurrent = 1;
             },
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'acl?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -355,7 +354,6 @@
                     });
             },
             productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -411,7 +409,6 @@
             },
             // 删除数据
             del () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.delete(this.Global.serverSrc + 'acl/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -462,7 +459,6 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.axios.defaults.withCredentials = true; // 带着cookie
                         // 编辑
                         let postData = {
                             'name': this.formValidate.name,

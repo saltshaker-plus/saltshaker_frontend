@@ -170,7 +170,6 @@
                 this.pageCurrent = 1;
             },
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'log?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -200,7 +199,6 @@
                     });
             },
             productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
