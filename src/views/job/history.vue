@@ -77,6 +77,7 @@
             };
         },
         methods: {
+            // 2018-04-18T12:51:59.321743 to yyyy-mm-dd hh:mm:ss
             convertTime (time) {
                 let dt = new Date(time);
                 dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
