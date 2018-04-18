@@ -1,7 +1,14 @@
 <template>
     <div>
         <common-table :cColumns="cColumns" :apiService="apiService"></common-table>
-    </div>
+        <Modal width="650px" v-model="showInfo" title="返回结果" >
+            <pre style="overflow:auto">
+{{result}}
+            </pre>
+            <div slot="footer"></div>
+        </Modal>
+</div>
+
 </template>
 
 <script>
@@ -13,11 +20,30 @@
         data () {
             return {
                 apiService: 'job',
+                showInfo: false,
+                result: '',
                 cColumns: [
                     {
                         title: 'Job ID',
                         key: 'jid',
-                        sortable: true
+                        sortable: true,
+                        width: 195,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'text',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.showInfo = true;
+                                            this.result = params.row.return;
+                                        }
+                                    }
+                                }, params.row.jid)
+                            ]);
+                        }
                     },
                     {
                         title: '用户名',
@@ -26,7 +52,7 @@
                     },
                     {
                         title: '目标',
-                        key: 'tgt',
+                        key: 'id',
                         sortable: true
                     },
                     {
@@ -42,43 +68,21 @@
                     {
                         title: '时间',
                         key: '_stamp',
-                        sortable: true
-                    },
-                    {
-                        title: '结果',
-                        key: 'return',
-                        sortable: true
-                    },
-                    {
-                        title: '状态',
-                        key: 'success',
-                        sortable: true
-                    },
-                    {
-                        title: '详情',
-                        key: 'show_more',
-                        align: 'center',
+                        sortable: true,
                         render: (h, params) => {
-                            return h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small'
-                                },
-                                on: {
-                                    click: () => {
-                                        let argu = { job_id: params.row.jid };
-                                        console.log(argu)
-                                        this.$router.push({
-                                            name: 'job-info',
-                                            params: argu
-                                        });
-                                    }
-                                }
-                            }, '了解详情');
+                            return this.convertTime(params.row._stamp);
                         }
                     }
                 ]
             };
+        },
+        methods: {
+            convertTime (time) {
+                let dt = new Date(time);
+                dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
+                let date = dt.toISOString().slice(0, -5).replace(/[T]/g, ' ');
+                return date;
+            }
         }
     };
 </script>
