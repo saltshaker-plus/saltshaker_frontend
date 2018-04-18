@@ -20,11 +20,6 @@
                         sortable: true
                     },
                     {
-                        title: '产品线',
-                        key: 'product_id',
-                        sortable: true
-                    },
-                    {
                         title: 'ID',
                         key: 'id',
                         sortable: true
