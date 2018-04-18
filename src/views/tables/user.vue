@@ -315,7 +315,6 @@
         },
         methods: {
             tableList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'user').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -328,7 +327,6 @@
                     err => { this.nerror('Get User Failure', err.response.data['message']); });
             },
             productList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -341,7 +339,6 @@
                     err => { this.nerror('Get Product Failure', err.response.data['message']); });
             },
             roleList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'role').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -353,7 +350,6 @@
                     err => { this.nerror('Get Role Failure', err.response.data['message']); });
             },
             alcList () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'acl').then(
                     res => {
                         if (res.data['status'] === true) {
@@ -365,7 +361,6 @@
                     err => { this.nerror('Get ACL Failure', err.response.data['message']); });
             },
             groupList (productId) {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.get(this.Global.serverSrc + 'groups?product_id=' + productId).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -414,7 +409,6 @@
             },
             // 删除数据
             del () {
-                this.axios.defaults.withCredentials = true; // 带着cookie
                 this.axios.delete(this.Global.serverSrc + 'user/' + this.delId).then(
                     res => {
                         if (res.data['status'] === true) {
