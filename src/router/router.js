@@ -67,9 +67,9 @@ export const appRouter = [
         title: 'Minion管理',
         component: Main,
         children: [
-            { path: 'status', title: '状态信息', name: 'status', component: () => import('@/views/execute/sls.vue') },
-            { path: 'key', title: 'Key管理', name: 'key', component: () => import('@/views/execute/sls.vue') },
-            { path: 'grains', title: 'Grains', name: 'grains', component: () => import('@/views/execute/sls.vue') }
+            { path: 'status', title: '状态信息', name: 'status', component: () => import('@/views/minion/status.vue') },
+            { path: 'key', title: 'Key管理', name: 'key', component: () => import('@/views/minion/key.vue') },
+            { path: 'grains', title: 'Grains', name: 'grains', component: () => import('@/views/minion/grains.vue') }
         ]
     },
     {
@@ -80,7 +80,7 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'history', title: 'Job历史', name: 'history', component: () => import('@/views/job/history.vue') },
-            { path: 'active', title: 'Job管理', name: 'active', component: () => import('@/views/job/manager.vue') }
+            { path: 'manager', title: 'Job管理', name: 'manager', component: () => import('@/views/job/manager.vue') }
         ]
     },
     {
@@ -90,7 +90,7 @@ export const appRouter = [
         title: '分组管理',
         component: Main,
         children: [
-            { path: 'group', title: '分组管理', name: 'group_index', component: () => import('@/views/groups/groups.vue') }
+            { path: 'index', title: '分组管理', name: 'group_index', component: () => import('@/views/groups/groups.vue') }
         ]
     },
     {
@@ -122,17 +122,17 @@ export const appRouter = [
         title: '产品管理',
         component: Main,
         children: [
-            { path: '', title: '产品管理', name: 'product_index', icon: 'social-dropbox', component: () => import('@/views/product/product.vue') }
+            { path: 'index', title: '产品管理', name: 'product_index', icon: 'social-dropbox', component: () => import('@/views/product/product.vue') }
         ]
     },
     {
         path: '/acl',
         icon: 'person-stalker',
-        name: 'funnel',
+        name: 'acl',
         title: 'ACL管理',
         component: Main,
         children: [
-            { path: '', title: 'ACL管理', name: 'acl', icon: 'funnel', component: () => import('@/views/acl/acl.vue') }
+            { path: 'index', title: 'ACL管理', name: 'acl_index', icon: 'funnel', component: () => import('@/views/acl/acl.vue') }
         ]
     },
     {
@@ -142,7 +142,7 @@ export const appRouter = [
         title: '用户管理',
         component: Main,
         children: [
-            { path: '', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
+            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
         ]
     },
     {
