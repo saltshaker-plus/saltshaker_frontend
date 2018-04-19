@@ -114,12 +114,9 @@
             };
         },
         methods: {
-            // 调用子组件进行删除
+            // 调用子组件进行kill
             kill () {
-                let minionArray = this.minion.map(item => {
-                    return Object.keys(item)[0];
-                });
-                this.$refs.childrenMethods.kill(this.delId, minionArray);
+                this.$refs.childrenMethods.kill(this.delId, this.minion);
             },
             // 2018, Apr 18 20:30:48.960755 to yyyy-mm-dd hh:mm:ss
             convertTime (time) {
