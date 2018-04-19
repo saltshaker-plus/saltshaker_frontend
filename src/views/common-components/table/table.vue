@@ -154,7 +154,7 @@
                             this.tableData.splice(this.pageSize, this.pageCount);
                             this.pageCurrent = 1;
                         } else {
-                            this.nerror('Get Log Failure', res.data['message']);
+                            this.nerror('Get Info Failure', res.data['message']);
                         };
                         this.loading = false;
                     },
@@ -165,11 +165,12 @@
                             if (err.response.status === 404) {
                                 this.tableData = [];
                             } else {
-                                this.nerror('Get Log Failure', errInfo);
+                                console.log(errInfo)
+                                this.nerror('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Log Failure', errInfo);
+                            this.nerror('Get Info Failure', errInfo);
                         }
                         this.loading = false;
                     });
@@ -198,7 +199,8 @@
             nerror (title, info) {
                 this.$Notice.error({
                     title: title,
-                    desc: info,
+                    // 替换<>避免被解析为html标签
+                    desc: info.replace(/<|>/g, ''),
                     duration: 10
                 });
             },
