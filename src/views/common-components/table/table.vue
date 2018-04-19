@@ -165,7 +165,6 @@
                             if (err.response.status === 404) {
                                 this.tableData = [];
                             } else {
-                                console.log(errInfo)
                                 this.nerror('Get Info Failure', errInfo);
                             }
                         } catch (error) {
@@ -291,9 +290,9 @@
                     });
             },
             // kill jid
-            kill (id, minionArray) {
+            kill (id, minion) {
                 let postData = {
-                    'minion_id': minionArray
+                    'minion': minion
                 };
                 this.axios.post(this.Global.serverSrc + this.apiService + '?action=kill&jid=' + id + '&product_id=' + this.productId, postData).then(
                     res => {
