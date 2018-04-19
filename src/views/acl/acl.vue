@@ -91,7 +91,7 @@
                                         return h('li', {
                                             style: {
                                                 textAlign: 'left',
-                                                padding: '4px'
+                                                padding: '0px'
                                             }
                                         }, item);
                                     }))
@@ -119,7 +119,7 @@
                                         return h('li', {
                                             style: {
                                                 textAlign: 'left',
-                                                padding: '4px'
+                                                padding: '0px'
                                             }
                                         }, item);
                                     }))
