@@ -40,7 +40,7 @@
                         sortable: true
                     },
                     {
-                        title: 'Minion:Pid',
+                        title: 'Minion:PPid',
                         key: 'Running',
                         sortable: true,
                         render: (h, params) => {
