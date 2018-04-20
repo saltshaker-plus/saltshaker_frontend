@@ -84,6 +84,16 @@ export const appRouter = [
         ]
     },
     {
+        path: '/host',
+        icon: 'ios-barcode',
+        name: 'host',
+        title: '分组管理',
+        component: Main,
+        children: [
+            { path: 'index', title: '主机管理', name: 'host_index', component: () => import('@/views/host/host.vue') }
+        ]
+    },
+    {
         path: '/group',
         icon: 'social-buffer',
         name: 'group',
