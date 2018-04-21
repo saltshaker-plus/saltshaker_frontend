@@ -1,6 +1,6 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" ref="childrenMethods"></common-table>
+        <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true" ref="childrenMethods"></common-table>
         <Modal width="650px" v-model="showInfo" title="返回结果" >
             <pre style="overflow:auto">
 {{result}}
@@ -19,7 +19,7 @@
         },
         data () {
             return {
-                apiService: 'job/manager',
+                apiService: 'minions/status',
                 showInfo: false,
                 minion: [],
                 tmp: '',
@@ -29,13 +29,12 @@
                 result: '',
                 cColumns: [
                     {
-                        title: 'Job ID',
-                        key: 'Jid',
-                        sortable: true,
-                        width: 195
+                        title: 'Minion',
+                        key: 'minion_id',
+                        sortable: true
                     },
                     {
-                        title: '用户名',
+                        title: '状态',
                         key: 'User',
                         sortable: true
                     },
