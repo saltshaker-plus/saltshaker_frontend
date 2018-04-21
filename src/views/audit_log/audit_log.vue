@@ -1,6 +1,6 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService"></common-table>
+        <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true"></common-table>
     </div>
 </template>
 
