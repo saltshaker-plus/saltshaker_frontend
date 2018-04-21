@@ -9,11 +9,12 @@
             <Col span="24">
                 <Card>
                     <Row :gutter="10">
-                        <Select style="width:200px" v-model="productId">
+                        <Select style="width:200px" v-model="productId" v-show="productShow">
                             <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
                         <div style="float: right;" >
                             <slot name="create"></slot>
+                            <slot name="downMenu"></slot>
                             <Button type="primary" @click="refresh()">刷新</Button>
                         </div>
                     </Row>
@@ -64,7 +65,12 @@
                         </div>
                         <br>
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
-                        <div style="margin:10px 0px 10px 10px;overflow: hidden">
+                        <div style="margin:10px 0px 10px 0px;overflow: hidden">
+                            <slot name="selectAll"></slot>
+                            <slot name="notSelectAll"></slot>
+                            <slot name="accept"></slot>
+                            <slot name="reject"></slot>
+                            <slot name="delete"></slot>
                             <div style="float: right;">
                                 <Page :total="pageCount" :current="pageCurrent" :page-size="pageSize" show-total show-elevator @on-change="changePage"></Page>
                             </div>
@@ -109,6 +115,9 @@
             apiService: {
                 type: String,
                 required: true
+            },
+            productShow: {
+                type: Boolean
             }
         },
         watch: {
@@ -316,7 +325,10 @@
             },
             // 传递给父组件
             getProduct () {
-                this.$emit('getProductEvent', this.productData);
+                this.$emit('getProductEvent', this.productData, this.productId);
+            },
+            handleSelectAll (status) {
+                this.$refs.selection.selectAll(status);
             }
         }
     };

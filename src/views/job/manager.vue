@@ -1,6 +1,6 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" ref="childrenMethods"></common-table>
+        <common-table :cColumns="cColumns" :apiService="apiService" ref="childrenMethods" :productShow="true"></common-table>
         <Modal width="650px" v-model="showInfo" title="返回结果" >
             <pre style="overflow:auto">
 {{result}}

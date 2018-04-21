@@ -1,6 +1,6 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" ref="childrenMethods">
+        <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" :productShow="true" ref="childrenMethods">
             <Button slot="create" type="primary" @click="add('formValidate')">创建分组</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
@@ -55,6 +55,7 @@
             return {
                 apiService: 'groups',
                 productData: [],
+                productId: '',
                 // 删除数据
                 delId: '',
                 delIndex: '',
@@ -198,8 +199,9 @@
             };
         },
         methods: {
-            getProductEvent: function (data) {
-                this.productData = data;
+            getProductEvent: function (productData, productId) {
+                this.productData = productData;
+                this.productId = productId;
             },
             // 调用子组件进行删除
             del () {

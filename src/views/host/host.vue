@@ -1,7 +1,7 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" ref="childrenMethods">
-            <Button slot="create" type="primary" @click="add('formValidate')">创建分组</Button>
+        <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" :productShow="true" ref="childrenMethods">
+            <Button slot="create" type="primary" @click="add('formValidate')">创建主机</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
                     <FormItem label="分组名" prop="name">
@@ -55,6 +55,7 @@
             return {
                 apiService: 'host',
                 productData: [],
+                productId: '',
                 // 删除数据
                 delId: '',
                 delIndex: '',
@@ -84,20 +85,38 @@
                     {
                         title: '分组',
                         key: 'group_id',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('ul', params.row.groups.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item['name']);
+                            })
+                            );
+                        }
                     },
                     {
                         title: '标签',
                         key: 'tag',
-                        sortable: true
-                    },
-                    {
-                        title: '操作',
-                        key: 'action',
-                        width: 123,
-                        align: 'center',
+                        sortable: true,
                         render: (h, params) => {
                             return h('div', [
+                                h('Tag', {
+                                    props: {
+                                        'v-for': 'item in count',
+                                        ':key': 'item',
+                                        ':name': 'item'
+                                    },
+                                    on: {
+                                        'on-close': () => {
+                                            const index = this.count.indexOf(name);
+                                            this.count.splice(index, 1);
+                                        }
+                                    }
+                                }, params.row.tag),
                                 h('Button', {
                                     props: {
                                         icon: 'ios-plus-empty',
@@ -117,19 +136,57 @@
                                         }
                                     }
                                 }, '添加标签'),
-                                h('Tag', {
+                            ]);
+                        }
+                    },
+                    {
+                        title: '操作',
+                        key: 'action',
+                        width: 123,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
                                     props: {
-                                        'v-for': 'item in count',
-                                        ':key': 'item',
-                                        ':name': 'item'
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
                                     },
                                     on: {
-                                        'on-close': () => {
-                                            const index = this.count.indexOf(name);
-                                            this.count.splice(index, 1);
+                                        click: () => {
+                                            this.formView = true;
+                                            this.optionType = 'edit';
+                                            this.optionTypeName = '编辑';
+                                            this.id = params.row.id;
+                                            this.formValidate = params.row;
+                                            this.readonly = true;
                                         }
                                     }
-                                }, '标签')
+                                }, '编辑'),
+                                h('Poptip', {
+                                    props: {
+                                        confirm: true,
+                                        title: '确定要删除 ' + params.row.name + ' 吗?',
+                                        transfer: true,
+                                        placement: 'top-end'
+                                    },
+                                    on: {
+                                        'on-ok': () => {
+                                            this.delId = params.row.id;
+                                            this.delIndex = params.index;
+                                            this.del();
+                                        }
+                                    }
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'error',
+                                            size: 'small'
+                                        }
+                                    }, '删除')
+                                ])
                             ]);
                         }
                     }
@@ -162,8 +219,9 @@
             };
         },
         methods: {
-            getProductEvent: function (data) {
-                this.productData = data;
+            getProductEvent: function (productData, productId) {
+                this.productData = productData;
+                this.productId = productId;
             },
             // 调用子组件进行删除
             del () {
