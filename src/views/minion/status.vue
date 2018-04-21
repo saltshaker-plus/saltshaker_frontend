@@ -1,12 +1,6 @@
 <template>
     <div>
         <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true" ref="childrenMethods"></common-table>
-        <Modal width="650px" v-model="showInfo" title="返回结果" >
-            <pre style="overflow:auto">
-{{result}}
-            </pre>
-            <div slot="footer"></div>
-        </Modal>
 </div>
 
 </template>
@@ -30,102 +24,29 @@
                 cColumns: [
                     {
                         title: 'Minion',
-                        key: 'minion_id',
+                        key: 'minions_id',
                         sortable: true
                     },
                     {
                         title: '状态',
-                        key: 'User',
-                        sortable: true
-                    },
-                    {
-                        title: 'Minion:Pid',
-                        key: 'Running',
+                        key: 'status',
                         sortable: true,
                         render: (h, params) => {
-                            return h('ul', params.row.Running.map(item => {
-                                return h('li', {
-                                    style: {
-                                        textAlign: 'left',
-                                        padding: '0px'
-                                    }
-                                }, Object.keys(item)[0] + ' : ' + Object.values(item)[0]);
-                            })
-                            );
-                        }
-                    },
-                    {
-                        title: '功能',
-                        key: 'Function',
-                        sortable: true
-                    },
-                    {
-                        title: '参数',
-                        key: 'Arguments',
-                        sortable: true,
-                        render: (h, params) => {
-                            return params.row.Arguments[0];
-                        }
-                    },
-                    {
-                        title: '时间',
-                        key: 'StartTime',
-                        sortable: true,
-                        render: (h, params) => {
-                            return this.convertTime(params.row.StartTime);
-                        }
-                    },
-                    {
-                        title: '操作',
-                        key: 'action',
-                        width: 70,
-                        align: 'center',
-                        render: (h, params) => {
+                            let tagColor = 'green';
+                            if (params.row.status === 'down') {
+                                tagColor = 'red';
+                            }
                             return h('div', [
-                                h('Poptip', {
+                                h('Tag', {
                                     props: {
-                                        confirm: true,
-                                        title: '确定要Kill ' + params.row.Jid + ' 吗?',
-                                        transfer: true,
-                                        placement: 'top-end'
-                                    },
-                                    on: {
-                                        'on-ok': () => {
-                                            this.delId = params.row.Jid;
-                                            this.delIndex = params.index;
-                                            this.minion = [];
-                                            this.minion = params.row.Running;
-                                            this.kill();
-                                        }
+                                        'color': tagColor
                                     }
-                                }, [
-                                    h('Button', {
-                                        props: {
-                                            type: 'error',
-                                            size: 'small'
-                                        }
-                                    }, 'Kill')
-                                ])
+                                }, params.row.status)
                             ]);
                         }
                     }
                 ]
             };
-        },
-        methods: {
-            // 调用子组件进行删除
-            kill () {
-                let minionArray = this.minion.map(item => {
-                    return Object.keys(item)[0];
-                });
-                this.$refs.childrenMethods.kill(this.delId, minionArray);
-            },
-            // 2018, Apr 18 20:30:48.960755 to yyyy-mm-dd hh:mm:ss
-            convertTime (time) {
-                let dt = new Date(time);
-                let date = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
-                return date;
-            }
         }
     };
 </script>
