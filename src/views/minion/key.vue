@@ -11,9 +11,9 @@
                     <p v-for="item in rowData">{{item.minions_id}}</p>
                 </div>
             </Modal>
-            <Button v-show="buttionShow" slot="accept" @click="handleSelectAll('全部接受','accept')">全部接受</Button>
-            <Button v-show="buttionShow" slot="reject" @click="handleSelectAll('全部拒绝','reject')">全部拒绝</Button>
-            <Button v-show="buttionShow" slot="delete" @click="handleSelectAll('全部删除','delete')">全部删除</Button>
+            <Button v-show="buttonShow" slot="accept" @click="handleSelectAll('全部接受','accept')">全部接受</Button>
+            <Button v-show="buttonShow" slot="reject" @click="handleSelectAll('全部拒绝','reject')">全部拒绝</Button>
+            <Button v-show="buttonShow" slot="delete" @click="handleSelectAll('全部删除','delete')">全部删除</Button>
         </common-table>
     </div>
 </template>
@@ -34,8 +34,8 @@
                 title: '',
                 minion: [],
                 rowData: [],
-                action:'',
-                buttionShow: false,
+                action: '',
+                buttonShow: false,
                 // 删除数据
                 delId: '',
                 delIndex: '',
@@ -177,9 +177,9 @@
             getRowEvent: function (rowData) {
                 this.rowData = rowData;
                 if (this.rowData.length > 0) {
-                    this.buttionShow = true;
+                    this.buttonShow = true;
                 } else {
-                    this.buttionShow = false;
+                    this.buttonShow = false;
                 }
             },
             // 调用子组件消息通知
@@ -213,7 +213,7 @@
                 this.axios.post(this.Global.serverSrc + this.apiService + '?product_id=' + this.productId + '&action=' + action,
                     postData).then(
                     res => {
-                        this.buttionShow = false;
+                        this.buttonShow = false;
                         if (res.data['status'] === true) {
                             this.formView = false;
                             this.$Message.success('成功！');
@@ -223,7 +223,7 @@
                         };
                     },
                     err => {
-                        this.buttionShow = false;
+                        this.buttonShow = false;
                         let errInfo = '';
                         try {
                             errInfo = err.response.data['message'];
