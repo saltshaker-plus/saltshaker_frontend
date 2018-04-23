@@ -64,7 +64,7 @@
                             </Dropdown>
                         </div>
                         <br>
-                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table"></Table>
+                        <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table" @on-selection-change="handleRowChange"></Table>
                         <div style="margin:10px 0px 10px 0px;overflow: hidden">
                             <slot name="selectAll"></slot>
                             <slot name="notSelectAll"></slot>
@@ -327,8 +327,12 @@
             getProduct () {
                 this.$emit('getProductEvent', this.productData, this.productId);
             },
-            handleSelectAll (status) {
-                this.$refs.selection.selectAll(status);
+            getTable () {
+                this.$emit('getTableEvent', this.tableData);
+            },
+            // 传递选择的行数据给父组件
+            handleRowChange (currentRow) {
+                this.$emit('getRowEvent', currentRow);
             }
         }
     };
