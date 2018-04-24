@@ -110,8 +110,8 @@ export const appRouter = [
         title: 'SLS管理',
         component: Main,
         children: [
-            { path: 'pillar', title: 'Pillar SLS', name: 'pillar', component: () => import('@/views/execute/sls.vue') },
-            { path: 'state', title: 'State SLS', name: 'state', component: () => import('@/views/execute/sls.vue') }
+            { path: 'pillar', title: 'Pillar SLS', name: 'pillar', component: () => import('@/views/execute/pillar_sls.vue') },
+            { path: 'state', title: 'State SLS', name: 'state', component: () => import('@/views/execute/state_sls.vue') }
         ]
     },
     {
@@ -121,8 +121,8 @@ export const appRouter = [
         title: '执行命令',
         component: Main,
         children: [
-            { path: 'shell', title: 'Shell命令', name: 'shell', component: () => import('@/views/execute/sls.vue') },
-            { path: 'models', title: 'Models命令', name: 'models', component: () => import('@/views/execute/sls.vue') }
+            { path: 'shell', title: 'Shell命令', name: 'shell', component: () => import('@/views/execute/pillar_sls.vue') },
+            { path: 'models', title: 'Models命令', name: 'models', component: () => import('@/views/execute/pillar_sls.vue') }
         ]
     },
     {
@@ -146,22 +146,13 @@ export const appRouter = [
         ]
     },
     {
-        path: '/user',
-        icon: 'person-stalker',
-        name: 'user',
-        title: '用户管理',
-        component: Main,
-        children: [
-            { path: 'index', title: '用户管理', name: 'user_index', component: () => import('@/views/user/user.vue') }
-        ]
-    },
-    {
         path: '/system',
         icon: 'settings',
         title: '系统管理',
         name: 'system',
         component: Main,
         children: [
+            { path: 'user', title: '用户管理', name: 'user', component: () => import('@/views/user/user.vue') },
             { path: 'role', title: '角色管理', name: 'role', component: () => import('@/views/role/role.vue') },
             { path: 'token', title: 'Token管理', name: 'token',component: () => import('@/views/error-page/error-page.vue') },
             { path: 'log', title: '操作日志', name: 'log', component: () => import('@/views/audit_log/audit_log.vue') },

@@ -1,6 +1,5 @@
 <style lang="less">
-    @import '../../styles/common.less';
-    @import '../common-components/table/table.less';
+    @import '../../../styles/common.less';
 </style>
 
 <template>
@@ -9,14 +8,16 @@
             <Col span="24">
                 <Card>
                     <Row :gutter="10">
-                        <Select style="width:200px" v-model="productId">
+                        <Select style="width:200px" v-model="productId" v-show="productShow">
                             <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
                         <div style="float: right;" >
+                            <slot name="create"></slot>
+                            <slot name="downMenu"></slot>
                             <Button type="primary" @click="refresh()">刷新</Button>
-                          </div>
+                        </div>
                     </Row>
-                    <Row :gutter="10">
+                    <Row>
                         <hr class="hr-margin" color="#e3e8ee" size="0.5">
                     </Row>
                     <Row :gutter="10">
@@ -53,6 +54,7 @@
 
 <script>
     export default {
+        name: 'CommonSLS',
         data () {
             return {
                 productData: this.productList(),
@@ -60,9 +62,22 @@
                 productStateProject: '',
                 branchData: [],
                 branchName: '',
-                fileTreeDate: [],
+                fileTreeData: [],
                 fileTree: []
             };
+        },
+        props: {
+            apiService: {
+                type: String,
+                required: true
+            },
+            productShow: {
+                type: Boolean
+            },
+            projectType: {
+                type: String,
+                required: true
+            }
         },
         watch: {
             // 监控产品线变化
@@ -70,7 +85,12 @@
                 this.branch();
             },
             branchName () {
-                this.file();
+                if (this.branchName !== '') {
+                    this.file();
+                } else {
+                    this.fileTreeData = [];
+                    this.fileTree = [];
+                }
             }
         },
         methods: {
@@ -78,7 +98,7 @@
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.productData = res.data['products']['product'];
+                            this.productData = res.data['data'];
                             this.productId = this.productData[0].id;
                             this.productStateProject = this.productData[0].state_project;
                         } else {
@@ -96,12 +116,14 @@
                     });
             },
             branch () {
-                this.axios.get(this.Global.serverSrc + 'gitlab/branch?product_id=' + this.productId + '&project_type=state_project').then(
+                this.axios.get(this.Global.serverSrc + this.apiService + '/branch?product_id=' + this.productId + '&project_type=' + this.projectType).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.branchData = res.data['branchs']['branch'];
+                            this.branchData = res.data['data'];
                             this.branchName = this.branchData[0];
                         } else {
+                            this.branchData = [];
+                            this.branchName = '';
                             this.nerror('Get Branch Failure', res.data['message']);
                         }
                     },
@@ -112,14 +134,16 @@
                         } catch (error) {
                             errInfo = err;
                         }
+                        this.branchData = [];
+                        this.branchName = '';
                         this.nerror('Get Branch Failure', errInfo);
                     });
             },
             file () {
-                this.axios.get(this.Global.serverSrc + 'gitlab/file?product_id=' + this.productId + '&project_type=state_project&path=/&branch=' + this.branchName).then(
+                this.axios.get(this.Global.serverSrc + this.apiService + '/file?product_id=' + this.productId + '&project_type=' + this.projectType + '&path=/&branch=' + this.branchName).then(
                     res => {
                         if (res.data['status'] === true) {
-                            this.fileTree = res.data['files']['file'];
+                            this.fileTree = res.data['data'];
                             // this.branchName = this.branchData[0];
                         } else {
                             this.nerror('Get File Tree Failure', res.data['message']);
