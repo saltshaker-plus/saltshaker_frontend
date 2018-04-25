@@ -33,7 +33,7 @@
                                 </Select>
                                 </div>
                                 <br>
-                                <Tree :data="fileTree" :load-data="loadData"></Tree>
+                                <Tree :data="fileTree" :load-data="loadData" @on-select-change="handleContent"></Tree>
                             </Card>
                         </Col>
                         <Col span="18">
@@ -42,7 +42,7 @@
                                     <Icon type="document-text"></Icon>
                                     SLS内容
                                 </p>
-                                dfdfdfdfdfdfdfd
+                                <pre>{{fileContent}}</pre>
                             </Card>
                         </Col>
                     </Row>
@@ -63,7 +63,8 @@
                 branchData: [],
                 branchName: '',
                 fileTreeData: [],
-                fileTree: []
+                fileTree: [],
+                fileContent: ''
             };
         },
         props: {
@@ -86,7 +87,7 @@
             },
             branchName () {
                 if (this.branchName !== '') {
-                    this.file();
+                    this.fileList();
                 } else {
                     this.fileTreeData = [];
                     this.fileTree = [];
@@ -116,14 +117,16 @@
                     });
             },
             branch () {
+                this.branchData = [];
+                this.branchName = '';
+                this.fileTree = [];
+                this.fileContent = '';
                 this.axios.get(this.Global.serverSrc + this.apiService + '/branch?product_id=' + this.productId + '&project_type=' + this.projectType).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.branchData = res.data['data'];
                             this.branchName = this.branchData[0];
                         } else {
-                            this.branchData = [];
-                            this.branchName = '';
                             this.nerror('Get Branch Failure', res.data['message']);
                         }
                     },
@@ -134,17 +137,38 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.branchData = [];
-                        this.branchName = '';
                         this.nerror('Get Branch Failure', errInfo);
                     });
             },
-            file () {
+            fileList () {
+                this.fileContent = '';
                 this.axios.get(this.Global.serverSrc + this.apiService + '/file?product_id=' + this.productId + '&project_type=' + this.projectType + '&path=/&branch=' + this.branchName).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.fileTree = res.data['data'];
-                            // this.branchName = this.branchData[0];
+                        } else {
+                            this.fileTree = [];
+                            this.nerror('Get File Tree Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.fileTree = [];
+                        this.nerror('Get File Tree Failure', errInfo);
+                    });
+            },
+            handleContent (filePath) {
+                this.fileContent = '';
+                let path = filePath[0]['path'];
+                this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + path).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.fileContent = res.data['data'];
                         } else {
                             this.nerror('Get File Tree Failure', res.data['message']);
                         }
@@ -185,7 +209,7 @@
                 });
             },
             refresh () {
-                this.product();
+                this.productList();
             }
         }
     };
