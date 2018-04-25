@@ -2,9 +2,9 @@
     <div>
         <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true"></common-table>
         <Modal width="650px" v-model="showInfo" title="返回结果" >
-            <pre style="overflow:auto">
-{{result}}
-            </pre>
+            <highlight-code lang="json" style="overflow:auto" v-if="result">
+                {{result}}
+            </highlight-code>
             <div slot="footer"></div>
         </Modal>
 </div>
