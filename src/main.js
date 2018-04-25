@@ -11,6 +11,10 @@ import util from './libs/util';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import global from './config/Global.vue';
+// 使用highlight
+import VueHighlightJS from 'vue-highlight.js/';
+import 'highlight.js/styles/agate.css';
+Vue.use(VueHighlightJS);
 
 Vue.prototype.Global = global;
 Vue.use(VueAxios, axios);
@@ -18,8 +22,17 @@ Vue.use(VueAxios, axios);
 Vue.use(VueI18n);
 Vue.use(iView);
 
+
 // axios带着cookie 请求
 axios.defaults.withCredentials = true;
+
+// Vue.directive('highlight', function (el) {
+//     let blocks = el.querySelectorAll('pre code');
+//     blocks.forEach((block) => {
+//         hljs.highlightBlock(block);
+//     });
+// });
+
 
 new Vue({
     el: '#app',

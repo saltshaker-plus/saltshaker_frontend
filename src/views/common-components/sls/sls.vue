@@ -42,7 +42,9 @@
                                     <Icon type="document-text"></Icon>
                                     SLS内容
                                 </p>
-                                <pre>{{fileContent}}</pre>
+                                <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
+                                    {{fileContent}}
+                                </highlight-code>
                             </Card>
                         </Col>
                     </Row>
