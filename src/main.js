@@ -22,9 +22,10 @@ Vue.use(VueAxios, axios);
 Vue.use(VueI18n);
 Vue.use(iView);
 
-
 // axios带着cookie 请求
 axios.defaults.withCredentials = true;
+// axios超时时间毫秒
+axios.defaults.timeout = 60 * 1000;
 
 // Vue.directive('highlight', function (el) {
 //     let blocks = el.querySelectorAll('pre code');
