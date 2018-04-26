@@ -11,31 +11,30 @@
                         <Input v-model="formValidate.description" placeholder="输入描述"></Input>
                     </FormItem>
                     <FormItem label="产品线" prop="productId">
-                        <Select v-model="formValidate.productId" placeholder="选择产品线">
+                        <Select v-model="formValidate.productId" placeholder="选择产品线" @on-change="groupList">
                             <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="主机" prop="allow">
+                    <FormItem label="主机" prop="host">
                         <Transfer
-                            :data="data3"
-                            :target-keys="targetKeys3"
+                            :data="originMinion"
+                            :target-keys="targetMinion"
                             :list-style="listStyle"
-                            :render-format="render3"
+                            :render-format="renders"
                             :titles = "titles"
                             filterable
-                            @on-change="handleChange3">
+                            @on-change="handleChange">
                             <!--<div :style="{float: 'right', margin: '5px'}">-->
                                 <!--<Button type="ghost" size="small" @click="reloadMockData">刷新</Button>-->
                             <!--</div>-->
-                            <div :style="{float: 'left', margin: '5px'}">
-                                <Select style="width:176px" size="small" v-model="productId" >
-                                    <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                </Select>
-                            </div>
+                            <!--<div :style="{float: 'left', margin: '5px'}">-->
+                                <!--<Select style="width:176px" size="small" v-model="groupsId" placeholder="请选择分组">-->
+                                    <!--<Option v-for="item in groupsData" :value="item.id" :key="item.id">{{ item.name }}</Option>-->
+                                <!--</Select>-->
+                            <!--</div>-->
                         </Transfer>
                     </FormItem>
                 </Form>
-
                 <div slot="footer">
                     <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
                     <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
@@ -56,12 +55,13 @@
                 apiService: 'groups',
                 productData: [],
                 productId: '',
+                groupsData: [],
+                groupsId: '',
                 // 删除数据
                 delId: '',
                 delIndex: '',
                 // 编辑数据
                 formView: false,
-                id: '',
                 optionType: '',
                 optionTypeName: '',
                 cColumns: [
@@ -88,30 +88,18 @@
                     },
                     {
                         title: '主机',
-                        key: 'deny',
+                        key: 'minion',
                         sortable: true,
                         render: (h, params) => {
-                            return h('Poptip', {
-                                props: {
-                                    trigger: 'hover',
-                                    title: '主机列表',
-                                    placement: 'bottom'
-                                }
-                            }, [
-                                h('Tag', params.row.deny.length),
-                                h('div', {
-                                    slot: 'content'
-                                }, [
-                                    h('ul', params.row.deny.map(item => {
-                                        return h('li', {
-                                            style: {
-                                                textAlign: 'left',
-                                                padding: '4px'
-                                            }
-                                        }, item);
-                                    }))
-                                ])
-                            ]);
+                            return h('ul', params.row.minion.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
                         }
                     },
                     {
@@ -135,11 +123,12 @@
                                             this.handleReset('formValidate');
                                             this.optionType = 'edit';
                                             this.optionTypeName = '编辑';
-                                            this.id = params.row.id;
+                                            //this.targetMinion = [];
+                                            this.groupsId = params.row.id;
+                                            this.getTargetMinion();
                                             this.formValidate.name = params.row.name;
                                             this.formValidate.description = params.row.description;
                                             this.formValidate.productId = params.row.product_id;
-                                            this.formValidate.allow = params.row.allow.join('\n');
                                         }
                                     }
                                 }, '编辑'),
@@ -173,9 +162,7 @@
                 formValidate: {
                     name: '',
                     description: '',
-                    productId: '',
-                    allow: '',
-                    deny: ''
+                    productId: ''
                 },
                 ruleValidate: {
                     name: [
@@ -189,14 +176,20 @@
                     ]
                 },
                 // 穿梭框
-                data3: this.getMockData(),
-                targetKeys3: this.getTargetKeys(),
-                titles: ['源主机', '目标组'],
+                originMinion: [],
+                targetMinion: [],
+                titles: ['待加主机', '当前组'],
                 listStyle: {
                     width: '186px',
                     height: '230px'
                 }
             };
+        },
+        watch: {
+            productId () {
+                this.originMinion = [];
+                this.getOriginMinion();
+            }
         },
         methods: {
             getProductEvent: function (productData, productId) {
@@ -231,11 +224,10 @@
                             'name': this.formValidate.name,
                             'description': this.formValidate.description,
                             'product_id': this.formValidate.productId,
-                            'allow': this.formValidate.allow.split('\n'),
-                            'deny': this.formValidate.deny.split('\n')
+                            'minion': this.targetMinion
                         };
                         if (this.optionType === 'edit') {
-                            this.axios.put(this.Global.serverSrc + this.apiService + '/' + this.id,
+                            this.axios.put(this.Global.serverSrc + this.apiService + '/' + this.groupsId,
                                 postData).then(
                                 res => {
                                     if (res.data['status'] === true) {
@@ -288,33 +280,87 @@
                 this.$refs[name].resetFields();
             },
             // 穿梭框
-            getMockData () {
-                let mockData = [];
-                for (let i = 1; i <= 20; i++) {
-                    mockData.push({
-                        key: i.toString(),
-                        label: 'Content ' + i,
-                        description: 'The desc of content  ' + i,
-                        disabled: Math.random() * 3 < 1
+            getOriginMinion () {
+                this.axios.get(this.Global.serverSrc + 'host?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            for (var i = 0; i < res.data['data'].length; i++) {
+                                this.originMinion.push({
+                                    key: res.data['data'][i]['minion_id']
+                                });
+                            }
+                        } else {
+                            this.nerror('Get Info Failure', res.data['message']);
+                        };
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                            if (err.response.status === 404) {
+                                this.originMinion = [];
+                            } else {
+                                this.nerror('Get Info Failure', errInfo);
+                            }
+                        } catch (error) {
+                            errInfo = err;
+                            this.nerror('Get Info Failure', errInfo);
+                        }
                     });
-                }
-                return mockData;
             },
-            getTargetKeys () {
-                return this.getMockData()
-                    .filter(() => Math.random() * 2 > 1)
-                    .map(item => item.key);
+            groupList () {
+                this.axios.get(this.Global.serverSrc + this.apiService + '?product_id=' + this.formValidate.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.groupsData = res.data['data'];
+                        } else {
+                            this.nerror('Get Groups Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Get Groups Failure', errInfo);
+                    });
             },
-            handleChange3 (newTargetKeys) {
-                this.targetKeys3 = newTargetKeys;
+            getTargetMinion () {
+                this.axios.get(this.Global.serverSrc + 'groups/' + this.groupsId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.targetMinion = res.data['data']['minion'];
+                        } else {
+                            this.nerror('Get Info Failure', res.data['message']);
+                        };
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                            if (err.response.status === 404) {
+                                this.targetMinion = [];
+                            } else {
+                                this.nerror('Get Info Failure', errInfo);
+                            }
+                        } catch (error) {
+                            errInfo = err;
+                            this.nerror('Get Info Failure', errInfo);
+                        }
+                    });
             },
-            render3 (item) {
-                return item.label + ' - ' + item.description;
+            handleChange (newtargetMinion) {
+                this.targetMinion = newtargetMinion;
             },
-            reloadMockData () {
-                this.data3 = this.getMockData();
-                this.targetKeys3 = this.getTargetKeys();
-            }
+            renders (item) {
+                return item.key;
+            },
+//            reloadMockData () {
+//                this.minionData = this.getMockData();
+//                this.targetKeys3 = this.getTargetKeys();
+//            }
         }
     };
 </script>

@@ -190,17 +190,6 @@ export const appRouter = [
         ]
     },
     {
-        path: '/form',
-        icon: 'android-checkbox',
-        name: 'form',
-        title: '表单编辑',
-        component: Main,
-        children: [
-            { path: 'workflow', title: '工作流', name: 'workflow', icon: 'arrow-swap', component: () => import('@/views/form/work-flow/work-flow.vue') }
-
-        ]
-    },
-    {
         path: '/tables',
         icon: 'ios-grid-view',
         name: 'tables',
@@ -245,16 +234,6 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
-        ]
-    },
-    {
-        path: '/international',
-        icon: 'earth',
-        title: {i18n: 'international'},
-        name: 'international',
-        component: Main,
-        children: [
-            { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
         ]
     },
     {
