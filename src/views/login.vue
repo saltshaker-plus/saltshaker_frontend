@@ -41,6 +41,7 @@ import Cookies from 'js-cookie';
 export default {
     data () {
         return {
+            token: '',
             form: {
                 userName: '',
                 password: ''
@@ -59,24 +60,47 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
                     this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
-                    });
+                    let postData = {
+                        'username': this.form.userName,
+                        'password': this.form.password
+                    };
+                    this.axios.post(this.Global.serverSrc + 'login', postData).then(
+                        res => {
+                            if (res.data['status'] === true) {
+                                let token = res.data['data'];
+                                Cookies.set('user', this.form.userName);
+                                // 后端返回过期时间,单位秒 转换成天
+                                let expireDays = Object.values(token)[0][1] / 60 / 60 / 24;
+                                Cookies.set(Object.keys(token)[0], Object.values(token)[0][0], { expires: expireDays });
+                                Cookies.set('access', 0);
+                                this.$router.push({
+                                    name: 'home_index'
+                                });
+                            } else {
+                                this.nerror('登录失败:', res.data['message']);
+                            }
+                        },
+                        err => {
+                            let errInfo = '';
+                            try {
+                                errInfo = err.response.data['message'];
+                            } catch (error) {
+                                errInfo = err;
+                            }
+                            this.nerror('登录失败:', errInfo);
+                        });
                 }
+            });
+        },
+        // 重新定义错误消息
+        nerror (title, info) {
+            this.$Notice.error({
+                title: title,
+                desc: info,
+                duration: 10
             });
         }
     }
 };
 </script>
-
-<style>
-
-</style>
