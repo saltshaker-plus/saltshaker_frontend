@@ -10,11 +10,6 @@
                     <FormItem label="描述" prop="description">
                         <Input v-model="formValidate.description" placeholder="输入描述"></Input>
                     </FormItem>
-                    <FormItem label="产品线" prop="productId">
-                        <Select v-model="formValidate.productId" placeholder="选择产品线" @on-change="groupList">
-                            <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                        </Select>
-                    </FormItem>
                     <FormItem label="主机" prop="host">
                         <Transfer
                             :data="originMinion"
@@ -170,9 +165,6 @@
                     ],
                     description: [
                         { required: true, message: '描述不能为空', trigger: 'blur' }
-                    ],
-                    productId: [
-                        { required: true, message: '产品线不能为空', trigger: 'change' }
                     ]
                 },
                 // 穿梭框
@@ -214,6 +206,9 @@
                 this.optionType = 'add';
                 this.optionTypeName = '添加';
                 this.formView = true;
+                this.originMinion = [];
+                this.targetMinion = [];
+                this.getOriginMinion();
             },
             // 表单提
             handleSubmit (name) {
@@ -223,7 +218,7 @@
                         let postData = {
                             'name': this.formValidate.name,
                             'description': this.formValidate.description,
-                            'product_id': this.formValidate.productId,
+                            'product_id': this.productId,
                             'minion': this.targetMinion
                         };
                         if (this.optionType === 'edit') {
@@ -309,7 +304,7 @@
                     });
             },
             groupList () {
-                this.axios.get(this.Global.serverSrc + this.apiService + '?product_id=' + this.formValidate.productId).then(
+                this.axios.get(this.Global.serverSrc + this.apiService + '?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.groupsData = res.data['data'];
