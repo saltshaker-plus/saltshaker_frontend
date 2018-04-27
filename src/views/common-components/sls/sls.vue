@@ -6,8 +6,8 @@
     <div>
         <Row class="margin-top-10">
             <Col span="24">
-                <Card>
-                    <Row :gutter="10">
+                <Card dis-hover>
+                    <Row>
                         <Select style="width:200px" v-model="productId" v-show="productShow">
                             <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
@@ -20,9 +20,9 @@
                     <Row>
                         <hr class="hr-margin" color="#e3e8ee" size="0.5">
                     </Row>
-                    <Row :gutter="10">
+                    <Row :gutter="5">
                         <Col span="6">
-                            <Card>
+                            <Card dis-hover>
                                 <p slot="title">
                                     <Icon type="ios-toggle"></Icon>
                                     选择分支
@@ -37,7 +37,7 @@
                             </Card>
                         </Col>
                         <Col span="18">
-                            <Card>
+                            <Card dis-hover>
                                 <p slot="title">
                                     <Icon type="document-text"></Icon>
                                     SLS内容
