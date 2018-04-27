@@ -165,25 +165,27 @@
                     });
             },
             handleContent (filePath) {
-                this.fileContent = '';
-                let path = filePath[0]['path'];
-                this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + path).then(
-                    res => {
-                        if (res.data['status'] === true) {
-                            this.fileContent = res.data['data'];
-                        } else {
-                            this.nerror('Get File Tree Failure', res.data['message']);
-                        }
-                    },
-                    err => {
-                        let errInfo = '';
-                        try {
-                            errInfo = err.response.data['message'];
-                        } catch (error) {
-                            errInfo = err;
-                        }
-                        this.nerror('Get File Tree Failure', errInfo);
-                    });
+                if (filePath.length !== 0) {
+                    this.fileContent = '';
+                    let path = filePath[0]['path'];
+                    this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + path).then(
+                        res => {
+                            if (res.data['status'] === true) {
+                                this.fileContent = res.data['data'];
+                            } else {
+                                this.nerror('Get File Tree Failure', res.data['message']);
+                            }
+                        },
+                        err => {
+                            let errInfo = '';
+                            try {
+                                errInfo = err.response.data['message'];
+                            } catch (error) {
+                                errInfo = err;
+                            }
+                            this.nerror('Get File Tree Failure', errInfo);
+                        });
+                }
             },
             loadData (item, callback) {
                 setTimeout(() => {
