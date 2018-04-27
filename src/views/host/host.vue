@@ -1,38 +1,23 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" :productShow="true" ref="childrenMethods">
+        <common-table
+                :cColumns="cColumns"
+                :apiService="apiService"
+                @getProductEvent="getProductEvent"
+                @getRowEvent="getRowEvent"
+                :productShow="true"
+                ref="childrenMethods">
             <Button slot="create" type="primary" @click="add('formValidate')">创建主机</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
-                    <FormItem label="分组名" prop="name">
-                        <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
-                    </FormItem>
-                    <FormItem label="描述" prop="description">
-                        <Input v-model="formValidate.description" placeholder="输入描述"></Input>
-                    </FormItem>
                     <FormItem label="产品线" prop="productId">
                         <Select v-model="formValidate.productId" placeholder="选择产品线">
                             <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="主机" prop="allow">
-                        <Transfer
-                            :data="data3"
-                            :target-keys="targetKeys3"
-                            :list-style="listStyle"
-                            :render-format="render3"
-                            :titles = "titles"
-                            filterable
-                            @on-change="handleChange3">
-                            <!--<div :style="{float: 'right', margin: '5px'}">-->
-                                <!--<Button type="ghost" size="small" @click="reloadMockData">刷新</Button>-->
-                            <!--</div>-->
-                            <div :style="{float: 'left', margin: '5px'}">
-                                <Select style="width:176px" size="small" v-model="productId" >
-                                    <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                </Select>
-                            </div>
-                        </Transfer>
+                    <FormItem label="标签" prop="productId">
+                        <Tag v-for="item in count" :key="item" :name="item" closable @on-close="handleClose2">标签</Tag>
+                        <Button icon="ios-plus-empty" type="dashed" size="small" @click="handleAdd">添加标签</Button>
                     </FormItem>
                 </Form>
 
@@ -41,6 +26,9 @@
                     <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                 </div>
             </Modal>
+            <Button v-show="buttonShow" slot="accept" @click="handleSelectAll('全部接受','accept')">全部接受</Button>
+            <Button v-show="buttonShow" slot="reject" @click="handleSelectAll('全部拒绝','reject')">全部拒绝</Button>
+            <Button v-show="buttonShow" slot="delete" @click="handleSelectAll('全部删除','delete')">全部删除</Button>
         </common-table>
     </div>
 </template>
@@ -61,11 +49,18 @@
                 delIndex: '',
                 // 编辑数据
                 formView: false,
-                count: [0, 1, 2],
+                buttonShow: false,
+                count: [],
                 id: '',
                 optionType: '',
                 optionTypeName: '',
+                index: 1,
                 cColumns: [
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
                     {
                         title: 'Minion',
                         key: 'minion_id',
@@ -84,7 +79,7 @@
                     },
                     {
                         title: '分组',
-                        key: 'group_id',
+                        key: 'groups',
                         sortable: true,
                         render: (h, params) => {
                             return h('ul', params.row.groups.map(item => {
@@ -93,7 +88,7 @@
                                         textAlign: 'left',
                                         padding: '0px'
                                     }
-                                }, item['name']);
+                                }, item);
                             })
                             );
                         }
@@ -106,9 +101,7 @@
                             return h('div', [
                                 h('Tag', {
                                     props: {
-                                        'v-for': 'item in count',
-                                        ':key': 'item',
-                                        ':name': 'item'
+                                        'color': 'blue'
                                     },
                                     on: {
                                         'on-close': () => {
@@ -117,25 +110,6 @@
                                         }
                                     }
                                 }, params.row.tag),
-                                h('Button', {
-                                    props: {
-                                        icon: 'ios-plus-empty',
-                                        type: 'dashed',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            if (this.count.length) {
-                                                this.count.push(this.count[this.count.length - 1] + 1);
-                                            } else {
-                                                this.count.push(0);
-                                            }
-                                        }
-                                    }
-                                }, '添加标签'),
                             ]);
                         }
                     },
@@ -193,35 +167,27 @@
                 ],
                 // 表单验证
                 formValidate: {
-                    name: '',
-                    description: '',
-                    productId: '',
+                    productId: ''
                 },
                 ruleValidate: {
-                    name: [
-                        { required: true, message: '分组名不能为空', trigger: 'blur' }
-                    ],
-                    description: [
-                        { required: true, message: '描述不能为空', trigger: 'blur' }
-                    ],
                     productId: [
                         { required: true, message: '产品线不能为空', trigger: 'change' }
                     ]
                 },
-                // 穿梭框
-                data3: this.getMockData(),
-                targetKeys3: this.getTargetKeys(),
-                titles: ['源主机', '目标组'],
-                listStyle: {
-                    width: '186px',
-                    height: '230px'
-                }
             };
         },
         methods: {
             getProductEvent: function (productData, productId) {
                 this.productData = productData;
                 this.productId = productId;
+            },
+            getRowEvent: function (rowData) {
+                this.rowData = rowData;
+                if (this.rowData.length > 0) {
+                    this.buttonShow = true;
+                } else {
+                    this.buttonShow = false;
+                }
             },
             // 调用子组件进行删除
             del () {
@@ -307,33 +273,19 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
-            // 穿梭框
-            getMockData () {
-                let mockData = [];
-                for (let i = 1; i <= 20; i++) {
-                    mockData.push({
-                        key: i.toString(),
-                        label: 'Content ' + i,
-                        description: 'The desc of content  ' + i,
-                        disabled: Math.random() * 3 < 1
-                    });
+            handleRemove (index) {
+                this.formDynamic.items[index].status = 0;
+            },
+            handleAdd () {
+                if (this.count.length) {
+                    this.count.push(this.count[this.count.length - 1] + 1);
+                } else {
+                    this.count.push(0);
                 }
-                return mockData;
             },
-            getTargetKeys () {
-                return this.getMockData()
-                    .filter(() => Math.random() * 2 > 1)
-                    .map(item => item.key);
-            },
-            handleChange3 (newTargetKeys) {
-                this.targetKeys3 = newTargetKeys;
-            },
-            render3 (item) {
-                return item.label + ' - ' + item.description;
-            },
-            reloadMockData () {
-                this.data3 = this.getMockData();
-                this.targetKeys3 = this.getTargetKeys();
+            handleClose2 (event, name) {
+                const index = this.count.indexOf(name);
+                this.count.splice(index, 1);
             }
         }
     };
