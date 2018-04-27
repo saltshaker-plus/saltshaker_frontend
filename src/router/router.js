@@ -110,8 +110,8 @@ export const appRouter = [
         title: 'SLS管理',
         component: Main,
         children: [
-            { path: 'pillar', title: 'Pillar SLS', name: 'pillar', component: () => import('@/views/execute/pillar_sls.vue') },
-            { path: 'state', title: 'State SLS', name: 'state', component: () => import('@/views/execute/state_sls.vue') }
+            { path: 'pillar', title: 'Pillar SLS', name: 'pillar', component: () => import('@/views/sls/pillar_sls.vue') },
+            { path: 'state', title: 'State SLS', name: 'state', component: () => import('@/views/sls/state_sls.vue') }
         ]
     },
     {
@@ -121,8 +121,8 @@ export const appRouter = [
         title: '执行命令',
         component: Main,
         children: [
-            { path: 'shell', title: 'Shell命令', name: 'shell', component: () => import('@/views/execute/pillar_sls.vue') },
-            { path: 'models', title: 'Models命令', name: 'models', component: () => import('@/views/execute/pillar_sls.vue') }
+            { path: 'shell', title: 'Shell命令', name: 'shell', component: () => import('@/views/execute/shell.vue') },
+            { path: 'models', title: 'Models命令', name: 'models', component: () => import('@/views/execute/model.vue') }
         ]
     },
     {
