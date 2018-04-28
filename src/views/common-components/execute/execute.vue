@@ -63,7 +63,7 @@
                                                 </li>
                                             </ul>
                                         </Alert>
-                                        <highlight-code lang="yaml" style="overflow:auto" v-if="true" v-for="(item , minion) in result.result">
+                                        <highlight-code lang="yaml" style="overflow:auto" v-if="true" v-for="(item, minion) in result.result">
 Minion: {{minion}}
 {{item}}
                                         </highlight-code>
@@ -85,14 +85,19 @@ Minion: {{minion}}
             return {
                 productData: this.productList(),
                 productId: '',
+                // 搜索内容
                 search: '',
+                // 执行命令的返回数据
                 result: '',
                 formValidate: {
                     command: '',
                     target: ''
                 },
+                // 默认不显示摘要信息
                 summaryShow: false,
+                // 摘要信息样式
                 summaryType: 'success',
+                // 默认不显示历史命令
                 historyShow: false,
                 ruleValidate: {
                     command: [
@@ -134,7 +139,17 @@ Minion: {{minion}}
                 columnsHistory: [
                     {
                         title: '命令',
-                        key: 'command'
+                        key: 'command',
+                        render: (h, params) => {
+                            return h('div', {
+                                on: {
+                                    'dblclick': () => {
+                                        // 双击历史命令填充到命令行表单
+                                        this.formValidate.command = params.row.command;
+                                    }
+                                }
+                            }, params.row.command);
+                        }
                     },
                     {
                         title: '用户',
@@ -166,11 +181,16 @@ Minion: {{minion}}
         watch: {
             // 监控产品线变化
             productId () {
+                // 关闭历史命令框
                 this.historyShow = false;
+                // 重新获取分组信息
                 this.getGroups();
+                // 清除命令表单数据
+                this.formValidate.command = '';
             }
         },
         methods: {
+            // 获取用户所拥有的产品线
             productList () {
                 this.axios.get(this.Global.serverSrc + 'product').then(
                     res => {
@@ -246,6 +266,7 @@ Minion: {{minion}}
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
+            // 历史命令展示与隐藏
             handleHistory () {
                 if (this.historyShow === true) {
                     this.historyShow = false;
