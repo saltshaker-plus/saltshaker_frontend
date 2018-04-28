@@ -22,7 +22,7 @@
                     </Row>
                     <Row :gutter="5">
                         <Col span="6">
-                            <Card dis-hover>
+                            <Card dis-hover :padding="5">
                                 <p slot="title">
                                     <Icon type="ios-toggle"></Icon>
                                     选择分支
@@ -37,7 +37,7 @@
                             </Card>
                         </Col>
                         <Col span="18">
-                            <Card dis-hover>
+                            <Card dis-hover :padding="5">
                                 <p slot="title">
                                     <Icon type="document-text"></Icon>
                                     SLS内容
