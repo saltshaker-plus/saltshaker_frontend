@@ -2,7 +2,7 @@
     <div>
         <common-s-l-s
                 :apiService="apiService"
-                :projectType="projectType"
+                :apiHistory="apiHistory"
                 :productShow="true"
                 ref="childrenMethods">
         </common-s-l-s>
@@ -17,8 +17,8 @@
         },
         data () {
             return {
-                apiService: 'gitlab',
-                projectType: 'pillar_project'
+                apiService: 'execute/shell',
+                apiHistory: 'shell/history'
             };
         }
     };
