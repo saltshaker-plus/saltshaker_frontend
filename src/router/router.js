@@ -115,7 +115,7 @@ export const appRouter = [
         ]
     },
     {
-        path: '/执行命令',
+        path: '/execute',
         icon: 'ios-play',
         name: 'execute',
         title: '执行命令',
