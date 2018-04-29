@@ -23,7 +23,7 @@
                             <Card dis-hover>
                                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="47">
                                     <FormItem label="目标" prop="target">
-                                        <Table size="small" width="100%" height="324" border :columns="columnsTarget" :data="targetData" stripe></Table>
+                                        <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData" stripe></Table>
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
                                         <Input v-model="formValidate.command" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="输入shell命令"></Input>
@@ -31,20 +31,28 @@
                                     <FormItem>
                                         <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                                         <Button type="ghost" @click="handleReset('formValidate')">重置</Button>
+                                        <!--<div style="float: right">-->
+                                            <!--<Input v-model="searchConName" icon="search" @on-change="handleSearch" style="width: 200px" />-->
+                                        <!--</div>-->
                                         <div style="float: right">
-                                            <Input v-model="search" placeholder="Enter something..." icon="ios-search" style="width: 200px">
-                                                <Button slot="append" icon="ios-search"></Button>
-                                            </Input>
-                                        </div>
-                                        <div style="float: right">
-                                            <Button type="ghost" @click="handleHistory" style="margin-right: 3px">历史</Button>
+                                            <Poptip placement="top-end" width="700">
+                                                <Button type="ghost">历史</Button>
+                                                <div class="api" slot="content">
+                                                    <div style="padding-bottom: 5px">
+                                                        <Input v-model="searchConName" icon="search" @on-change="handleSearch" style="width: 200px" />
+                                                    </div>
+                                                    <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData" stripe></Table>
+                                                </div>
+                                             </Poptip>
+                                            <!--<Button type="ghost" @click="handleHistory" style="margin-right: 3px">历史</Button>-->
                                         </div>
                                     </FormItem>
                                     <FormItem label="历史" prop="history" v-show="historyShow">
-                                        <Table size="small" width="100%" height="220" border :columns="columnsHistory" :data="historyData" stripe></Table>
+                                        <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData" stripe></Table>
                                     </FormItem>
                                     <FormItem label="结果">
-                                        <Alert :type="summaryType" v-if="summaryShow">
+                                        <Spin size="large" fix v-if="spinShow"></Spin>
+                                        <Alert :type="summaryType" v-show="summaryShow">
                                             <ul>
                                                 <li>
                                                     总数: {{result.total}}
@@ -63,7 +71,7 @@
                                                 </li>
                                             </ul>
                                         </Alert>
-                                        <highlight-code lang="yaml" style="overflow:auto" v-if="true" v-for="(item, minion) in result.result">
+                                        <highlight-code lang="yaml" style="overflow:auto" v-show="resultShow" v-for="(item, minion) in result.result">
 Minion: {{minion}}
 {{item}}
                                         </highlight-code>
@@ -85,20 +93,23 @@ Minion: {{minion}}
             return {
                 productData: this.productList(),
                 productId: '',
-                // 搜索内容
-                search: '',
                 // 执行命令的返回数据
                 result: '',
+                searchConName: '',
                 formValidate: {
                     command: '',
                     target: ''
                 },
+                // 默认不显示结果信息
+                resultShow: false,
                 // 默认不显示摘要信息
                 summaryShow: false,
                 // 摘要信息样式
                 summaryType: 'success',
                 // 默认不显示历史命令
                 historyShow: false,
+                // 等等返回结果
+                spinShow: false,
                 ruleValidate: {
                     command: [
                         { required: true, message: '请输入命令', trigger: 'blur' }
@@ -162,7 +173,8 @@ Minion: {{minion}}
                         width: 160
                     }
                 ],
-                historyData: []
+                historyData: [],
+                initHistoryData: []
             };
         },
         props: {
@@ -187,6 +199,16 @@ Minion: {{minion}}
                 this.getGroups();
                 // 清除命令表单数据
                 this.formValidate.command = '';
+                // 清除摘要信息
+                this.summaryShow = false;
+                // 清除结果信息
+                this.resultShow = false;
+                // 停止loading
+                this.spinShow = false;
+                // 重新获取历史命令
+                this.getHistory();
+                // 清除搜索的内容
+                this.searchConName = '';
             }
         },
         methods: {
@@ -197,7 +219,8 @@ Minion: {{minion}}
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
                             this.productId = this.productData[0].id;
-                            this.productStateProject = this.productData[0].state_project;
+                            // 加载完产品线后加载历史命令
+                            this.getHistory();
                         } else {
                             this.nerror('Get Product Failure', res.data['message']);
                         }
@@ -221,11 +244,13 @@ Minion: {{minion}}
                 });
             },
             refresh () {
-                this.productList();
+                this.getGroups();
+                this.getHistory();
             },
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (true) {
+                        this.spinShow = true;
                         let postData = {
                             'minion_id': ['10.55.30.22', '10.55.30.23'],
                             'command': this.formValidate.command
@@ -235,6 +260,8 @@ Minion: {{minion}}
                                 if (res.data['status'] === true) {
                                     this.result = res.data['data'];
                                     this.summaryShow = true;
+                                    this.resultShow = true;
+                                    this.spinShow = false;
                                     // 有错误后显示不同的颜色
                                     if (this.result['failure'] !== '0') {
                                         this.summaryType = 'error';
@@ -244,6 +271,7 @@ Minion: {{minion}}
                                 } else {
                                     this.result = '';
                                     this.summaryShow = false;
+                                    this.spinShow = false;
                                     this.nerror('Execute Failure', res.data['message']);
                                 }
                             },
@@ -256,6 +284,7 @@ Minion: {{minion}}
                                 }
                                 this.result = '';
                                 this.summaryShow = false;
+                                this.spinShow = false;
                                 this.nerror('Execute Failure', errInfo);
                             });
                     } else {
@@ -270,6 +299,7 @@ Minion: {{minion}}
             handleHistory () {
                 if (this.historyShow === true) {
                     this.historyShow = false;
+                    this.searchConName = '';
                 } else {
                     this.getHistory();
                     this.historyShow = true;
@@ -280,6 +310,7 @@ Minion: {{minion}}
                     res => {
                         if (res.data['status'] === true) {
                             this.historyData = res.data['data'];
+                            this.initHistoryData = this.historyData
                         } else {
                             this.nerror('Get Info Failure', res.data['message']);
                         }
@@ -328,6 +359,26 @@ Minion: {{minion}}
                         }
                         this.loading = false;
                     });
+            },
+            search (data, argumentObj) {
+                let res = data;
+                let dataClone = data;
+                for (let argu in argumentObj) {
+                    if (argumentObj[argu].length > 0) {
+                        res = dataClone.filter(d => {
+                            return d[argu].indexOf(argumentObj[argu]) > -1;
+                        });
+                        dataClone = res;
+                    }
+                }
+                return res;
+            },
+            handleSearch () {
+//                if (this.historyShow === false) {
+//                    this.historyShow = true;
+//                }
+                this.historyData = this.initHistoryData;
+                this.historyData = this.search(this.historyData, {command: this.searchConName});
             }
         }
     };
