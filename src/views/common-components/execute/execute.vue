@@ -23,28 +23,32 @@
                             <Card dis-hover>
                                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="47">
                                     <FormItem label="目标" prop="target">
-                                        <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData" stripe></Table>
+                                        <CheckboxGroup v-model="formValidate.target">
+                                            <Checkbox label="Eat"></Checkbox>
+                                            <Checkbox label="Sleep"></Checkbox>
+                                            <Checkbox label="Run"></Checkbox>
+                                            <Checkbox label="Movie"></Checkbox>
+                                            <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData" stripe></Table>
+                                        </CheckboxGroup>
+
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
+                                        {{formValidate.target}}
                                         <Input v-model="formValidate.command" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="输入shell命令"></Input>
                                     </FormItem>
                                     <FormItem>
                                         <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                                         <Button type="ghost" @click="handleReset('formValidate')">重置</Button>
-                                        <!--<div style="float: right">-->
-                                            <!--<Input v-model="searchConName" icon="search" @on-change="handleSearch" style="width: 200px" />-->
-                                        <!--</div>-->
                                         <div style="float: right">
                                             <Poptip placement="top-end" width="700">
-                                                <Button type="ghost">历史</Button>
+                                                <Button type="ghost" @click="handleHistory">历史命令</Button>
                                                 <div class="api" slot="content">
                                                     <div style="padding-bottom: 5px">
-                                                        <Input v-model="searchConName" icon="search" @on-change="handleSearch" style="width: 200px" />
+                                                        <Input v-model="searchConName" icon="search" @on-change="handleSearch" placeholder="请输入历史命令" style="width: 200px" />
                                                     </div>
                                                     <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData" stripe></Table>
                                                 </div>
                                              </Poptip>
-                                            <!--<Button type="ghost" @click="handleHistory" style="margin-right: 3px">历史</Button>-->
                                         </div>
                                     </FormItem>
                                     <FormItem label="历史" prop="history" v-show="historyShow">
@@ -71,7 +75,7 @@
                                                 </li>
                                             </ul>
                                         </Alert>
-                                        <highlight-code lang="yaml" style="overflow:auto" v-show="resultShow" v-for="(item, minion) in result.result">
+                                        <highlight-code lang="yaml" v-show="resultShow" style="overflow:auto"　v-for="(item, minion) in result.result" :key="item.minion">
 Minion: {{minion}}
 {{item}}
                                         </highlight-code>
@@ -98,7 +102,7 @@ Minion: {{minion}}
                 searchConName: '',
                 formValidate: {
                     command: '',
-                    target: ''
+                    target: []
                 },
                 // 默认不显示结果信息
                 resultShow: false,
@@ -115,7 +119,7 @@ Minion: {{minion}}
                         { required: true, message: '请输入命令', trigger: 'blur' }
                     ],
                     target: [
-                        { required: true, message: '请勾选主机或者分组', trigger: 'blur' }
+                        { required: true, type: 'array', message: '请勾选主机或者分组', trigger: 'change' }
                     ]
                 },
                 columnsTarget: [
@@ -125,8 +129,9 @@ Minion: {{minion}}
                         width: 180,
                         render: (h, params) => {
                             return h('Checkbox', {
-                                style: {
-                                    padding: '0px'
+                                props: {
+                                    label: params.row.name,
+                                    value: params.row.name
                                 }
                             }, params.row.name);
                         }
@@ -135,10 +140,10 @@ Minion: {{minion}}
                         title: '主机',
                         key: 'minion',
                         render: (h, params) => {
-                            return h('CheckboxGroup', params.row.minion.map(item => {
+                            return h('div', params.row.minion.map(item => {
                                 return h('Checkbox', {
-                                    style: {
-                                        padding: '0px'
+                                    props: {
+                                        label: item
                                     }
                                 }, item);
                             })
@@ -249,10 +254,10 @@ Minion: {{minion}}
             },
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
-                    if (true) {
+                    if (valid) {
                         this.spinShow = true;
                         let postData = {
-                            'minion_id': ['10.55.30.22', '10.55.30.23'],
+                            'minion_id': this.formValidate.target,
                             'command': this.formValidate.command
                         };
                         this.axios.post(this.Global.serverSrc + this.apiService + '?product_id=' + this.productId, postData).then(
@@ -295,22 +300,12 @@ Minion: {{minion}}
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
-            // 历史命令展示与隐藏
-            handleHistory () {
-                if (this.historyShow === true) {
-                    this.historyShow = false;
-                    this.searchConName = '';
-                } else {
-                    this.getHistory();
-                    this.historyShow = true;
-                }
-            },
             getHistory () {
                 this.axios.get(this.Global.serverSrc + this.apiHistory + '?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.historyData = res.data['data'];
-                            this.initHistoryData = this.historyData
+                            this.initHistoryData = this.historyData;
                         } else {
                             this.nerror('Get Info Failure', res.data['message']);
                         }
@@ -374,11 +369,12 @@ Minion: {{minion}}
                 return res;
             },
             handleSearch () {
-//                if (this.historyShow === false) {
-//                    this.historyShow = true;
-//                }
                 this.historyData = this.initHistoryData;
                 this.historyData = this.search(this.historyData, {command: this.searchConName});
+            },
+            handleHistory () {
+                this.searchConName = '';
+                this.getHistory();
             }
         }
     };
