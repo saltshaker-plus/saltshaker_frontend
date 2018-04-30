@@ -7,28 +7,27 @@
                 @getRowEvent="getRowEvent"
                 :productShow="true"
                 ref="childrenMethods">
-            <Button slot="create" type="primary" @click="add('formValidate')">创建主机</Button>
+            <Button slot="create" type="primary" @click="add('formValidate')" v-show="false">创建主机</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName">
-                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
-                    <FormItem label="产品线" prop="productId">
-                        <Select v-model="formValidate.productId" placeholder="选择产品线">
-                            <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                        </Select>
+                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="70" inline>
+                    <FormItem label="标签">
+                        <Tag v-for="item in formValidate.tag" :key="item.name" :name="item.name" :color="item.color" closable @on-close="handleTagDel">{{item.name}}</Tag>
                     </FormItem>
-                    <FormItem label="标签" prop="productId">
-                        <Tag v-for="item in count" :key="item" :name="item" closable @on-close="handleClose2">标签</Tag>
-                        <Button icon="ios-plus-empty" type="dashed" size="small" @click="handleAdd">添加标签</Button>
+                    <FormItem label="添加标签" prop="tagName">
+                        <Input size="small" v-model="formValidate.tagName" style="width:220px"></Input>
+                        <Select size="small" v-model="tagColor" style="width:80px">
+                            <Option value="default" key="default">默认</Option>
+                            <Option value="green" key="green">绿色</Option>
+                            <Option value="red" key="red">红色</Option>
+                            <Option value="yellow" key="yellow">黄色</Option>
+                        </Select>
+                        <Button icon="ios-plus-empty" type="dashed" size="small" @click="handleTagAdd('formValidate')">添加标签</Button>
                     </FormItem>
                 </Form>
-
                 <div slot="footer">
                     <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
-                    <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                 </div>
             </Modal>
-            <Button v-show="buttonShow" slot="accept" @click="handleSelectAll('全部接受','accept')">全部接受</Button>
-            <Button v-show="buttonShow" slot="reject" @click="handleSelectAll('全部拒绝','reject')">全部拒绝</Button>
-            <Button v-show="buttonShow" slot="delete" @click="handleSelectAll('全部删除','delete')">全部删除</Button>
         </common-table>
     </div>
 </template>
@@ -55,12 +54,11 @@
                 optionType: '',
                 optionTypeName: '',
                 index: 1,
+                // tag
+                tagName: '',
+                tagColor: 'default',
+                minionId: '',
                 cColumns: [
-                    {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
                     {
                         title: 'Minion',
                         key: 'minion_id',
@@ -98,19 +96,15 @@
                         key: 'tag',
                         sortable: true,
                         render: (h, params) => {
-                            return h('div', [
-                                h('Tag', {
+                            return h('div', params.row.tag.map(item => {
+                                return h('Tag', {
                                     props: {
-                                        'color': 'blue'
+                                        color: item['color'],
+                                        name: item['name']
                                     },
-                                    on: {
-                                        'on-close': () => {
-                                            const index = this.count.indexOf(name);
-                                            this.count.splice(index, 1);
-                                        }
-                                    }
-                                }, params.row.tag),
-                            ]);
+                                }, item['name']);
+                            })
+                            );
                         }
                     },
                     {
@@ -134,8 +128,9 @@
                                             this.optionType = 'edit';
                                             this.optionTypeName = '编辑';
                                             this.id = params.row.id;
-                                            this.formValidate = params.row;
-                                            this.readonly = true;
+                                            this.minionId = params.row.minion_id;
+                                            this.formValidate.tagName = '';
+                                            this.formValidate.tag = params.row.tag;
                                         }
                                     }
                                 }, '编辑'),
@@ -157,7 +152,8 @@
                                     h('Button', {
                                         props: {
                                             type: 'error',
-                                            size: 'small'
+                                            size: 'small',
+                                            disabled: true
                                         }
                                     }, '删除')
                                 ])
@@ -167,13 +163,14 @@
                 ],
                 // 表单验证
                 formValidate: {
-                    productId: ''
+                    tagName: '',
+                    tag: []
                 },
                 ruleValidate: {
-                    productId: [
-                        { required: true, message: '产品线不能为空', trigger: 'change' }
+                    tagName: [
+                        { required: true, message: '标签不能为空', trigger: 'blur' }
                     ]
-                },
+                }
             };
         },
         methods: {
@@ -276,16 +273,68 @@
             handleRemove (index) {
                 this.formDynamic.items[index].status = 0;
             },
-            handleAdd () {
-                if (this.count.length) {
-                    this.count.push(this.count[this.count.length - 1] + 1);
-                } else {
-                    this.count.push(0);
+            handleTagAdd (name) {
+                for (var i = 1; i < this.formValidate.tag.length; i++) {
+                    if (this.formValidate.tag[i]['name'] === this.formValidate.tagName) {
+                        this.$Message.error('标签不能重复！');
+                        return;
+                    }
                 }
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.formValidate.tag.push({'name': this.formValidate.tagName, 'color': this.tagColor});
+                        let postData = {
+                            'tag': this.formValidate.tag,
+                            'minion_id': this.minionId,
+                            'product_id': this.productId
+                        };
+                        this.axios.put(this.Global.serverSrc + this.apiService + '/' + this.id, postData).then(
+                            res => {
+                                if (res.data['status'] === true) {
+                                    this.$Message.success('添加成功！');
+                                } else {
+                                    this.nerror('Add Failure', res.data['message']);
+                                }
+                            },
+                            err => {
+                                let errInfo = '';
+                                try {
+                                    errInfo = err.response.data['message'];
+                                } catch (error) {
+                                    errInfo = err;
+                                }
+                                this.nerror('Add Failure', errInfo);
+                            });
+                    } else {
+                        this.$Message.error('请检查表单数据！');
+                    }
+                });
             },
-            handleClose2 (event, name) {
-                const index = this.count.indexOf(name);
-                this.count.splice(index, 1);
+            handleTagDel (event, name) {
+                // 删除tag
+                this.formValidate.tag.splice(this.formValidate.tag.findIndex(item => item.name === name), 1);
+                let postData = {
+                    'tag': this.formValidate.tag,
+                    'minion_id': this.minionId,
+                    'product_id': this.productId
+                };
+                this.axios.put(this.Global.serverSrc + this.apiService + '/' + this.id, postData).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('删除成功！');
+                        } else {
+                            this.nerror('Delete Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Delete Failure', errInfo);
+                    });
             }
         }
     };
