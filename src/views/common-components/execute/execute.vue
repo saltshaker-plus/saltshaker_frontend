@@ -28,7 +28,6 @@
                                         </CheckboxGroup>
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
-                                        {{formValidate.target}}
                                         <Input v-model="formValidate.command" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="输入shell命令"></Input>
                                     </FormItem>
                                     <FormItem>
@@ -48,22 +47,22 @@
                                     </FormItem>
                                     <FormItem label="结果">
                                         <Spin size="large" fix v-if="spinShow"></Spin>
-                                        <Alert :type="summaryType" v-show="summaryShow">
+                                        <Alert :type="summaryType">
                                             <ul>
                                                 <li>
-                                                    总数: {{result.total}}
+                                                    总数： {{result.total}}
                                                 </li>
                                                 <li>
-                                                    成功: {{result.succeed}}
+                                                    成功： {{result.succeed}}
                                                 </li>
                                                 <li>
-                                                    失败: {{result.failure}}
+                                                    失败： {{result.failure}}
                                                 </li>
                                                 <li>
-                                                    失败主机: {{result.failure_minion}}
+                                                    失败主机： {{result.failure_minion}}
                                                 </li>
                                                 <li>
-                                                    命令: {{result.command}}
+                                                    命令： {{result.command}}
                                                 </li>
                                             </ul>
                                         </Alert>
@@ -98,11 +97,9 @@ Minion: {{minion}}
                 },
                 // 默认不显示结果信息
                 resultShow: false,
-                // 默认不显示摘要信息
-                summaryShow: false,
                 // 摘要信息样式
                 summaryType: 'success',
-                // 等等返回结果
+                // 等待返回结果
                 spinShow: false,
                 // 全选
                 indeterminate: false,
@@ -215,10 +212,12 @@ Minion: {{minion}}
                 this.getGroups();
                 // 清除命令表单数据
                 this.formValidate.command = '';
-                // 清除摘要信息
-                this.summaryShow = false;
+                // 清除目标表单数据
+                this.formValidate.target = [];
                 // 清除结果信息
                 this.resultShow = false;
+                // 清除摘要信息
+                this.result = '';
                 // 停止loading
                 this.spinShow = false;
                 // 重新获取历史命令
@@ -275,7 +274,6 @@ Minion: {{minion}}
                             res => {
                                 if (res.data['status'] === true) {
                                     this.result = res.data['data'];
-                                    this.summaryShow = true;
                                     this.resultShow = true;
                                     this.spinShow = false;
                                     // 有错误后显示不同的颜色
@@ -286,7 +284,7 @@ Minion: {{minion}}
                                     }
                                 } else {
                                     this.result = '';
-                                    this.summaryShow = false;
+                                    this.resultShow = false;
                                     this.spinShow = false;
                                     this.nerror('Execute Failure', res.data['message']);
                                 }
@@ -299,7 +297,7 @@ Minion: {{minion}}
                                     errInfo = err;
                                 }
                                 this.result = '';
-                                this.summaryShow = false;
+                                this.resultShow = false;
                                 this.spinShow = false;
                                 this.nerror('Execute Failure', errInfo);
                             });
@@ -388,7 +386,7 @@ Minion: {{minion}}
                 this.getHistory();
             },
             handleSelect (minion) {
-                console.log(minion)
+                console.log(minion);
             },
             handleCheckAll () {
                 if (this.indeterminate) {
