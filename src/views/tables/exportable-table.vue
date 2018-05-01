@@ -73,7 +73,9 @@
 import {table2csvData, csvColumns} from './data/table2csv.js';
 import {table2excelData, excelColumns} from './data/table2excel.js';
 import table2excel from '@/libs/table2excel.js';
+import TableToImage from './table-to-image.vue'
 export default {
+    components: {TableToImage},
     name: 'exportable-table',
     data () {
         return {

@@ -23,10 +23,6 @@
                     <Row :gutter="5">
                         <Col span="6">
                             <Card dis-hover :padding="5">
-                                <p slot="title">
-                                    <Icon type="ios-toggle"></Icon>
-                                    选择分支
-                                </p>
                                 <div style="margin-bottom: -10px;">
                                 <Select v-model="branchName">
                                     <Option v-for="item in branchData" :value="item" :key="item">{{ item }}</Option>
@@ -37,21 +33,18 @@
                             </Card>
                         </Col>
                         <Col span="18">
-                            <Card dis-hover :padding="5">
-                                <p slot="title">
-                                    <Icon type="document-text"></Icon>
-                                    SLS内容
-                                </p>
-                                <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
-                                    {{fileContent}}
-                                </highlight-code>
-                            </Card>
-                            <execute
+                            <common-execute
                                     :apiService="apiService"
                                     :apiHistory="apiHistory"
                                     :productShow="true"
+                                    :productId="productId"
                                     ref="childrenMethods">
-                            </execute>
+                                <FormItem label="SLS" prop="command" slot="command">
+                                    <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
+                                    {{fileContent}}
+                                    </highlight-code>
+                                </FormItem>
+                            </common-execute>
                         </Col>
                     </Row>
                 </Card>
@@ -61,10 +54,10 @@
 </template>
 
 <script>
-    import Execute from '../../common-components/execute/execute.vue';
+    import commonExecute from '../../common-components/execute/common-execute.vue';
     export default {
         components: {
-            Execute
+            commonExecute
         },
         name: 'CommonSLS',
         data () {
