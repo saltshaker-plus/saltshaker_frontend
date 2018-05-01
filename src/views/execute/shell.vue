@@ -1,19 +1,19 @@
 <template>
     <div>
-        <common-s-l-s
+        <execute
                 :apiService="apiService"
                 :apiHistory="apiHistory"
                 :productShow="true"
                 ref="childrenMethods">
-        </common-s-l-s>
+        </execute>
     </div>
 </template>
 
 <script>
-    import CommonSLS from '../common-components/execute/execute.vue';
+    import Execute from '../common-components/execute/execute.vue';
     export default {
         components: {
-            CommonSLS
+            Execute
         },
         data () {
             return {

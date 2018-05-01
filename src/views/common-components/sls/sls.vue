@@ -46,6 +46,12 @@
                                     {{fileContent}}
                                 </highlight-code>
                             </Card>
+                            <execute
+                                    :apiService="apiService"
+                                    :apiHistory="apiHistory"
+                                    :productShow="true"
+                                    ref="childrenMethods">
+                            </execute>
                         </Col>
                     </Row>
                 </Card>
@@ -55,7 +61,11 @@
 </template>
 
 <script>
+    import Execute from '../../common-components/execute/execute.vue';
     export default {
+        components: {
+            Execute
+        },
         name: 'CommonSLS',
         data () {
             return {
