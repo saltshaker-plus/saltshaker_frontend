@@ -105,8 +105,10 @@
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
-                            this.productId = this.productData[0].id;
-                            this.productStateProject = this.productData[0].state_project;
+                            if (this.productData.length > 0) {
+                                this.productId = this.productData[0].id;
+                                this.productStateProject = this.productData[0].state_project;
+                            }
                         } else {
                             this.nerror('Get Product Failure', res.data['message']);
                         }

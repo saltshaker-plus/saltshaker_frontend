@@ -233,7 +233,9 @@ Minion: {{minion}}
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
-                            this.productId = this.productData[0].id;
+                            if (this.productData.length > 0) {
+                                this.productId = this.productData[0].id;
+                            }
                             // 加载完产品线后加载历史命令
                             this.getHistory();
                         } else {

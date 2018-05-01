@@ -188,8 +188,13 @@
                     res => {
                         if (res.data['status'] === true) {
                             this.productData = res.data['data'];
-                            this.productId = this.productData[0].id;
+                            if (this.productData.length > 0) {
+                                this.productId = this.productData[0].id;
+                            } else {
+                                this.loading = false;
+                            }
                         } else {
+                            this.loading = false;
                             this.nerror('Get Product Failure', res.data['message']);
                         }
                     },
@@ -200,6 +205,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
+                        this.loading = false;
                         this.nerror('Get Product Failure', errInfo);
                     });
             },
