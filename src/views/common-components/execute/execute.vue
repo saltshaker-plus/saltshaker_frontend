@@ -24,13 +24,8 @@
                                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="47">
                                     <FormItem label="目标" prop="target">
                                         <CheckboxGroup v-model="formValidate.target">
-                                            <Checkbox label="Eat"></Checkbox>
-                                            <Checkbox label="Sleep"></Checkbox>
-                                            <Checkbox label="Run"></Checkbox>
-                                            <Checkbox label="Movie"></Checkbox>
                                             <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData" stripe></Table>
                                         </CheckboxGroup>
-
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
                                         {{formValidate.target}}
@@ -50,9 +45,6 @@
                                                 </div>
                                              </Poptip>
                                         </div>
-                                    </FormItem>
-                                    <FormItem label="历史" prop="history" v-show="historyShow">
-                                        <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData" stripe></Table>
                                     </FormItem>
                                     <FormItem label="结果">
                                         <Spin size="large" fix v-if="spinShow"></Spin>
@@ -92,7 +84,7 @@ Minion: {{minion}}
 
 <script>
     export default {
-        name: 'CommonSLS',
+        name: 'Execute',
         data () {
             return {
                 productData: this.productList(),
@@ -110,10 +102,11 @@ Minion: {{minion}}
                 summaryShow: false,
                 // 摘要信息样式
                 summaryType: 'success',
-                // 默认不显示历史命令
-                historyShow: false,
                 // 等等返回结果
                 spinShow: false,
+                // 全选
+                indeterminate: false,
+                checkAll: false,
                 ruleValidate: {
                     command: [
                         { required: true, message: '请输入命令', trigger: 'blur' }
@@ -126,14 +119,34 @@ Minion: {{minion}}
                     {
                         title: '分组',
                         key: 'name',
-                        width: 180,
+                        width: 145,
                         render: (h, params) => {
-                            return h('Checkbox', {
-                                props: {
-                                    label: params.row.name,
-                                    value: params.row.name
-                                }
-                            }, params.row.name);
+                            return h('CheckboxGroup', [
+                                h('Checkbox', {
+                                    props: {
+                                        label: params.row.name,
+                                        indeterminate: this.indeterminate,
+                                        value: this.checkAll
+                                    },
+                                    nativeOn: {
+                                        click: () => {
+                                            if (this.indeterminate) {
+                                                this.checkAll = false;
+                                            } else {
+                                                this.checkAll = !this.checkAll;
+                                            }
+                                            this.indeterminate = false;
+                                            if (this.checkAll) {
+                                                this.formValidate.target = [...params.row.minion];
+                                                console.log(this.formValidate.target)
+                                            } else {
+                                                this.formValidate.target.splice(this.formValidate.target.findIndex(item => params.row.minion.indexOf(item)), 1);
+                                                //this.formValidate.target = [];
+                                            }
+                                        }
+                                    }
+                                }, params.row.name)
+                            ]);
                         }
                     },
                     {
@@ -170,7 +183,7 @@ Minion: {{minion}}
                     {
                         title: '用户',
                         key: 'username',
-                        width: 180,
+                        width: 180
                     },
                     {
                         title: '时间',
@@ -198,8 +211,6 @@ Minion: {{minion}}
         watch: {
             // 监控产品线变化
             productId () {
-                // 关闭历史命令框
-                this.historyShow = false;
                 // 重新获取分组信息
                 this.getGroups();
                 // 清除命令表单数据
@@ -329,7 +340,7 @@ Minion: {{minion}}
                     });
             },
             getGroups () {
-                this.axios.get(this.Global.serverSrc + 'groups' + '?product_id=' + this.productId).then(
+                this.axios.get(this.Global.serverSrc + 'execute/groups?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.targetData = res.data['data'];
@@ -375,6 +386,35 @@ Minion: {{minion}}
             handleHistory () {
                 this.searchConName = '';
                 this.getHistory();
+            },
+            handleSelect (minion) {
+                console.log(minion)
+            },
+            handleCheckAll () {
+                if (this.indeterminate) {
+                    this.checkAll = false;
+                } else {
+                    this.checkAll = !this.checkAll;
+                }
+                this.indeterminate = false;
+
+                if (this.checkAll) {
+                    this.checkAllGroup = ['苹果', '西瓜'];
+                } else {
+                    this.checkAllGroup = [];
+                }
+            },
+            checkAllGroupChange (data) {
+                if (data.length === 3) {
+                    this.indeterminate = false;
+                    this.checkAll = true;
+                } else if (data.length > 0) {
+                    this.indeterminate = true;
+                    this.checkAll = false;
+                } else {
+                    this.indeterminate = false;
+                    this.checkAll = false;
+                }
             }
         }
     };
