@@ -180,6 +180,7 @@
                             errInfo = err;
                             this.nerror('Get Info Failure', errInfo);
                         }
+                        this.tableData = [];
                         this.loading = false;
                     });
             },
