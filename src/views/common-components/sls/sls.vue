@@ -29,6 +29,7 @@
                                 </Select>
                                 </div>
                                 <br>
+                                <!--<Tree :data="fileTree" :load-data="loadData"></Tree>-->
                                 <Tree :data="fileTree" :load-data="loadData" @on-select-change="handleContent"></Tree>
                             </Card>
                         </Col>
@@ -40,6 +41,7 @@
                                     :productId="productId"
                                     ref="childrenMethods">
                                 <FormItem label="SLS" prop="command" slot="command">
+                                     {{path}}
                                     <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
                                     {{fileContent}}
                                     </highlight-code>
@@ -69,7 +71,10 @@
                 branchName: '',
                 fileTreeData: [],
                 fileTree: [],
-                fileContent: ''
+                fileListPathData: [],
+                fileContent: '',
+                path: '',
+                apiHistory: ''
             };
         },
         props: {
@@ -92,10 +97,13 @@
             },
             branchName () {
                 if (this.branchName !== '') {
+                    // 获取第一级GitLab数据
                     this.fileList();
                 } else {
                     this.fileTreeData = [];
                     this.fileTree = [];
+                    this.fileListPathData = [];
+                    this.path = '';
                 }
             }
         },
@@ -149,6 +157,7 @@
             },
             fileList () {
                 this.fileContent = '';
+                this.path = '';
                 this.axios.get(this.Global.serverSrc + this.apiService + '/file?product_id=' + this.productId + '&project_type=' + this.projectType + '&path=/&branch=' + this.branchName).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -169,16 +178,39 @@
                         this.nerror('Get File Tree Failure', errInfo);
                     });
             },
+            // 传入path获取gitlab对应数据
+            fileListPath (path) {
+                this.fileContent = '';
+                this.axios.get(this.Global.serverSrc + this.apiService + '/file?product_id=' + this.productId + '&project_type=' + this.projectType + '&path=' + path + '&branch=' + this.branchName).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.fileListPathData = res.data['data'];
+                        } else {
+                            this.fileListPathData = [];
+                            this.nerror('Get File Tree Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.fileListPathData = [];
+                        this.nerror('Get File Tree Failure', errInfo);
+                    });
+            },
             handleContent (filePath) {
-                if (filePath.length !== 0) {
+                if (filePath.length !== 0 && filePath[0]['type'] !== 'tree') {
                     this.fileContent = '';
-                    let path = filePath[0]['path'];
-                    this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + path).then(
+                    this.path = filePath[0]['path'];
+                    this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + this.path).then(
                         res => {
                             if (res.data['status'] === true) {
                                 this.fileContent = res.data['data'];
                             } else {
-                                this.nerror('Get File Tree Failure', res.data['message']);
+                                this.nerror('Get File Content Failure', res.data['message']);
                             }
                         },
                         err => {
@@ -188,26 +220,17 @@
                             } catch (error) {
                                 errInfo = err;
                             }
-                            this.nerror('Get File Tree Failure', errInfo);
+                            this.nerror('Get File Content Failure', errInfo);
                         });
                 }
             },
+            // 展开树型结构获取gitlab数据
             loadData (item, callback) {
+                this.fileListPath(item['path']);
+                // fileListPath为异步方法,等待500ms
                 setTimeout(() => {
-                    const data = [
-                        {
-                            title: 'children',
-                            loading: false,
-                            children: []
-                        },
-                        {
-                            title: 'children',
-                            loading: false,
-                            children: []
-                        }
-                    ];
-                    callback(data);
-                }, 300);
+                    callback(this.fileListPathData);
+                }, 500);
             },
             // 重新定义错误消息
             nerror (title, info) {
@@ -218,7 +241,7 @@
                 });
             },
             refresh () {
-                this.productList();
+                this.fileList();
             }
         }
     };

@@ -72,7 +72,6 @@ Minion: {{minion}}
         data () {
             return {
                 productData: this.productList(),
-                productId: '',
                 // 执行命令的返回数据
                 result: '',
                 searchConName: '',
