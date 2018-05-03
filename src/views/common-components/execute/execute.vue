@@ -28,6 +28,7 @@
                                         </CheckboxGroup>
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
+                                        {{formValidate.target}}
                                         <Input v-model="formValidate.command" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="输入shell命令"></Input>
                                     </FormItem>
                                     <FormItem>
@@ -122,24 +123,44 @@ Minion: {{minion}}
                                 h('Checkbox', {
                                     props: {
                                         label: params.row.name,
-                                        indeterminate: this.indeterminate,
-                                        value: this.checkAll
+//                                        indeterminate: true,
+//                                        value: true
                                     },
                                     nativeOn: {
                                         click: () => {
-                                            if (this.indeterminate) {
-                                                this.checkAll = false;
-                                            } else {
-                                                this.checkAll = !this.checkAll;
-                                            }
-                                            this.indeterminate = false;
-                                            if (this.checkAll) {
-                                                this.formValidate.target = [...params.row.minion];
+//                                            if (this.indeterminate) {
+//                                                this.checkAll = false;
+//                                            } else {
+//                                                this.checkAll = !this.checkAll;
+//                                            }
+//                                            this.indeterminate = false;
+//                                            if (this.checkAll) {
+//                                                this.formValidate.target = this.formValidate.target.concat(params.row.minion);
+//                                                console.log(this.formValidate.target)
+//                                            } else {
+//                                                this.formValidate.target.splice(this.formValidate.target.findIndex(item => params.row.minion.indexOf(item)), 1);
+//                                                console.log(this.formValidate.target)
+//                                                //this.formValidate.target = [];
+//                                            }
+                                            if (this.formValidate.target.includes(params.row.name)) {
+                                                this.formValidate.target.splice(this.formValidate.target.indexOf(params.row.name), 1);
+                                                for (let i = 0; i < this.formValidate.target.length; i++) {
+                                                    for (let m = 0; m < params.row.minion.length; m++) {
+                                                        if (this.formValidate.target[i] === params.row.minion[m]){
+                                                            console.log(this.formValidate.target[i])
+                                                            console.log(i)
+                                                            this.formValidate.target.splice(i, 1);
+
+                                                        }
+                                                    }
+                                                }
                                                 console.log(this.formValidate.target)
                                             } else {
-                                                this.formValidate.target.splice(this.formValidate.target.findIndex(item => params.row.minion.indexOf(item)), 1);
-                                                //this.formValidate.target = [];
+                                                this.formValidate.target.push(params.row.name)
+                                                this.formValidate.target = this.formValidate.target.concat(params.row.minion);
+                                                console.log(this.formValidate.target)
                                             }
+
                                         }
                                     }
                                 }, params.row.name)
@@ -199,10 +220,6 @@ Minion: {{minion}}
             },
             productShow: {
                 type: Boolean
-            },
-            apiHistory: {
-                type: String,
-                required: true
             }
         },
         watch: {
@@ -312,7 +329,7 @@ Minion: {{minion}}
                 this.$refs[name].resetFields();
             },
             getHistory () {
-                this.axios.get(this.Global.serverSrc + this.apiHistory + '?product_id=' + this.productId).then(
+                this.axios.get(this.Global.serverSrc + 'history?type=shell&product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.historyData = res.data['data'];

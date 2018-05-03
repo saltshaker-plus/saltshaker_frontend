@@ -2,7 +2,6 @@
     <div>
         <execute
                 :apiService="apiService"
-                :apiHistory="apiHistory"
                 :productShow="true"
                 ref="childrenMethods">
         </execute>
@@ -18,7 +17,6 @@
         data () {
             return {
                 apiService: 'execute/shell',
-                apiHistory: 'shell/history'
             };
         }
     };
