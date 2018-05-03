@@ -149,17 +149,7 @@ Minion: {{minion}}
                 columnsHistory: [
                     {
                         title: '命令',
-                        key: 'command',
-                        render: (h, params) => {
-                            return h('div', {
-                                on: {
-                                    'dblclick': () => {
-                                        // 双击历史命令填充到命令行表单
-                                        this.formValidate.command = params.row.command;
-                                    }
-                                }
-                            }, params.row.command);
-                        }
+                        key: 'command'
                     },
                     {
                         title: '用户',
@@ -184,11 +174,11 @@ Minion: {{minion}}
             productShow: {
                 type: Boolean
             },
-            apiHistory: {
+            productId: {
                 type: String,
                 required: true
             },
-            productId: {
+            slsCommand: {
                 type: String,
                 required: true
             }
@@ -212,6 +202,14 @@ Minion: {{minion}}
                 this.getHistory();
                 // 清除搜索的内容
                 this.searchConName = '';
+            },
+            // 监听sls文件名变化
+            slsCommand () {
+                this.formValidate.command = this.slsCommand;
+                // 清除结果信息
+                this.resultShow = false;
+                // 清除摘要信息
+                this.result = '';
             }
         },
         methods: {
@@ -258,9 +256,9 @@ Minion: {{minion}}
                         this.spinShow = true;
                         let postData = {
                             'minion_id': this.formValidate.target,
-                            'command': this.formValidate.command
+                            'sls': this.formValidate.command
                         };
-                        this.axios.post(this.Global.serverSrc + this.apiService + '?product_id=' + this.productId, postData).then(
+                        this.axios.post(this.Global.serverSrc + 'execute/sls?product_id=' + this.productId, postData).then(
                             res => {
                                 if (res.data['status'] === true) {
                                     this.result = res.data['data'];
@@ -300,7 +298,7 @@ Minion: {{minion}}
                 this.$refs[name].resetFields();
             },
             getHistory () {
-                this.axios.get(this.Global.serverSrc + this.apiHistory + '?product_id=' + this.productId).then(
+                this.axios.get(this.Global.serverSrc + 'history?type=sls&product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.historyData = res.data['data'];

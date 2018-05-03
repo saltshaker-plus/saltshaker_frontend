@@ -29,19 +29,17 @@
                                 </Select>
                                 </div>
                                 <br>
-                                <!--<Tree :data="fileTree" :load-data="loadData"></Tree>-->
                                 <Tree :data="fileTree" :load-data="loadData" @on-select-change="handleContent"></Tree>
                             </Card>
                         </Col>
                         <Col span="18">
                             <common-execute
                                     :apiService="apiService"
-                                    :apiHistory="apiHistory"
                                     :productShow="true"
                                     :productId="productId"
+                                    :slsCommand="path"
                                     ref="childrenMethods">
                                 <FormItem label="SLS" prop="command" slot="command">
-                                     {{path}}
                                     <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
                                     {{fileContent}}
                                     </highlight-code>
