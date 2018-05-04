@@ -181,6 +181,10 @@ Minion: {{minion}}
             slsCommand: {
                 type: String,
                 required: true
+            },
+            slsURI: {
+                type: String,
+                required: true
             }
         },
         watch: {
@@ -258,7 +262,7 @@ Minion: {{minion}}
                             'minion_id': this.formValidate.target,
                             'sls': this.formValidate.command
                         };
-                        this.axios.post(this.Global.serverSrc + 'execute/sls?product_id=' + this.productId, postData).then(
+                        this.axios.post(this.Global.serverSrc + this.slsURI + '?product_id=' + this.productId, postData).then(
                             res => {
                                 if (res.data['status'] === true) {
                                     this.result = res.data['data'];

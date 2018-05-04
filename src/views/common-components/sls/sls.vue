@@ -38,6 +38,7 @@
                                     :productShow="true"
                                     :productId="productId"
                                     :slsCommand="path"
+                                    :slsURI = "slsURI"
                                     ref="childrenMethods">
                                 <FormItem label="SLS" prop="command" slot="command">
                                     <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
@@ -84,6 +85,10 @@
                 type: Boolean
             },
             projectType: {
+                type: String,
+                required: true
+            },
+            slsURI: {
                 type: String,
                 required: true
             }

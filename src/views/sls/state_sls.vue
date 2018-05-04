@@ -3,6 +3,7 @@
         <common-s-l-s
                 :apiService="apiService"
                 :projectType="projectType"
+                :slsURI = "slsURI"
                 :productShow="true"
                 ref="childrenMethods">
         </common-s-l-s>
@@ -18,7 +19,8 @@
         data () {
             return {
                 apiService: 'gitlab',
-                projectType: 'state_project'
+                projectType: 'state_project',
+                slsURI: 'execute/sls'
             };
         }
     };
