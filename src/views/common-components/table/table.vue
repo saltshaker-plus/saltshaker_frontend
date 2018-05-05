@@ -100,7 +100,7 @@
                 pageCount: this.pageCount,
                 // 搜索
                 nSearchVal: '',
-                searchDate: [],
+                tmpData: [],
                 showBorder: true,
                 loading: true,
                 nData: [],
@@ -147,7 +147,8 @@
             customPage (num) {
                 this.pageSize = num;
                 let list = [];
-                list = nCopy(this.nData);
+                // 如果没有进行搜索tmpData是原始全部数据,如果进行了搜索tmpData为搜索或的数据
+                list = nCopy(this.tmpData);
                 list.splice(this.pageSize, this.pageCount);
                 this.tableData = list;
                 // 初始化到第一页
@@ -159,7 +160,10 @@
                         if (res.data['status'] === true) {
                             this.tableData = res.data['data'];
                             this.pageCount = this.tableData.length;
+                            // nData 为原始数据始终不能改变
                             this.nData = nCopy(this.tableData);
+                            // tmpData 初始值与nData相同,后面用于搜索,翻页,改变表格条数使用
+                            this.tmpData = nCopy(this.tableData);
                             this.tableData.splice(this.pageSize, this.pageCount);
                             this.pageCurrent = 1;
                         } else {
@@ -234,7 +238,8 @@
             },
             changePage (page) {
                 let list = [];
-                list = nCopy(this.nData);
+                // 如果没有进行搜索tmpData是原始全部数据,如果进行了搜索tmpData为搜索或的数据
+                list = nCopy(this.tmpData);
                 this.pageCurrent = page;
                 this.tableData = list.splice((page - 1) * this.pageSize, this.pageSize);
             },
@@ -242,46 +247,77 @@
             exportData (type) {
                 if (type === 1) {
                     this.$refs.table.exportCsv({
-                        filename: 'The original data',
+                        filename: 'saltshaker',
                         data: this.nData
                     });
                 } else if (type === 2) {
                     this.$refs.table.exportCsv({
-                        filename: 'Sorting and filtering data',
+                        filename: 'saltshaker',
                         original: false
                     });
                 } else if (type === 3) {
                     this.$refs.table.exportCsv({
-                        filename: 'Custom data',
+                        filename: 'saltshaker',
                         columns: this.nColumns.filter((col, index) => index < 4),
                         data: this.tableData.filter((data, index) => index < 4)
                     });
                 }
             },
-            search (data, argumentObj) {
+            search (data, searchVal) {
+                // 最终的是最字符串的搜索,达到模糊匹配的效果
                 let res = data;
                 let dataClone = data;
-                for (let argu in argumentObj) {
-                    if (argumentObj[argu].length > 0) {
-                        res = dataClone.filter(d => {
-                            return d[argu].indexOf(argumentObj[argu]) > -1;
-                        });
-                        dataClone = res;
+                let searchResult = [];
+                if (searchVal.length > 0) {
+                    for (let i = 0; i < this.nColumns.length; i++) {
+                        let key = this.nColumns[i]['key'];
+                        if (key !== 'action' && key !== undefined) {
+                            res = dataClone.filter(d => {
+                                // 转换成字符串,数字没有indexOf方法
+                                let value = d[key].toString();
+                                // 如果是数组在进行filter
+                                if (value instanceof Array) {
+                                    let tmp = value.filter(v => {
+                                        // 如果是数组里面是对象在搜索
+                                        if (v instanceof Object) {
+                                            let r = false;
+                                            for (let s in v) {
+                                                if (v[s].indexOf(searchVal) > -1) {
+                                                    r = true;
+                                                    return r;
+                                                }
+                                            }
+                                        } else {
+                                            return v.indexOf(searchVal) > -1;
+                                        }
+                                    });
+                                    return tmp.length > 0;
+                                } else {
+                                    return value.indexOf(searchVal) > -1;
+                                }
+                            });
+                            searchResult = searchResult.concat(res);
+                        }
                     }
+                    // 数组去重
+                    return [...new Set(searchResult)];
+                } else {
+                    return res;
                 }
-                return res;
             },
             handleSearch () {
-                let tmpSearch = [];
-                console.log(this.nData.length)
-                tmpSearch = this.search(this.nData, {user: this.nSearchVal});
-                if (this.nSearchVal !== null) {
-                    this.searchDate = nCopy(tmpSearch);
-                    this.pageCount = tmpSearch.length;
-                    this.pageCurrent = 1;
-                    tmpSearch.splice(this.pageSize, this.pageCount);
-                    this.tableData = tmpSearch;
-                }
+                // 获取原始数据
+                this.tableData = nCopy(this.nData);
+                // 获取搜索后的数据
+                this.tableData = this.search(this.tableData, this.nSearchVal);
+                // 获取搜索后的长度
+                this.pageCount = this.tableData.length;
+                // 给tmpData赋值为搜索后的数据
+                this.tmpData = nCopy(this.tableData);
+                // 展示默认行数的数据
+                this.tableData.splice(this.pageSize, this.pageCount);
+                // 切换到第一页
+                this.pageCurrent = 1;
             },
             // 删除数据
             del (id) {

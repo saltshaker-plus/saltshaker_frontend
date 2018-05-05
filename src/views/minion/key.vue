@@ -58,7 +58,6 @@
                     },
                     {
                         title: '接受 Key',
-                        key: 'Function',
                         sortable: true,
                         align: 'center',
                         render: (h, params) => {
@@ -96,7 +95,6 @@
                     },
                     {
                         title: '拒绝 Key',
-                        key: 'Function',
                         sortable: true,
                         align: 'center',
                         render: (h, params) => {
@@ -134,7 +132,6 @@
                     },
                     {
                         title: '删除 Key',
-                        key: 'Function',
                         sortable: true,
                         align: 'center',
                         render: (h, params) => {
