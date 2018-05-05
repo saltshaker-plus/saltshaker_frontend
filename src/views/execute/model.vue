@@ -2,7 +2,6 @@
     <div>
         <execute
                 :apiService="apiService"
-                :apiHistory="apiHistory"
                 :productShow="true"
                 ref="childrenMethods">
         </execute>
@@ -10,15 +9,14 @@
 </template>
 
 <script>
-    import Execute from '../common-components/sls/sls.vue';
+    import Execute from '../common-components/execute/execute.vue';
     export default {
         components: {
             Execute
         },
         data () {
             return {
-                apiService: 'execute/shell',
-                apiHistory: 'shell/history'
+                apiService: 'execute/shell'
             };
         }
     };

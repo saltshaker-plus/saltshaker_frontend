@@ -16,7 +16,7 @@
         },
         data () {
             return {
-                apiService: 'execute/shell',
+                apiService: 'execute/shell'
             };
         }
     };
