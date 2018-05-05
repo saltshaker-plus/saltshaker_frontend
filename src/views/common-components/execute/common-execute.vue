@@ -19,6 +19,7 @@
                                 <FormItem>
                                     <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                                     <Button type="ghost" @click="handleReset('formValidate')">重置</Button>
+                                    <slot name="commitButton"></slot>
                                     <div style="float: right">
                                         <Poptip placement="top-end" width="700">
                                             <Button type="ghost" @click="handleHistory">历史命令</Button>

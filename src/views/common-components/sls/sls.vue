@@ -41,16 +41,26 @@
                                     :slsURI = "slsURI"
                                     ref="childrenMethods">
                                 <FormItem label="SLS" prop="command" slot="command">
-                                    <highlight-code lang="yaml" style="overflow:auto" v-if="fileContent">
+                                    <highlight-code lang="yaml" style="overflow:auto">
                                     {{fileContent}}
                                     </highlight-code>
                                 </FormItem>
+                                <Button type="dashed" :disabled="editDisabled" @click="handleEdit()" slot="commitButton">编辑</Button>
                             </common-execute>
                         </Col>
                     </Row>
                 </Card>
             </Col>
         </Row>
+        <Modal v-model="edit" title="编辑">
+            <div style="text-align:center">
+                <Input v-model="fileContent" type="textarea" :autosize="{minRows: 5,maxRows: 50}"></Input>
+            </div>
+            <div slot="footer">
+                <Button type="text" @click="handleCancel">取消</Button>
+                <Button type="success" @click="handleCommit">提交</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -71,6 +81,10 @@
                 fileTreeData: [],
                 fileTree: [],
                 fileListPathData: [],
+                // 编辑
+                edit: false,
+                editDisabled: true,
+                filePath: '',
                 fileContent: '',
                 path: '',
                 apiHistory: ''
@@ -107,6 +121,11 @@
                     this.fileTree = [];
                     this.fileListPathData = [];
                     this.path = '';
+                }
+            },
+            fileContent () {
+                if (this.fileContent !== '') {
+                    this.editDisabled = false;
                 }
             }
         },
@@ -205,6 +224,7 @@
                     });
             },
             handleContent (filePath) {
+                this.filePath = filePath;
                 if (filePath.length !== 0 && filePath[0]['type'] !== 'tree') {
                     this.fileContent = '';
                     this.path = filePath[0]['path'];
@@ -245,6 +265,69 @@
             },
             refresh () {
                 this.fileList();
+                // 调用hook进行更新
+                this.handlehook();
+            },
+            handleCancel () {
+                // 取消编辑后再请求一次文件内容,以便恢复文件内容
+                // 暂时关闭
+                // this.handleContent(this.filePath);
+                this.edit = false;
+            },
+            handleEdit () {
+                this.edit = true;
+            },
+            handleCommit () {
+                let postData = {
+                    'path': this.path,
+                    'project_type': this.projectType,
+                    'branch': this.branchName,
+                    'action': 'update',
+                    'content': this.fileContent
+                };
+                this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.result = res.data['data'];
+                            this.edit = false;
+                            this.$Message.success('成功！');
+                            // 调用hook进行更新
+                            this.handlehook();
+                        } else {
+                            this.nerror('Commit Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Commit Failure', errInfo);
+                    });
+            },
+            handlehook () {
+                let postData = {
+                    'tag': 'gitfs/update'
+                };
+                this.axios.post(this.Global.serverSrc + 'hook?product_id=' + this.productId, postData).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.result = res.data['data'];
+                        } else {
+                            this.nerror('Web Hook Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nerror('Web Hook Failure', errInfo);
+                    });
             }
         }
     };
