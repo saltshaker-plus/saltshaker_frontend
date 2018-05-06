@@ -110,8 +110,8 @@ export const appRouter = [
         title: 'SLS管理',
         component: Main,
         children: [
-            { path: 'pillar', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
-            { path: 'state', title: 'State SLS', name: 'state sls', component: () => import('@/views/sls/state_sls.vue') }
+            { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
+            { path: 'state_sls', title: 'State SLS', name: 'state sls', component: () => import('@/views/sls/state_sls.vue') }
         ]
     },
     {
