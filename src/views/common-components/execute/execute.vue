@@ -28,7 +28,6 @@
                                         </CheckboxGroup>
                                     </FormItem>
                                     <FormItem label="命令" prop="command">
-                                        {{formValidate.target}}
                                         <Input v-model="formValidate.command" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="输入shell命令"></Input>
                                     </FormItem>
                                     <FormItem>
@@ -103,8 +102,7 @@ Minion: {{minion}}
                 // 等待返回结果
                 spinShow: false,
                 // 全选
-                indeterminate: false,
-                checkAll: false,
+                target: [],
                 ruleValidate: {
                     command: [
                         { required: true, message: '请输入命令', trigger: 'blur' }
@@ -122,45 +120,26 @@ Minion: {{minion}}
                             return h('CheckboxGroup', [
                                 h('Checkbox', {
                                     props: {
-                                        label: params.row.name,
-//                                        indeterminate: true,
-//                                        value: true
+                                        label: params.row.name
                                     },
                                     nativeOn: {
                                         click: () => {
-//                                            if (this.indeterminate) {
-//                                                this.checkAll = false;
-//                                            } else {
-//                                                this.checkAll = !this.checkAll;
-//                                            }
-//                                            this.indeterminate = false;
-//                                            if (this.checkAll) {
-//                                                this.formValidate.target = this.formValidate.target.concat(params.row.minion);
-//                                                console.log(this.formValidate.target)
-//                                            } else {
-//                                                this.formValidate.target.splice(this.formValidate.target.findIndex(item => params.row.minion.indexOf(item)), 1);
-//                                                console.log(this.formValidate.target)
-//                                                //this.formValidate.target = [];
-//                                            }
+                                            // 点击已经勾选的组,去除勾选的组及对应的minion
                                             if (this.formValidate.target.includes(params.row.name)) {
                                                 this.formValidate.target.splice(this.formValidate.target.indexOf(params.row.name), 1);
-                                                for (let i = 0; i < this.formValidate.target.length; i++) {
-                                                    for (let m = 0; m < params.row.minion.length; m++) {
-                                                        if (this.formValidate.target[i] === params.row.minion[m]){
-                                                            console.log(this.formValidate.target[i])
-                                                            console.log(i)
+                                                // 索引位置变化,采用逆向循环,达到数组去掉另一个数组元素的目的
+                                                for (let i = this.formValidate.target.length - 1; i >= 0; i--) {
+                                                    for (let m = params.row.minion.length - 1; m >= 0; m--) {
+                                                        if (this.formValidate.target[i] === params.row.minion[m]) {
                                                             this.formValidate.target.splice(i, 1);
-
                                                         }
                                                     }
                                                 }
-                                                console.log(this.formValidate.target)
                                             } else {
-                                                this.formValidate.target.push(params.row.name)
+                                                // 点击没有勾选的组,勾选上组及对应的minion
+                                                this.formValidate.target.push(params.row.name);
                                                 this.formValidate.target = this.formValidate.target.concat(params.row.minion);
-                                                console.log(this.formValidate.target)
                                             }
-
                                         }
                                     }
                                 }, params.row.name)
@@ -281,12 +260,30 @@ Minion: {{minion}}
                 this.getGroups();
                 this.getHistory();
             },
+            // 处理选择的minion
+            handleTarget () {
+                // 去重
+                this.target = [...new Set(this.formValidate.target)];
+                // 获取所有的组名
+                let group = this.targetData.map(item => {
+                    return item['name'];
+                });
+                // 去除minion里面的组名
+                for (let i = this.target.length - 1; i >= 0; i--) {
+                    for (let m = group.length - 1; m >= 0; m--) {
+                        if (this.target[i] === group[m]) {
+                            this.target.splice(i, 1);
+                        }
+                    }
+                }
+            },
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.spinShow = true;
+                        this.handleTarget();
                         let postData = {
-                            'minion_id': this.formValidate.target,
+                            'minion_id': this.target,
                             'command': this.formValidate.command
                         };
                         this.axios.post(this.Global.serverSrc + this.apiService + '?product_id=' + this.productId, postData).then(
@@ -336,8 +333,7 @@ Minion: {{minion}}
                             this.initHistoryData = this.historyData;
                         } else {
                             this.nerror('Get Info Failure', res.data['message']);
-                        }
-                        ;
+                        };
                         this.loading = false;
                     },
                     err => {
@@ -403,35 +399,6 @@ Minion: {{minion}}
             handleHistory () {
                 this.searchConName = '';
                 this.getHistory();
-            },
-            handleSelect (minion) {
-                console.log(minion);
-            },
-            handleCheckAll () {
-                if (this.indeterminate) {
-                    this.checkAll = false;
-                } else {
-                    this.checkAll = !this.checkAll;
-                }
-                this.indeterminate = false;
-
-                if (this.checkAll) {
-                    this.checkAllGroup = ['苹果', '西瓜'];
-                } else {
-                    this.checkAllGroup = [];
-                }
-            },
-            checkAllGroupChange (data) {
-                if (data.length === 3) {
-                    this.indeterminate = false;
-                    this.checkAll = true;
-                } else if (data.length > 0) {
-                    this.indeterminate = true;
-                    this.checkAll = false;
-                } else {
-                    this.indeterminate = false;
-                    this.checkAll = false;
-                }
             }
         }
     };
