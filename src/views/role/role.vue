@@ -74,10 +74,16 @@
                         width: 123,
                         align: 'center',
                         render: (h, params) => {
+                            let buttonDisabled = false;
+                            // 默认角色不能编辑及删除
+                            if ([0, 1, 2, 3, 4].indexOf(params.row.tag) > -1) {
+                                buttonDisabled = true;
+                            }
                             return h('div', [
                                 h('Button', {
                                     props: {
                                         type: 'primary',
+                                        disabled: buttonDisabled,
                                         size: 'small'
                                     },
                                     style: {
@@ -112,6 +118,7 @@
                                     h('Button', {
                                         props: {
                                             type: 'error',
+                                            disabled: buttonDisabled,
                                             size: 'small'
                                         }
                                     }, '删除')
@@ -123,7 +130,8 @@
                 // 表单验证
                 formValidate: {
                     name: '',
-                    description: ''
+                    description: '',
+                    tag: 20
                 },
                 ruleValidate: {
                     name: [
