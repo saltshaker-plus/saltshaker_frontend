@@ -61,6 +61,18 @@ export const otherRouter = {
 // 作为Main组件的子页面展示并且在左侧菜单显示的路由写在appRouter里
 export const appRouter = [
     {
+        path: '/job',
+        icon: 'arrow-swap',
+        name: 'job',
+        title: 'Job管理',
+        component: Main,
+        children: [
+            { path: 'create', title: 'Job创建', name: 'create', component: () => import('@/views/job/create.vue') },
+            { path: 'history', title: 'Job历史', name: 'history', component: () => import('@/views/job/history.vue') },
+            { path: 'manager', title: 'Job管理', name: 'manager', component: () => import('@/views/job/manager.vue') }
+        ]
+    },
+    {
         path: '/minion',
         icon: 'ios-keypad',
         name: 'minion',
@@ -70,17 +82,6 @@ export const appRouter = [
             { path: 'status', title: '状态信息', name: 'status', component: () => import('@/views/minion/status.vue') },
             { path: 'key', title: 'Key管理', name: 'key', component: () => import('@/views/minion/key.vue') },
             { path: 'grains', title: 'Grains', name: 'grains', component: () => import('@/views/minion/grains.vue') }
-        ]
-    },
-    {
-        path: '/job',
-        icon: 'arrow-swap',
-        name: 'job',
-        title: 'Job管理',
-        component: Main,
-        children: [
-            { path: 'history', title: 'Job历史', name: 'history', component: () => import('@/views/job/history.vue') },
-            { path: 'manager', title: 'Job管理', name: 'manager', component: () => import('@/views/job/manager.vue') }
         ]
     },
     {
