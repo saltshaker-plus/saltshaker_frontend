@@ -266,7 +266,7 @@
             refresh () {
                 this.fileList();
                 // 调用hook进行更新
-                this.handlehook();
+                this.handleHook();
             },
             handleCancel () {
                 // 取消编辑后再请求一次文件内容,以便恢复文件内容
@@ -292,7 +292,7 @@
                             this.edit = false;
                             this.$Message.success('成功！');
                             // 调用hook进行更新
-                            this.handlehook();
+                            this.handleHook();
                         } else {
                             this.nerror('Commit Failure', res.data['message']);
                         }
@@ -307,7 +307,7 @@
                         this.nerror('Commit Failure', errInfo);
                     });
             },
-            handlehook () {
+            handleHook () {
                 let postData = {
                     'tag': 'gitfs/update'
                 };
