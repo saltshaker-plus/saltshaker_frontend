@@ -12,7 +12,7 @@
                             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="47">
                                 <FormItem label="目标" prop="target">
                                     <CheckboxGroup v-model="formValidate.target">
-                                        <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData" stripe></Table>
+                                        <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData"></Table>
                                     </CheckboxGroup>
                                 </FormItem>
                                 <slot name="command"></slot>
@@ -27,7 +27,7 @@
                                                 <div style="padding-bottom: 5px">
                                                     <Input v-model="searchConName" icon="search" @on-change="handleSearch" placeholder="请输入历史命令" style="width: 200px" />
                                                 </div>
-                                                <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData" stripe></Table>
+                                                <Table size="small" width="100%" height="190" border :columns="columnsHistory" :data="historyData"></Table>
                                             </div>
                                          </Poptip>
                                     </div>

@@ -267,6 +267,7 @@
                 this.fileList();
                 // 调用hook进行更新
                 this.handleHook();
+                this.editDisabled = true;
             },
             handleCancel () {
                 // 取消编辑后再请求一次文件内容,以便恢复文件内容
