@@ -273,8 +273,7 @@
                         let key = this.nColumns[i]['key'];
                         if (key !== 'action' && key !== undefined) {
                             res = dataClone.filter(d => {
-                                // 转换成字符串,数字没有indexOf方法
-                                let value = d[key].toString();
+                                let value = d[key];
                                 // 如果是数组在进行filter
                                 if (value instanceof Array) {
                                     let tmp = value.filter(v => {
@@ -282,18 +281,22 @@
                                         if (v instanceof Object) {
                                             let r = false;
                                             for (let s in v) {
-                                                if (v[s].indexOf(searchVal) > -1) {
+                                                let z = v[s].toString();
+                                                if (z.indexOf(searchVal) > -1) {
                                                     r = true;
                                                     return r;
                                                 }
                                             }
                                         } else {
-                                            return v.indexOf(searchVal) > -1;
+                                            let y = v.toString();
+                                            return y.indexOf(searchVal) > -1;
                                         }
                                     });
                                     return tmp.length > 0;
                                 } else {
-                                    return value.indexOf(searchVal) > -1;
+                                    // 转换成字符串,数字没有indexOf方法
+                                    let x = value.toString();
+                                    return x.indexOf(searchVal) > -1;
                                 }
                             });
                             searchResult = searchResult.concat(res);
