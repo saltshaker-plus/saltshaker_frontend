@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import CommonSLS from '../common-components/sls/sls.vue';
+    import CommonSLS from '../common-components/sls/sls-manage.vue';
     export default {
         components: {
             CommonSLS

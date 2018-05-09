@@ -36,6 +36,10 @@ module.exports = merge(webpackBaseConfig, {
         new CopyWebpackPlugin([
             {
                 from: 'src/views/main-components/theme-switch/theme'
+            },
+            {
+                from: 'node_modules/monaco-editor/min/vs',
+                to: 'vs',
             }
         ], {
             ignore: [

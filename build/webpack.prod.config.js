@@ -66,6 +66,10 @@ module.exports = merge(webpackBaseConfig, {
             {
                 from: 'src/views/main-components/theme-switch/theme'
             },
+            {
+                from: 'node_modules/monaco-editor/min/vs',
+                to: 'vs',
+            }
         ], {
             ignore: [
                 'text-editor.vue'
