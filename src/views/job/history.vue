@@ -30,7 +30,7 @@
                         width: 195,
                         render: (h, params) => {
                             return h('div', [
-                                h('Button', {
+                                h('div', {
                                     props: {
                                         type: 'text',
                                         size: 'small'
