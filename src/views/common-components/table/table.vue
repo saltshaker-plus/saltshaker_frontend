@@ -281,21 +281,30 @@
                                         if (v instanceof Object) {
                                             let r = false;
                                             for (let s in v) {
-                                                let z = v[s].toString();
+                                                let z = '';
+                                                if (v[s] !== undefined) {
+                                                    z = v[s].toString();
+                                                }
                                                 if (z.indexOf(searchVal) > -1) {
                                                     r = true;
                                                     return r;
                                                 }
                                             }
                                         } else {
-                                            let y = v.toString();
+                                            let y = '';
+                                            if (v !== undefined) {
+                                                y = v.toString();
+                                            }
                                             return y.indexOf(searchVal) > -1;
                                         }
                                     });
                                     return tmp.length > 0;
                                 } else {
                                     // 转换成字符串,数字没有indexOf方法
-                                    let x = value.toString();
+                                    let x = '';
+                                    if (value !== undefined) {
+                                        x = value.toString();
+                                    }
                                     return x.indexOf(searchVal) > -1;
                                 }
                             });

@@ -63,7 +63,12 @@
                     {
                         title: '参数',
                         key: 'fun_args',
-                        sortable: true
+                        render: (h, params) => {
+                            if (params.row.fun_args === undefined) {
+                                params.row.fun_args = [];
+                            }
+                            return h('div', params.row.fun_args.join(' '));
+                        }
                     },
                     {
                         title: '时间',
