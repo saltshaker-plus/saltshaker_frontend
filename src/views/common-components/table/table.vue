@@ -219,7 +219,7 @@
                 this.$Notice.error({
                     title: title,
                     // 替换<>避免被解析为html标签
-                    desc: info.replace(/<|>/g, ''),
+                    desc: info.toString().replace(/<|>/g, ''),
                     duration: 10
                 });
             },
