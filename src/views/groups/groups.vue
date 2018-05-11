@@ -2,7 +2,7 @@
     <div>
         <common-table :cColumns="cColumns" :apiService="apiService" @getProductEvent="getProductEvent" :productShow="true" ref="childrenMethods">
             <Button slot="create" type="primary" @click="add('formValidate')">创建分组</Button>
-            <Modal slot="option" v-model="formView"  :title="optionTypeName">
+            <Modal slot="option" v-model="formView"  :title="optionTypeName" width="650px">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
                     <FormItem label="分组名" prop="name">
                         <Input v-model="formValidate.name" placeholder="输入用户名"></Input>
@@ -118,7 +118,7 @@
                                             this.handleReset('formValidate');
                                             this.optionType = 'edit';
                                             this.optionTypeName = '编辑';
-                                            //this.targetMinion = [];
+                                            // this.targetMinion = [];
                                             this.groupsId = params.row.id;
                                             this.getTargetMinion();
                                             this.formValidate.name = params.row.name;
@@ -170,9 +170,9 @@
                 // 穿梭框
                 originMinion: [],
                 targetMinion: [],
-                titles: ['待加主机', '当前组'],
+                titles: ['待加主机', '当前分组'],
                 listStyle: {
-                    width: '186px',
+                    width: '250px',
                     height: '230px'
                 }
             };
@@ -346,16 +346,12 @@
                         }
                     });
             },
-            handleChange (newtargetMinion) {
-                this.targetMinion = newtargetMinion;
+            handleChange (newTargetMinion) {
+                this.targetMinion = newTargetMinion;
             },
             renders (item) {
                 return item.key;
-            },
-//            reloadMockData () {
-//                this.minionData = this.getMockData();
-//                this.targetKeys3 = this.getTargetKeys();
-//            }
+            }
         }
     };
 </script>
