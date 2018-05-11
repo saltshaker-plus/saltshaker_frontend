@@ -355,6 +355,7 @@
                             username: this.formValidate.username,
                             password: this.formValidate.password,
                             product: this.formValidate.product,
+                            role: this.formValidate.role,
                             groups: this.targetGroup,
                             acl: this.targetACL
                         };
