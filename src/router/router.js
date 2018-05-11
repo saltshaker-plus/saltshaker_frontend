@@ -123,7 +123,7 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'shell', title: 'Shell', name: 'shell', component: () => import('@/views/execute/shell.vue') },
-            { path: 'models', title: 'Models', name: 'models', component: () => import('@/views/execute/model.vue') },
+            { path: 'module', title: 'Module', name: 'module', component: () => import('@/views/execute/module.vue') },
             { path: 'state', title: 'State', name: 'state', component: () => import('@/views/execute/state.vue') },
             { path: 'pillar', title: 'Pillar', name: 'pillar', component: () => import('@/views/execute/pillar.vue') }
         ]

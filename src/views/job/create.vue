@@ -6,54 +6,93 @@
                 @getProductEvent="getProductEvent"
                 :productShow="true">
             <Button slot="create" type="primary" @click="add('formValidate')">创建Job</Button>
-            <Modal slot="option" v-model="formView"  :title="optionTypeName">
+            <Modal slot="option" v-model="formView"  :title="optionTypeName" width="600px">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
-                    <FormItem label="Job名" prop="name">
-                        <Input v-model="formValidate.name" placeholder="输入Job名"></Input>
+                    <FormItem>
+                        <Steps :current="current">
+                            <Step title="基本配置"></Step>
+                            <Step title="SLS配置"></Step>
+                            <Step title="配置成功"></Step>
+                        </Steps>
                     </FormItem>
-                    <FormItem label="描述" prop="description">
-                        <Input v-model="formValidate.description" placeholder="输入描述"></Input>
-                    </FormItem>
-                    <FormItem label="目标" prop="target">
-                        <Select v-model="formValidate.target" multiple >
-                            <Option v-for="item in targetData" :value="item.id" :key="item.id" placeholder="选择目标">{{ item.name }}</Option>
-                        </Select>
-                    </FormItem>
-                    <FormItem label="SLS" prop="sls">
-                        <Input v-model="path" placeholder="输入描述"></Input>
-                        <br>
-                        <Select v-model="branchName">
-                            <Option v-for="item in branchData" :value="item" :key="item">{{ item }}</Option>
+                    <div v-show="first">
+                        <FormItem label="Job名" prop="name">
+                            <Input v-model="formValidate.name" placeholder="输入Job名"></Input>
+                        </FormItem>
+                        <FormItem label="描述" prop="description">
+                            <Input v-model="formValidate.description" placeholder="输入描述"></Input>
+                        </FormItem>
+                        <FormItem label="目标" prop="target">
+                            <Select v-model="formValidate.target" multiple >
+                                <Option v-for="item in targetData" :value="item.id" :key="item.id" placeholder="选择目标">{{ item.name }}</Option>
+                            </Select>
+                        </FormItem>
+                        <FormItem label="并行数" prop="concurrent">
+                            <InputNumber :min="0" v-model="formValidate.concurrent"></InputNumber>
+                        </FormItem>
+                        <FormItem label="周期">
+                            <RadioGroup v-model="formValidate.period">
+                                <Radio label="oneTime">一次</Radio>
+                                <Radio label="period">周期性</Radio>
+                            </RadioGroup>
+                        </FormItem>
+                        <FormItem label="时间">
+                            <Row>
+                                <Col span="9">
+                                    <FormItem prop="date">
+                                        <DatePicker type="date" placeholder="Select date" v-model="formValidate.date"></DatePicker>
+                                    </FormItem>
+                                </Col>
+                                <Col span="2" style="text-align: center">-</Col>
+                                <Col span="13">
+                                    <FormItem prop="time">
+                                        <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </FormItem>
+                    </div>
+                    <div v-show="second">
+                        <FormItem label="类型">
+                            <RadioGroup v-model="formValidate.type">
+                                <span @click="handleSLS()"><Radio label="sls">SLS</Radio></span>
+                                <span @click="handleShell()"><Radio label="shell">Shell</Radio></span>
+                                <span @click="handleModule()"><Radio label="module">Module</Radio></span>
+                            </RadioGroup>
+                        </FormItem>
+                        <FormItem label="SLS" prop="sls" v-show="sls">
+                            <Select v-model="branchName">
+                                <Option v-for="item in branchData" :value="item" :key="item">{{ item }}</Option>
+                            </Select>
                             <Tree :data="fileTree" :load-data="loadData" @on-select-change="handleContent"></Tree>
-                        </Select>
-                    </FormItem>
-                    <FormItem label="并行数" prop="concurrent">
-                        <InputNumber :min="0" v-model="formValidate.concurrent"></InputNumber>
-                    </FormItem>
-                    <FormItem label="周期">
-                        <RadioGroup v-model="formValidate.period">
-                            <Radio label="oneTime">一次</Radio>
-                            <Radio label="period">周期性</Radio>
-                        </RadioGroup>
-                    </FormItem>
-                    <FormItem label="时间">
-                        <Row>
-                            <Col span="11">
-                                <FormItem prop="date">
-                                    <DatePicker type="date" placeholder="Select date" v-model="formValidate.date"></DatePicker>
-                                </FormItem>
-                            </Col>
-                            <Col span="2" style="text-align: center">-</Col>
-                            <Col span="11">
-                                <FormItem prop="time">
-                                    <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </FormItem>
+                        </FormItem>
+                        <FormItem label="Shell" prop="shell" v-show="shell">
+                            <MonacoEditor
+                                height="600"
+                                language="typescript"
+                                srcPath="dist"
+                                :code="code"
+                                :options="options"
+                                :highlighted="highlightLines"
+                                :changeThrottle="500"
+                                theme="vs-dark"
+                                @mounted="onMounted"
+                                @codeChange="onCodeChange"
+                                >
+                            </MonacoEditor>
+                        </FormItem>
+                        <FormItem label="Module" prop="module" v-show="module">
+                            <Select v-model="branchName">
+                                <Option v-for="item in branchData" :value="item" :key="item">{{ item }}</Option>
+                            </Select>
+                            <Tree :data="fileTree" :load-data="loadData" @on-select-change="handleContent"></Tree>
+                        </FormItem>
+                    </div>
                 </Form>
                 <div slot="footer">
-                    <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
+                    <!--<Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>-->
+                    <Button type="text" @click="previous()" style="margin-left: 8px" v-show="previousShow">上一步</Button>
+                    <Button type="primary" @click="next()">下一步</Button>
                     <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                 </div>
             </Modal>
@@ -64,9 +103,11 @@
 
 <script>
     import CommonTable from '../common-components/table/table.vue';
+    import MonacoEditor from 'vue-monaco-editor';
     export default {
         components: {
-            CommonTable
+            CommonTable,
+            MonacoEditor
         },
         data () {
             return {
@@ -78,6 +119,9 @@
                 delIndex: '',
                 // 编辑数据
                 formView: false,
+                first: false,
+                second: false,
+                previousShow: false,
                 id: '',
                 optionType: '',
                 optionTypeName: '',
@@ -91,6 +135,10 @@
                 projectType: 'state_project',
                 filePath: '',
                 path: '',
+                current: 0,
+                sls: true,
+                shell: false,
+                module: false,
                 cColumns: [
                     {
                         title: 'Job ID',
@@ -150,7 +198,8 @@
                     target: [],
                     sls: '',
                     concurrent: 0,
-                    period: 'period'
+                    period: 'period',
+                    type: 'sls'
                 },
                 ruleValidate: {
                     name: [
@@ -171,7 +220,21 @@
                     time: [
                         { required: true, type: 'string', message: '请选择时间', trigger: 'change' }
                     ]
-                }
+                },
+                code: 'ggggggg',
+                options: {
+                    selectOnLineNumbers: false
+                },
+                highlightLines: [
+                    {
+                        number: 0,
+                        class: 'primary-highlighted-line'
+                    },
+                    {
+                        number: 0,
+                        class: 'secondary-highlighted-line'
+                    }
+                ]
             };
         },
         watch: {
@@ -223,6 +286,9 @@
                 this.optionType = 'add';
                 this.optionTypeName = '添加';
                 this.formView = true;
+                this.first = true;
+                this.second = false;
+                this.previousShow = false;
             },
             // 表单提
             handleSubmit (name) {
@@ -417,6 +483,43 @@
                     callback(this.fileListPathData);
                 }, 500);
             },
+            next () {
+                this.first = false;
+                this.second = true;
+                if (this.current !== 3) {
+                    this.previousShow = true;
+                    this.current += 1;
+                }
+            },
+            previous () {
+                this.first = true;
+                this.second = false;
+                this.previousShow = false;
+                if (this.current !== 0) {
+                    this.current -= 1;
+                }
+            },
+            handleSLS () {
+                this.sls = true;
+                this.shell = false;
+                this.module = false;
+            },
+            handleShell () {
+                this.sls = false;
+                this.shell = true;
+                this.module = false;
+            },
+            handleModule () {
+                this.sls = false;
+                this.shell = false;
+                this.module = true;
+            },
+            onMounted (editor) {
+                this.editor = editor;
+            },
+            onCodeChange (editor) {
+                console.log(this.editor.getValue());
+            }
         }
     };
 </script>

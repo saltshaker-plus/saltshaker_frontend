@@ -7,18 +7,18 @@
         <Row class="margin-top-10">
             <Col span="24">
                 <MonacoEditor
-                height="300"
-                language="yaml"
-                srcPath="dist"
-                :highlighted="highlightLines"
-                :changeThrottle="700"
-                theme="vs-dark"
-                :code="code"
-                :editorOptions="options"
-                @mounted="onMounted"
-                @codeChange="onCodeChange"
-                >
-            </MonacoEditor>
+        height="600"
+        language="typescript"
+        srcPath="dist"
+        :code="code"
+        :options="options"
+        :highlighted="highlightLines"
+        :changeThrottle="500"
+        theme="vs-dark"
+        @mounted="onMounted"
+        @codeChange="onCodeChange"
+        >
+    </MonacoEditor>
             </Col>
         </Row>
     </div>

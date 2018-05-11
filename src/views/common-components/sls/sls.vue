@@ -52,23 +52,40 @@
                 </Card>
             </Col>
         </Row>
-        <Modal v-model="edit" title="编辑">
-            <div style="text-align:center">
-                <Input v-model="fileContent" type="textarea" :autosize="{minRows: 5,maxRows: 50}"></Input>
-            </div>
+        <Modal width="750px" v-model="edit" title="编辑">
+            <!--<div>-->
+                <!--<MonacoEditor-->
+                <!--height="300"-->
+                <!--language="yaml"-->
+                <!--srcPath="dist"-->
+                <!--:highlighted="highlightLines"-->
+                <!--:changeThrottle="700"-->
+                <!--theme="vs-dark"-->
+                <!--:code="code"-->
+                <!--:editorOptions="options"-->
+                <!--@mounted="onMounted"-->
+                <!--@codeChange="onCodeChange"-->
+                <!--&gt;-->
+            <!--</MonacoEditor>-->
+               <!---->
+            <!--</div>-->
+             <Input v-model="fileContent" type="textarea" :autosize="{minRows: 2,maxRows: 50}" placeholder="Enter something..."></Input>
             <div slot="footer">
                 <Button type="text" @click="handleCancel">取消</Button>
                 <Button type="success" @click="handleCommit">提交</Button>
             </div>
         </Modal>
+
     </div>
 </template>
 
 <script>
     import commonExecute from '../../common-components/execute/common-execute.vue';
+    import MonacoEditor from 'vue-monaco-editor';
     export default {
         components: {
-            commonExecute
+            commonExecute,
+            MonacoEditor
         },
         name: 'CommonSLS',
         data () {
@@ -87,7 +104,21 @@
                 filePath: '',
                 fileContent: '',
                 path: '',
-                apiHistory: ''
+                apiHistory: '',
+                code: '',
+                options: {
+                    selectOnLineNumbers: false
+                },
+                highlightLines: [
+                    {
+                        number: 0,
+                        class: 'primary-highlighted-line'
+                    },
+                    {
+                        number: 0,
+                        class: 'secondary-highlighted-line'
+                    }
+                ]
             };
         },
         props: {
@@ -127,7 +158,7 @@
                 if (this.fileContent !== '') {
                     this.editDisabled = false;
                 }
-            }
+            },
         },
         methods: {
             productList () {
@@ -277,6 +308,7 @@
             },
             handleEdit () {
                 this.edit = true;
+                this.code = this.fileContent;
             },
             handleCommit () {
                 let postData = {
@@ -329,6 +361,12 @@
                         }
                         this.nerror('Web Hook Failure', errInfo);
                     });
+            },
+            onMounted (editor) {
+                this.editor = editor;
+            },
+            onCodeChange (editor) {
+                console.log(this.editor.getValue());
             }
         }
     };
@@ -338,4 +376,13 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+</style>
+
+<style media="screen">
+  .secondary-highlighted-line {
+    background: green;
+  }
+  .primary-highlighted-line {
+    background: blue;
+  }
 </style>
