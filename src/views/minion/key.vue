@@ -180,8 +180,8 @@
                 }
             },
             // 调用子组件消息通知
-            nerror (title, info) {
-                this.$refs.childrenMethods.nerror(title, info);
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
             },
             // 调用子组件进行数据刷新
             tableList () {
@@ -216,7 +216,7 @@
                             this.$Message.success('成功！');
                             this.tableList();
                         } else {
-                            this.nerror(action.substring(0, 1).toUpperCase() + action.substring(1) + ' Failure', res.data['message']);
+                            this.nError(action.substring(0, 1).toUpperCase() + action.substring(1) + ' Failure', res.data['message']);
                         };
                     },
                     err => {
@@ -227,7 +227,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror(action.substring(0, 1).toUpperCase() + action.substring(1) + ' Failure', errInfo);
+                        this.nError(action.substring(0, 1).toUpperCase() + action.substring(1) + ' Failure', errInfo);
                     });
             }
         }

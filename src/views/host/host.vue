@@ -195,8 +195,8 @@
                 this.$refs.childrenMethods.tableList();
             },
             // 调用子组件消息通知
-            nerror (title, info) {
-                this.$refs.childrenMethods.nerror(title, info);
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
             },
             // 添加展示
             add (name) {
@@ -226,7 +226,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Edit Failure', res.data['message']);
+                                        this.nError('Edit Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -236,7 +236,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Edit Failure', errInfo);
+                                    this.nError('Edit Failure', errInfo);
                                 });
                         } else {
                             // 添加
@@ -248,7 +248,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Add Failure', res.data['message']);
+                                        this.nError('Add Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -258,7 +258,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Add Failure', errInfo);
+                                    this.nError('Add Failure', errInfo);
                                 });
                         }
                     } else {
@@ -293,7 +293,7 @@
                                 if (res.data['status'] === true) {
                                     this.$Message.success('添加成功！');
                                 } else {
-                                    this.nerror('Add Failure', res.data['message']);
+                                    this.nError('Add Failure', res.data['message']);
                                 }
                             },
                             err => {
@@ -303,7 +303,7 @@
                                 } catch (error) {
                                     errInfo = err;
                                 }
-                                this.nerror('Add Failure', errInfo);
+                                this.nError('Add Failure', errInfo);
                             });
                     } else {
                         this.$Message.error('请检查表单数据！');
@@ -323,7 +323,7 @@
                         if (res.data['status'] === true) {
                             this.$Message.success('删除成功！');
                         } else {
-                            this.nerror('Delete Failure', res.data['message']);
+                            this.nError('Delete Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -333,7 +333,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Delete Failure', errInfo);
+                        this.nError('Delete Failure', errInfo);
                     });
             }
         }

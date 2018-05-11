@@ -235,7 +235,7 @@ Minion: {{minion}}
                             // 加载完产品线后加载历史命令
                             this.getHistory();
                         } else {
-                            this.nerror('Get Product Failure', res.data['message']);
+                            this.nError('Get Product Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -245,11 +245,11 @@ Minion: {{minion}}
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Product Failure', errInfo);
+                        this.nError('Get Product Failure', errInfo);
                     });
             },
             // 重新定义错误消息
-            nerror (title, info) {
+            nError (title, info) {
                 this.$Notice.error({
                     title: title,
                     desc: info,
@@ -302,7 +302,7 @@ Minion: {{minion}}
                                     this.result = '';
                                     this.resultShow = false;
                                     this.spinShow = false;
-                                    this.nerror('Execute Failure', res.data['message']);
+                                    this.nError('Execute Failure', res.data['message']);
                                 }
                             },
                             err => {
@@ -315,7 +315,7 @@ Minion: {{minion}}
                                 this.result = '';
                                 this.resultShow = false;
                                 this.spinShow = false;
-                                this.nerror('Execute Failure', errInfo);
+                                this.nError('Execute Failure', errInfo);
                             });
                     } else {
                         this.$Message.error('请检查表单数据！');
@@ -332,7 +332,7 @@ Minion: {{minion}}
                             this.historyData = res.data['data'];
                             this.initHistoryData = this.historyData;
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         };
                         this.loading = false;
                     },
@@ -343,11 +343,11 @@ Minion: {{minion}}
                             if (err.response.status === 404) {
                                 this.historyData = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                         this.loading = false;
                     });
@@ -358,7 +358,7 @@ Minion: {{minion}}
                         if (res.data['status'] === true) {
                             this.targetData = res.data['data'];
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         }
                         ;
                         this.loading = false;
@@ -370,11 +370,11 @@ Minion: {{minion}}
                             if (err.response.status === 404) {
                                 this.targetData = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                         this.loading = false;
                     });

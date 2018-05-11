@@ -197,8 +197,8 @@
                 this.$refs.childrenMethods.tableList();
             },
             // 调用子组件消息通知
-            nerror (title, info) {
-                this.$refs.childrenMethods.nerror(title, info);
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
             },
             // 添加展示
             add (name) {
@@ -230,7 +230,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Edit Failure', res.data['message']);
+                                        this.nError('Edit Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -240,7 +240,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Edit Failure', errInfo);
+                                    this.nError('Edit Failure', errInfo);
                                 });
                         } else {
                             // 添加
@@ -252,7 +252,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Add Failure', res.data['message']);
+                                        this.nError('Add Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -262,7 +262,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Add Failure', errInfo);
+                                    this.nError('Add Failure', errInfo);
                                 });
                         }
                     } else {
@@ -285,7 +285,7 @@
                                 });
                             }
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         };
                     },
                     err => {
@@ -295,11 +295,11 @@
                             if (err.response.status === 404) {
                                 this.originMinion = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                     });
             },
@@ -309,7 +309,7 @@
                         if (res.data['status'] === true) {
                             this.groupsData = res.data['data'];
                         } else {
-                            this.nerror('Get Groups Failure', res.data['message']);
+                            this.nError('Get Groups Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -319,7 +319,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Groups Failure', errInfo);
+                        this.nError('Get Groups Failure', errInfo);
                     });
             },
             getTargetMinion () {
@@ -328,7 +328,7 @@
                         if (res.data['status'] === true) {
                             this.targetMinion = res.data['data']['minion'];
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         };
                     },
                     err => {
@@ -338,11 +338,11 @@
                             if (err.response.status === 404) {
                                 this.targetMinion = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                     });
             },

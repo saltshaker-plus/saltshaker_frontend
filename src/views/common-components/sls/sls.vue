@@ -171,7 +171,7 @@
                                 this.productStateProject = this.productData[0].state_project;
                             }
                         } else {
-                            this.nerror('Get Product Failure', res.data['message']);
+                            this.nError('Get Product Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -181,7 +181,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Product Failure', errInfo);
+                        this.nError('Get Product Failure', errInfo);
                     });
             },
             branch () {
@@ -195,7 +195,7 @@
                             this.branchData = res.data['data'];
                             this.branchName = this.branchData[0];
                         } else {
-                            this.nerror('Get Branch Failure', res.data['message']);
+                            this.nError('Get Branch Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -205,7 +205,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Branch Failure', errInfo);
+                        this.nError('Get Branch Failure', errInfo);
                     });
             },
             fileList () {
@@ -217,7 +217,7 @@
                             this.fileTree = res.data['data'];
                         } else {
                             this.fileTree = [];
-                            this.nerror('Get File Tree Failure', res.data['message']);
+                            this.nError('Get File Tree Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -228,7 +228,7 @@
                             errInfo = err;
                         }
                         this.fileTree = [];
-                        this.nerror('Get File Tree Failure', errInfo);
+                        this.nError('Get File Tree Failure', errInfo);
                     });
             },
             // 传入path获取gitlab对应数据
@@ -240,7 +240,7 @@
                             this.fileListPathData = res.data['data'];
                         } else {
                             this.fileListPathData = [];
-                            this.nerror('Get File Tree Failure', res.data['message']);
+                            this.nError('Get File Tree Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -251,7 +251,7 @@
                             errInfo = err;
                         }
                         this.fileListPathData = [];
-                        this.nerror('Get File Tree Failure', errInfo);
+                        this.nError('Get File Tree Failure', errInfo);
                     });
             },
             handleContent (filePath) {
@@ -264,7 +264,7 @@
                             if (res.data['status'] === true) {
                                 this.fileContent = res.data['data'];
                             } else {
-                                this.nerror('Get File Content Failure', res.data['message']);
+                                this.nError('Get File Content Failure', res.data['message']);
                             }
                         },
                         err => {
@@ -274,7 +274,7 @@
                             } catch (error) {
                                 errInfo = err;
                             }
-                            this.nerror('Get File Content Failure', errInfo);
+                            this.nError('Get File Content Failure', errInfo);
                         });
                 }
             },
@@ -287,7 +287,7 @@
                 }, 500);
             },
             // 重新定义错误消息
-            nerror (title, info) {
+            nError (title, info) {
                 this.$Notice.error({
                     title: title,
                     desc: info,
@@ -327,7 +327,7 @@
                             // 调用hook进行更新
                             this.handleHook();
                         } else {
-                            this.nerror('Commit Failure', res.data['message']);
+                            this.nError('Commit Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -337,7 +337,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Commit Failure', errInfo);
+                        this.nError('Commit Failure', errInfo);
                     });
             },
             handleHook () {
@@ -349,7 +349,7 @@
                         if (res.data['status'] === true) {
                             this.result = res.data['data'];
                         } else {
-                            this.nerror('Web Hook Failure', res.data['message']);
+                            this.nError('Web Hook Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -359,7 +359,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Web Hook Failure', errInfo);
+                        this.nError('Web Hook Failure', errInfo);
                     });
             },
             onMounted (editor) {

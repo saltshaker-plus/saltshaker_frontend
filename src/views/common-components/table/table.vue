@@ -167,7 +167,7 @@
                             this.tableData.splice(this.pageSize, this.pageCount);
                             this.pageCurrent = 1;
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         };
                         this.loading = false;
                     },
@@ -178,11 +178,11 @@
                             if (err.response.status === 404) {
                                 this.tableData = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                         this.tableData = [];
                         this.loading = false;
@@ -200,7 +200,7 @@
                             }
                         } else {
                             this.loading = false;
-                            this.nerror('Get Product Failure', res.data['message']);
+                            this.nError('Get Product Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -211,11 +211,11 @@
                             errInfo = err;
                         }
                         this.loading = false;
-                        this.nerror('Get Product Failure', errInfo);
+                        this.nError('Get Product Failure', errInfo);
                     });
             },
             // 重新定义错误消息
-            nerror (title, info) {
+            nError (title, info) {
                 this.$Notice.error({
                     title: title,
                     // 替换<>避免被解析为html标签
@@ -340,7 +340,7 @@
                             this.$Message.success('删除成功！');
                             this.tableList();
                         } else {
-                            this.nerror('Delete Failure', res.data['message']);
+                            this.nError('Delete Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -350,7 +350,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Delete Failure', errInfo);
+                        this.nError('Delete Failure', errInfo);
                     });
             },
             // kill jid
@@ -365,7 +365,7 @@
                             this.$Message.success('Kill成功！');
                             this.tableList();
                         } else {
-                            this.nerror('Delete Failure', res.data['message']);
+                            this.nError('Delete Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -375,7 +375,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Delete Failure', errInfo);
+                        this.nError('Delete Failure', errInfo);
                     });
             },
             // 传递给父组件

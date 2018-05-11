@@ -50,7 +50,7 @@
             };
         },
         methods: {
-            nerror (title, info) {
+            nError (title, info) {
                 this.$Notice.error({
                     title: title,
                     desc: info,

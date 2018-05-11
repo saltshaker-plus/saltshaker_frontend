@@ -293,8 +293,8 @@
                 this.$refs.childrenMethods.tableList();
             },
             // 调用子组件消息通知
-            nerror (title, info) {
-                this.$refs.childrenMethods.nerror(title, info);
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
             },
             // 添加展示
             add (name) {
@@ -314,7 +314,7 @@
                             this.productData = res.data['data'];
                             this.userInfo.product = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -324,7 +324,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Product Failure', errInfo);
+                        this.nError('Get Product Failure', errInfo);
                     });
             },
             roleList () {
@@ -333,7 +333,7 @@
                         if (res.data['status'] === true) {
                             this.userInfo.role = res.data['data'];
                         } else {
-                            this.nerror('Get Role Failure', res.data['message']);
+                            this.nError('Get Role Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -343,7 +343,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get Role Failure', errInfo);
+                        this.nError('Get Role Failure', errInfo);
                     });
             },
             // 表单提
@@ -367,7 +367,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Edit Failure', res.data['message']);
+                                        this.nError('Edit Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -377,7 +377,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Edit Failure', errInfo);
+                                    this.nError('Edit Failure', errInfo);
                                 });
                         } else {
                             // 添加
@@ -389,7 +389,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Add Failure', res.data['message']);
+                                        this.nError('Add Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -399,7 +399,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Add Failure', errInfo);
+                                    this.nError('Add Failure', errInfo);
                                 });
                         }
                     } else {
@@ -425,7 +425,7 @@
                                 });
                             }
                         } else {
-                            this.nerror('Get Info Failure', res.data['message']);
+                            this.nError('Get Info Failure', res.data['message']);
                         };
                     },
                     err => {
@@ -435,11 +435,11 @@
                             if (err.response.status === 404) {
                                 this.originGroup = [];
                             } else {
-                                this.nerror('Get Info Failure', errInfo);
+                                this.nError('Get Info Failure', errInfo);
                             }
                         } catch (error) {
                             errInfo = err;
-                            this.nerror('Get Info Failure', errInfo);
+                            this.nError('Get Info Failure', errInfo);
                         }
                     });
             },
@@ -456,7 +456,7 @@
                                 });
                             }
                         } else {
-                            this.nerror('Get ACL Failure', res.data['message']);
+                            this.nError('Get ACL Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -466,7 +466,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nerror('Get ACL Failure', errInfo);
+                        this.nError('Get ACL Failure', errInfo);
                     });
             },
             // 处理穿梭框

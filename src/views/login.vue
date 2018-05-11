@@ -78,7 +78,7 @@ export default {
                                     name: 'home_index'
                                 });
                             } else {
-                                this.nerror('登录失败:', res.data['message']);
+                                this.nError('登录失败:', res.data['message']);
                             }
                         },
                         err => {
@@ -88,13 +88,13 @@ export default {
                             } catch (error) {
                                 errInfo = err;
                             }
-                            this.nerror('登录失败:', errInfo);
+                            this.nError('登录失败:', errInfo);
                         });
                 }
             });
         },
         // 重新定义错误消息
-        nerror (title, info) {
+        nError (title, info) {
             this.$Notice.error({
                 title: title,
                 desc: info,

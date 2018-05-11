@@ -321,10 +321,10 @@
                             this.pageCount = res.data['data'].length;
                             this.tableData = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get User Failure', err.response.data['message']); });
+                    err => { this.nError('Get User Failure', err.response.data['message']); });
             },
             productList () {
                 this.axios.get(this.Global.serverSrc + 'product').then(
@@ -333,10 +333,10 @@
                             this.productData = res.data['data'];
                             this.userInfo.product = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Product Failure', err.response.data['message']); });
+                    err => { this.nError('Get Product Failure', err.response.data['message']); });
             },
             roleList () {
                 this.axios.get(this.Global.serverSrc + 'role').then(
@@ -344,10 +344,10 @@
                         if (res.data['status'] === true) {
                             this.userInfo.role = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Role Failure', err.response.data['message']); });
+                    err => { this.nError('Get Role Failure', err.response.data['message']); });
             },
             alcList () {
                 this.axios.get(this.Global.serverSrc + 'acl').then(
@@ -355,10 +355,10 @@
                         if (res.data['status'] === true) {
                             this.userInfo.acl = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get ACL Failure', err.response.data['message']); });
+                    err => { this.nError('Get ACL Failure', err.response.data['message']); });
             },
             groupList (productId) {
                 this.axios.get(this.Global.serverSrc + 'groups?product_id=' + productId).then(
@@ -366,13 +366,13 @@
                         if (res.data['status'] === true) {
                             this.userInfo.groups = res.data['data'];
                         } else {
-                            this.nerror('Get User Failure', res.data['message']);
+                            this.nError('Get User Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Get Group Failure', err.response.data['message']); });
+                    err => { this.nError('Get Group Failure', err.response.data['message']); });
             },
             // 重新定义错误消息
-            nerror (title, info) {
+            nError (title, info) {
                 this.$Notice.error({
                     title: title,
                     desc: info,
@@ -415,10 +415,10 @@
                             this.tableData.splice(this.delIndex, 1);
                             this.$Message.success('删除成功！');
                         } else {
-                            this.nerror('Delete Failure', res.data['message']);
+                            this.nError('Delete Failure', res.data['message']);
                         }
                     },
-                    err => { this.nerror('Delete Failure', err); });
+                    err => { this.nError('Delete Failure', err); });
                 this.delModal = false;
             },
             // 导出表格数据

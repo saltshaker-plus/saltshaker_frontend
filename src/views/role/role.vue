@@ -157,8 +157,8 @@
                 this.$refs.childrenMethods.tableList();
             },
             // 调用子组件消息通知
-            nerror (title, info) {
-                this.$refs.childrenMethods.nerror(title, info);
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
             },
             // 添加展示
             add (name) {
@@ -182,7 +182,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Edit Failure', res.data['message']);
+                                        this.nError('Edit Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -192,7 +192,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Edit Failure', errInfo);
+                                    this.nError('Edit Failure', errInfo);
                                 });
                         } else {
                             // 添加
@@ -204,7 +204,7 @@
                                         this.$Message.success('成功！');
                                         this.tableList();
                                     } else {
-                                        this.nerror('Add Failure', res.data['message']);
+                                        this.nError('Add Failure', res.data['message']);
                                     }
                                 },
                                 err => {
@@ -214,7 +214,7 @@
                                     } catch (error) {
                                         errInfo = err;
                                     }
-                                    this.nerror('Add Failure', errInfo);
+                                    this.nError('Add Failure', errInfo);
                                 });
                         }
                     } else {
