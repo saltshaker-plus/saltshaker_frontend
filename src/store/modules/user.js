@@ -7,6 +7,8 @@ const user = {
             Cookies.remove('user');
             Cookies.remove('password');
             Cookies.remove('access');
+            Cookies.remove(Cookies.get('tag'));
+            Cookies.remove('tag');
             // 恢复默认样式
             let themeLink = document.querySelector('link[name="theme"]');
             themeLink.setAttribute('href', '');
