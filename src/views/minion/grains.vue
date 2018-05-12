@@ -1,12 +1,6 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService"></common-table>
-        <Modal width="650px" v-model="showInfo" title="返回结果" >
-            <pre style="overflow:auto">
-{{result}}
-            </pre>
-            <div slot="footer"></div>
-        </Modal>
+        <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true"></common-table>
 </div>
 
 </template>
@@ -19,60 +13,148 @@
         },
         data () {
             return {
-                apiService: 'job',
+                apiService: 'minions/grains',
                 showInfo: false,
                 result: '',
                 cColumns: [
                     {
-                        title: 'Job ID',
-                        key: 'jid',
-                        sortable: true,
-                        width: 195,
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'text',
-                                        size: 'small'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.showInfo = true;
-                                            this.result = params.row.return;
-                                        }
-                                    }
-                                }, params.row.jid)
-                            ]);
-                        }
-                    },
-                    {
-                        title: '用户名',
-                        key: 'user',
-                        sortable: true
-                    },
-                    {
-                        title: '目标',
+                        title: 'ID',
                         key: 'id',
+                        sortable: true,
+                        width: 110,
+                        fixed: 'left'
+                    },
+                    {
+                        title: 'OS',
+                        key: 'os',
+                        sortable: true,
+                        width: 140,
+                        render: (h, params) => {
+                            return h('div', params.row.os + ' ' + params.row.osrelease);
+                        }
+                    },
+                    {
+                        title: 'fqdn',
+                        key: 'fqdn',
+                        width: 150,
                         sortable: true
                     },
                     {
-                        title: '功能',
-                        key: 'fun',
-                        sortable: true
-                    },
-                    {
-                        title: '参数',
-                        key: 'fun_args',
-                        sortable: true
-                    },
-                    {
-                        title: '时间',
-                        key: '_stamp',
+                        title: 'ipv4',
+                        key: 'ipv4',
+                        width: 110,
                         sortable: true,
                         render: (h, params) => {
-                            return this.convertTime(params.row._stamp);
+                            return h('ul', params.row.ipv4.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
                         }
-                    }
+                    },
+                    {
+                        title: 'CPU',
+                        key: 'num_cpus',
+                        width: 80,
+                        sortable: true
+                    },
+                    {
+                        title: 'GPU',
+                        key: 'num_gpus',
+                        width: 80,
+                        sortable: true
+                    },
+                    {
+                        title: 'cpu_model',
+                        key: 'cpu_model',
+                        width: 190,
+                        sortable: true
+                    },
+                    {
+                        title: 'mem_total',
+                        key: 'mem_total',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'productname',
+                        key: 'productname',
+                        width: 110,
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', params.row.manufacturer + ' ' + params.row.productname);
+                        }
+                    },
+                    {
+                        title: 'saltversion',
+                        key: 'saltversion',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'kernelrelease',
+                        key: 'kernelrelease',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'biosversion',
+                        key: 'biosversion',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'serialnumber',
+                        key: 'serialnumber',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'uuid',
+                        key: 'uuid',
+                        width: 150,
+                        sortable: true
+                    },
+                    {
+                        title: 'hwaddr_interfaces',
+                        key: 'hwaddr_interfaces',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'biosreleasedate',
+                        key: 'biosreleasedate',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'cpuarch',
+                        key: 'cpuarch',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'locale_info',
+                        key: 'locale_info',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'gpus',
+                        key: 'gpus',
+                        width: 110,
+                        sortable: true
+                    },
+                    {
+                        title: 'machine_id',
+                        key: 'machine_id',
+                        width: 110,
+                        sortable: true
+                    },
                 ]
             };
         },
