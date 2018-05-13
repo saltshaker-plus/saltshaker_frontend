@@ -82,6 +82,8 @@
                         title: '产品线',
                         key: 'name',
                         sortable: true,
+                        width: 160,
+                        fixed: 'left',
                         render: (h, params) => {
                             return h('div', [
                                 h('Tooltip', {
@@ -97,57 +99,68 @@
                     {
                         title: '描述',
                         key: 'description',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'Master ID',
                         key: 'salt_master_id',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'Master API 地址',
                         key: 'salt_master_url',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'Master API 用户名',
                         key: 'salt_master_user',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: '文件服务器',
                         key: 'file_server',
+                        width: 140,
                         sortable: true
                     },
                     {
                         title: 'GitLab 地址',
                         key: 'gitlab_url',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'GitLab API 版本',
                         key: 'api_version',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'GitLab Token',
                         key: 'private_token',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'GitLab State 项目',
                         key: 'state_project',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'GitLab Pillar 项目',
                         key: 'pillar_project',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: '操作',
                         key: 'action',
                         width: 123,
+                        fixed: 'right',
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
