@@ -34,7 +34,6 @@ axios.defaults.timeout = 60 * 1000;
 //     });
 // });
 
-
 new Vue({
     el: '#app',
     router: router,
