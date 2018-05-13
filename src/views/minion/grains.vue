@@ -1,6 +1,18 @@
 <template>
     <div>
-        <common-table :cColumns="cColumns" :apiService="apiService" :productShow="true"></common-table>
+        <common-table
+            :cColumns="cColumns"
+            :apiService="apiService"
+            @getProductEvent="getProductEvent"
+            :productShow="false"
+            ref="childrenMethods">
+        </common-table>
+        <Modal width="650px" v-model="showInfo" title="详情" :styles="{top: '20px'}">
+            <highlight-code lang="json" style="overflow:auto" v-if="result">
+                {{result}}
+            </highlight-code>
+            <div slot="footer"></div>
+        </Modal>
 </div>
 
 </template>
@@ -16,33 +28,40 @@
                 apiService: 'minions/grains',
                 showInfo: false,
                 result: '',
+                productId: '',
                 cColumns: [
                     {
-                        title: 'ID',
+                        title: 'id',
                         key: 'id',
                         sortable: true,
-                        width: 110,
-                        fixed: 'left'
-                    },
-                    {
-                        title: 'OS',
-                        key: 'os',
-                        sortable: true,
-                        width: 140,
+                        width: 160,
+                        fixed: 'left',
                         render: (h, params) => {
-                            return h('div', params.row.os + ' ' + params.row.osrelease);
+                            return h('div', [
+                                h('div', {
+                                    props: {
+                                        type: 'text',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.grains(params.row.id);
+                                        }
+                                    }
+                                }, params.row.id)
+                            ]);
                         }
                     },
                     {
                         title: 'fqdn',
                         key: 'fqdn',
-                        width: 150,
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: 'ipv4',
                         key: 'ipv4',
-                        width: 110,
+                        width: 130,
                         sortable: true,
                         render: (h, params) => {
                             return h('ul', params.row.ipv4.map(item => {
@@ -57,14 +76,20 @@
                         }
                     },
                     {
-                        title: 'CPU',
-                        key: 'num_cpus',
-                        width: 80,
-                        sortable: true
+                        title: 'os',
+                        key: 'os',
+                        sortable: true,
+                        width: 140
                     },
                     {
-                        title: 'GPU',
-                        key: 'num_gpus',
+                        title: 'osrelease',
+                        key: 'osrelease',
+                        sortable: true,
+                        width: 140
+                    },
+                    {
+                        title: 'cpu',
+                        key: 'num_cpus',
                         width: 80,
                         sortable: true
                     },
@@ -77,58 +102,19 @@
                     {
                         title: 'mem_total',
                         key: 'mem_total',
-                        width: 110,
+                        width: 130,
                         sortable: true
                     },
                     {
-                        title: 'productname',
-                        key: 'productname',
-                        width: 110,
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('div', params.row.manufacturer + ' ' + params.row.productname);
-                        }
-                    },
-                    {
-                        title: 'saltversion',
-                        key: 'saltversion',
-                        width: 110,
+                        title: 'gpu',
+                        key: 'num_gpus',
+                        width: 80,
                         sortable: true
                     },
                     {
                         title: 'kernelrelease',
                         key: 'kernelrelease',
-                        width: 110,
-                        sortable: true
-                    },
-                    {
-                        title: 'biosversion',
-                        key: 'biosversion',
-                        width: 110,
-                        sortable: true
-                    },
-                    {
-                        title: 'serialnumber',
-                        key: 'serialnumber',
-                        width: 110,
-                        sortable: true
-                    },
-                    {
-                        title: 'uuid',
-                        key: 'uuid',
                         width: 150,
-                        sortable: true
-                    },
-                    {
-                        title: 'hwaddr_interfaces',
-                        key: 'hwaddr_interfaces',
-                        width: 110,
-                        sortable: true
-                    },
-                    {
-                        title: 'biosreleasedate',
-                        key: 'biosreleasedate',
-                        width: 110,
                         sortable: true
                     },
                     {
@@ -138,33 +124,151 @@
                         sortable: true
                     },
                     {
+                        title: 'nameservers',
+                        key: 'nameservers',
+                        width: 130,
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('ul', params.row.dns.nameservers.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
+                        }
+                    },
+                    {
+                        title: 'selinux',
+                        key: 'selinux',
+                        width: 145,
+                        sortable: true,
+                        render: (h, params) => {
+                            let selinux = [];
+                            for (let k in params.row.selinux) {
+                                selinux.push(k + ' : ' + params.row.selinux[k]);
+                            }
+                            return h('ul', selinux.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
+                        }
+                    },
+                    {
                         title: 'locale_info',
                         key: 'locale_info',
-                        width: 110,
+                        width: 190,
+                        sortable: true,
+                        render: (h, params) => {
+                            let localeInfo = [];
+                            for (let k in params.row.locale_info) {
+                                localeInfo.push(k + ' : ' + params.row.locale_info[k]);
+                            }
+                            return h('ul', localeInfo.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
+                        }
+                    },
+                    {
+                        title: 'pythonversion',
+                        key: 'pythonversion',
+                        width: 140,
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('div', params.row.pythonversion.join('.'));
+                        }
+                    },
+                    {
+                        title: 'saltversion',
+                        key: 'saltversion',
+                        width: 120,
                         sortable: true
                     },
                     {
-                        title: 'gpus',
-                        key: 'gpus',
-                        width: 110,
+                        title: 'zmqversion',
+                        key: 'zmqversion',
+                        width: 130,
                         sortable: true
                     },
                     {
-                        title: 'machine_id',
-                        key: 'machine_id',
-                        width: 110,
+                        title: 'manufacturer',
+                        key: 'manufacturer',
+                        width: 140,
                         sortable: true
                     },
+                    {
+                        title: 'productname',
+                        key: 'productname',
+                        width: 150,
+                        sortable: true
+                    },
+                    {
+                        title: 'biosversion',
+                        key: 'biosversion',
+                        width: 130,
+                        sortable: true
+                    },
+                    {
+                        title: 'serialnumber',
+                        key: 'serialnumber',
+                        width: 150,
+                        sortable: true
+                    },
+                    {
+                        title: 'biosreleasedate',
+                        key: 'biosreleasedate',
+                        width: 150,
+                        sortable: true
+                    }
                 ]
             };
         },
         methods: {
-            // 2018-04-18T12:51:59.321743 to yyyy-mm-dd hh:mm:ss
-            convertTime (time) {
-                let dt = new Date(time);
-                dt.setMinutes(dt.getMinutes() - dt.getTimezoneOffset());
-                let date = dt.toISOString().slice(0, -5).replace(/[T]/g, ' ');
-                return date;
+            getProductEvent: function (productData, productId) {
+                this.productData = productData;
+                this.productId = productId;
+            },
+            // 调用子组件消息通知
+            nError (title, info) {
+                this.$refs.childrenMethods.nError(title, info);
+            },
+            grains (id) {
+                this.axios.get(this.Global.serverSrc + 'minions/grain?minion=' + id + '&product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.result = res.data['data'];
+                            this.showInfo = true;
+                            this.loading = true;
+                        } else {
+                            this.result = '';
+                            this.loading = false;
+                            this.nError('Get Grains Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.result = '';
+                        this.loading = false;
+                        this.nError('Get Grains Failure', errInfo);
+                    });
             }
         }
     };
