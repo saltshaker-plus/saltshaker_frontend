@@ -7,8 +7,8 @@
                     <FormItem label="用户名" prop="username">
                         <Input v-model="formValidate.username" placeholder="输入用户名"></Input>
                     </FormItem>
-                    <FormItem label="密码" prop="password">
-                        <Input  type="password"　v-model="formValidate.password" placeholder="密码"></Input>
+                    <FormItem label="邮箱" prop="mail">
+                        <Input v-model="formValidate.mail" placeholder="输入你的邮箱"></Input>
                     </FormItem>
                     <FormItem label="角色" prop="role">
                         <CheckboxGroup v-model="formValidate.role">
@@ -100,6 +100,11 @@
                                 }, params.row.username)
                             ]);
                         }
+                    },
+                    {
+                        title: '邮箱',
+                        key: 'mail',
+                        sortable: true
                     },
                     {
                         title: '产品线',
@@ -209,6 +214,7 @@
                                             this.optionTypeName = '编辑';
                                             this.id = params.row.id;
                                             this.formValidate.username = params.row.username;
+                                            this.formValidate.mail = params.row.mail;
                                             this.originGroup = [];
                                             this.originACL = [];
                                             this.formValidate.product = params.row.product.map(item => {
@@ -252,15 +258,16 @@
                 // 表单验证
                 formValidate: {
                     username: '',
-                    password: '',
+                    mail: '',
                     product: []
                 },
                 ruleValidate: {
                     username: [
                         { required: true, message: '用户名不能为空', trigger: 'blur' }
                     ],
-                    password: [
-                        { required: true, message: '密码不能为空', trigger: 'blur' }
+                    mail: [
+                        { required: true, message: '邮箱不能为空', trigger: 'blur' },
+                        { type: 'email', message: '无效的邮箱格式', trigger: 'blur' }
                     ],
                     product: [
                         { required: true, type: 'array', min: 1, message: '至少选择一项', trigger: 'change' }
@@ -353,7 +360,7 @@
                         // 编辑
                         let postData = {
                             username: this.formValidate.username,
-                            password: this.formValidate.password,
+                            mail: this.formValidate.mail,
                             product: this.formValidate.product,
                             role: this.formValidate.role,
                             groups: this.targetGroup,
