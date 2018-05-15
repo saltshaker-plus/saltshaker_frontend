@@ -195,7 +195,7 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 123,
+                        width: 193,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -248,8 +248,31 @@
                                         props: {
                                             type: 'error',
                                             size: 'small'
+                                        },
+                                        style: {
+                                            marginRight: '5px'
                                         }
                                     }, '删除')
+                                ]),
+                                h('Poptip', {
+                                    props: {
+                                        confirm: true,
+                                        title: '确定要重置 ' + params.row.username + ' 密码吗?',
+                                        transfer: true,
+                                        placement: 'top-end'
+                                    },
+                                    on: {
+                                        'on-ok': () => {
+                                            this.handleResetPassword(params.row.id)
+                                        }
+                                    }
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'default',
+                                            size: 'small'
+                                        }
+                                    }, '重置密码')
                                 ])
                             ]);
                         }
@@ -414,6 +437,25 @@
                         this.$Message.error('请检查表单数据！');
                     }
                 });
+            },
+            handleResetPassword(id) {
+                this.axios.get(this.Global.serverSrc + this.apiService + '/reset/' + id).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                        } else {
+                            this.nError('Reset Password Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Reset Password Failure', errInfo);
+                    });
             },
             // 表单重置
             handleReset (name) {
