@@ -11,7 +11,7 @@
                     欢迎使用
                 </p>
                 <div class="form-con">
-                    <Tabs v-model="tab">
+                    <Tabs v-model="tab" :style="[h]">
                         <TabPane label="登录" name="login">
                             <Form ref="loginForm" :model="form" :rules="rules">
                                 <FormItem prop="userName">
@@ -36,14 +36,14 @@
                         <TabPane label="注册" name="register">
                             <Form ref="registerForm" :model="registerForm" :rules="registerRules">
                                 <FormItem prop="userName">
-                                    <Input v-model="registerForm.userName" placeholder="输入用户名">
+                                    <Input v-model="registerForm.userName" placeholder="请输入用户名">
                                         <span slot="prepend">
                                             <Icon :size="16" type="person"></Icon>
                                         </span>
                                     </Input>
                                 </FormItem>
                                  <FormItem prop="mail">
-                                     <Input v-model="registerForm.mail" placeholder="输入你的邮箱">
+                                     <Input v-model="registerForm.mail" placeholder="请输入邮箱">
                                         <span slot="prepend">
                                             <Icon :size="16" type="email"></Icon>
                                         </span>
@@ -57,7 +57,7 @@
                                     </Input>
                                 </FormItem>
                                 <FormItem prop="rePassword">
-                                    <Input type="password" v-model="registerForm.rePassword" placeholder="请再次输入新密码" >
+                                    <Input type="password" v-model="registerForm.rePassword" placeholder="请再次输入密码" >
                                         <span slot="prepend">
                                             <Icon :size="16" type="unlocked"></Icon>
                                         </span>
@@ -91,6 +91,9 @@ export default {
             token: '',
             publicKey: this.RSA(),
             tab: 'login',
+            h: {
+                height: '209px'
+            },
             form: {
                 userName: '',
                 password: ''
@@ -126,6 +129,15 @@ export default {
                 ]
             }
         };
+    },
+    watch: {
+        tab () {
+            if (this.tab === 'login') {
+                this.h.height = '209px';
+            } else {
+                this.h.height = '320px';
+            }
+        }
     },
     methods: {
         handleSubmit () {
