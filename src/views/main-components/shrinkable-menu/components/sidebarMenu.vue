@@ -34,7 +34,7 @@ export default {
         iconSize: Number,
         menuTheme: {
             type: String,
-            default: 'dark'
+            default: 'light'
         },
         openNames: {
             type: Array

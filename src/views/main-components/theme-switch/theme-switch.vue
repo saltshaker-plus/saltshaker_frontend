@@ -25,31 +25,31 @@ export default {
     data () {
         return {
             themeList: [
-                {
-                    name: 'black_b',
-                    menu: '#495060',
-                    element: '#2d8cf0'
-                },
-                {
-                    name: 'black_g',
-                    menu: '#495060',
-                    element: '#00a854'
-                },
-                {
-                    name: 'black_y',
-                    menu: '#495060',
-                    element: '#e96500'
-                },
-                {
-                    name: 'black_r',
-                    menu: '#495060',
-                    element: '#e43e31'
-                },
-                {
-                    name: 'light_b',
-                    menu: '#495060',
-                    element: '#2d8cf0'
-                },
+//                {
+//                    name: 'black_b',
+//                    menu: '#495060',
+//                    element: '#2d8cf0'
+//                },
+//                {
+//                    name: 'black_g',
+//                    menu: '#495060',
+//                    element: '#00a854'
+//                },
+//                {
+//                    name: 'black_y',
+//                    menu: '#495060',
+//                    element: '#e96500'
+//                },
+//                {
+//                    name: 'black_r',
+//                    menu: '#495060',
+//                    element: '#e43e31'
+//                },
+//                {
+//                    name: 'light_b',
+//                    menu: '#495060',
+//                    element: '#2d8cf0'
+//                },
                 {
                     name: 'light_g',
                     menu: '#495060',
@@ -142,15 +142,15 @@ export default {
                     return true;
                 } else {
                     return false;
-                }themeSwitch
+                }
             });
             if (!hasThisUser) {
-                this.$store.commit('changeMenuTheme', 'dark');
-                this.$store.commit('changeMainTheme', 'b');
+                this.$store.commit('changeMenuTheme', 'light');
+                this.$store.commit('changeMainTheme', 'g');
             }
         } else {
-            this.$store.commit('changeMenuTheme', 'dark');
-            this.$store.commit('changeMainTheme', 'b');
+            this.$store.commit('changeMenuTheme', 'light');
+            this.$store.commit('changeMainTheme', 'g');
         }
         // 根据用户设置主题
         if (this.$store.state.app.themeColor !== 'b') {

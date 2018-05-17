@@ -7,7 +7,7 @@
             <shrinkable-menu 
                 :shrink="shrink"
                 @on-change="handleSubmenuChange"
-                :theme="menuTheme" 
+                :theme="menuTheme"
                 :before-push="beforePush"
                 :open-names="openedSubmenuArr"
                 :menu-list="menuList">
@@ -88,6 +88,7 @@
         },
         data () {
             return {
+                // 控制左侧菜单栏是否折叠
                 shrink: false,
                 userName: '',
                 isFullScreen: false,
