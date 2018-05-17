@@ -4,7 +4,7 @@
             :cColumns="cColumns"
             :apiService="apiService"
             @getProductEvent="getProductEvent"
-            :productShow="false"
+            :productShow="true"
             ref="childrenMethods">
         </common-table>
         <Modal width="650px" v-model="showInfo" title="详情" :styles="{top: '20px'}">
