@@ -155,13 +155,15 @@ export default {
                     this.axios.post(this.Global.serverSrc + 'login', postData).then(
                         res => {
                             if (res.data['status'] === true) {
-                                let token = res.data['data'];
+                                let info = res.data['data'];
                                 Cookies.set('user', this.form.userName);
                                 // 后端返回过期时间,单位秒 转换成天
-                                let expireDays = Object.values(token)[0][1] / 60 / 60 / 24;
-                                Cookies.set(Object.keys(token)[0], Object.values(token)[0][0], { expires: expireDays });
-                                Cookies.set('tag', Object.keys(token)[0]);
+                                let expireDays = info['token']['expires'] / 60 / 60 / 24;
+                                Cookies.set(info['token']['key'], info['token']['value'], { expires: expireDays });
+                                Cookies.set('tag', info['token']['key']);
                                 Cookies.set('access', 0);
+                                // 设置UID
+                                this.$store.commit('setUserId', info['user']['uid']);
                                 this.$router.push({
                                     name: 'home_index'
                                 });

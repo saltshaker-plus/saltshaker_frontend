@@ -438,7 +438,7 @@
                     }
                 });
             },
-            handleResetPassword(id) {
+            handleResetPassword (id) {
                 this.axios.get(this.Global.serverSrc + this.apiService + '/reset/' + id).then(
                     res => {
                         if (res.data['status'] === true) {

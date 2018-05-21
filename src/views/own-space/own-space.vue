@@ -17,66 +17,76 @@
                     label-position="right"
                     :rules="inforValidate"
                 >
-                    <FormItem label="用户姓名：" prop="name">
+                    <FormItem label="ID：">
+                        <span>{{ userForm.id }}</span>
+                    </FormItem>
+                    <FormItem label="用户名：" prop="username">
                         <div style="display:inline-block;width:300px;">
-                            <Input v-model="userForm.name" ></Input>
+                            <Input v-model="userForm.username" ></Input>
                         </div>
                     </FormItem>
-                    <FormItem label="用户手机：" prop="cellphone" >
-                        <div style="display:inline-block;width:204px;">
-                            <Input v-model="userForm.cellphone" @on-keydown="hasChangePhone"></Input>
+                    <!--<FormItem label="用户手机：" prop="cellphone" >-->
+                        <!--<div style="display:inline-block;width:204px;">-->
+                            <!--<Input v-model="userForm.cellphone" @on-keydown="hasChangePhone"></Input>-->
+                        <!--</div>-->
+                        <!--<div style="display:inline-block;position:relative;">-->
+                            <!--<Button @click="getIdentifyCode" :disabled="canGetIdentifyCode">{{ gettingIdentifyCodeBtnContent }}</Button>-->
+                            <!--<div class="own-space-input-identifycode-con" v-if="inputCodeVisible">-->
+                                <!--<div style="background-color:white;z-index:110;margin:10px;">-->
+                                    <!--<Input v-model="securityCode" placeholder="请填写短信验证码" ></Input>-->
+                                    <!--<div style="margin-top:10px;text-align:right">-->
+                                        <!--<Button type="ghost" @click="cancelInputCodeBox">取消</Button>-->
+                                        <!--<Button type="primary" @click="submitCode" :loading="checkIdentifyCodeLoading">确定</Button>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</FormItem>-->
+                    <!--<FormItem label="公司：">-->
+                        <!--<span>{{ userForm.company }}</span>-->
+                    <!--</FormItem>-->
+                    <!--<FormItem label="部门：">-->
+                        <!--<span>{{ userForm.department }}</span>-->
+                    <!--</FormItem>-->
+                    <FormItem label="邮箱：" prop="mail">
+                        <div style="display:inline-block;width:300px;">
+                            <Input v-model="userForm.mail" ></Input>
                         </div>
-                        <div style="display:inline-block;position:relative;">
-                            <Button @click="getIdentifyCode" :disabled="canGetIdentifyCode">{{ gettingIdentifyCodeBtnContent }}</Button>
-                            <div class="own-space-input-identifycode-con" v-if="inputCodeVisible">
-                                <div style="background-color:white;z-index:110;margin:10px;">
-                                    <Input v-model="securityCode" placeholder="请填写短信验证码" ></Input>
-                                    <div style="margin-top:10px;text-align:right">
-                                        <Button type="ghost" @click="cancelInputCodeBox">取消</Button>
-                                        <Button type="primary" @click="submitCode" :loading="checkIdentifyCodeLoading">确定</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </FormItem>
-                    <FormItem label="公司：">
-                        <span>{{ userForm.company }}</span>
-                    </FormItem>
-                    <FormItem label="部门：">
-                        <span>{{ userForm.department }}</span>
                     </FormItem>
                     <FormItem label="登录密码：">
                         <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
                     </FormItem>
                     <div>
                         <Button type="text" style="width: 100px;" @click="cancelEditUserInfor">取消</Button>
-                        <Button type="primary" style="width: 100px;" :loading="save_loading" @click="saveEdit">保存</Button>
+                        <Button type="primary" style="width: 100px;" @click="saveEdit">保存</Button>
                     </div>
                 </Form>
             </div>
         </Card>
         <Modal v-model="editPasswordModal" :closable='false' :mask-closable=false :width="500">
-            <h3 slot="header" style="color:#2D8CF0">修改密码</h3>
-            <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
+            <h3 slot="header">修改密码</h3>
+            <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="82" label-position="right" :rules="passwordValidate">
                 <FormItem label="原密码" prop="oldPass" :error="oldPassError">
-                    <Input v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" ></Input>
                 </FormItem>
                 <FormItem label="新密码" prop="newPass">
-                    <Input v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" ></Input>
+                    <Input type="password" v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" ></Input>
                 </FormItem>
                 <FormItem label="确认新密码" prop="rePass">
-                    <Input v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" ></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="cancelEditPass">取消</Button>
-                <Button type="primary" :loading="savePassLoading" @click="saveEditPass">保存</Button>
+                <Button type="primary" @click="saveEditPass">保存</Button>
             </div>
         </Modal>
     </div>
 </template>
 
 <script>
+import Cookies from 'js-cookie';
+import jsEncrypt from 'jsencrypt/bin/jsencrypt';
 export default {
     name: 'ownspace_index',
     data () {
@@ -97,30 +107,27 @@ export default {
         };
         return {
             userForm: {
-                name: '',
-                cellphone: '',
-                company: '',
-                department: ''
+                id: '',
+                username: '',
+                mail: ''
             },
-            uid: '', // 登录用户的userId
+            publicKey: '',
             securityCode: '', // 验证码
             phoneHasChanged: false, // 是否编辑了手机
             save_loading: false,
             identifyError: '', // 验证码错误
-            editPasswordModal: false, // 修改密码模态框显示
-            savePassLoading: false,
             oldPassError: '',
             identifyCodeRight: false, // 验证码是否正确
             hasGetIdentifyCode: false, // 是否点了获取验证码
             canGetIdentifyCode: false, // 是否可点获取验证码
             checkIdentifyCodeLoading: false,
             inforValidate: {
-                name: [
+                username: [
                     { required: true, message: '请输入姓名', trigger: 'blur' }
                 ],
-                cellphone: [
-                    { required: true, message: '请输入手机号码' },
-                    { validator: validePhone }
+                mail: [
+                    { required: true, message: '邮箱不能为空', trigger: 'blur' },
+                    { type: 'email', message: '无效的邮箱格式', trigger: 'blur' }
                 ]
             },
             editPasswordForm: {
@@ -147,6 +154,11 @@ export default {
             gettingIdentifyCodeBtnContent: '获取验证码' // “获取验证码”按钮的文字
         };
     },
+    computed: {
+        uid () {
+            return this.$store.state.globalInfo.uid;
+        }
+    },
     methods: {
         getIdentifyCode () {
             this.hasGetIdentifyCode = true;
@@ -171,6 +183,7 @@ export default {
         },
         showEditPassword () {
             this.editPasswordModal = true;
+            this.RSA();
         },
         cancelEditUserInfor () {
             this.$store.commit('removeTag', 'ownspace_index');
@@ -210,17 +223,53 @@ export default {
         saveEditPass () {
             this.$refs['editPasswordForm'].validate((valid) => {
                 if (valid) {
-                    this.savePassLoading = true;
-                    // you can write ajax request here
+                    // 使用rsa对密码进行加密
+                    let jse = new jsEncrypt();
+                    jse.setPublicKey(this.publicKey);
+                    let postData = {
+                        'username': Cookies.get('user'),
+                        'old_password': jse.encrypt(this.editPasswordForm.oldPass),
+                        'new_password': jse.encrypt(this.editPasswordForm.newPass)
+                    };
+                    this.axios.post(this.Global.serverSrc + 'user/reset/owner/' + this.uid, postData).then(
+                        res => {
+                            if (res.data['status'] === true) {
+                                this.editPasswordModal = false;
+                                this.$Message.success('重置密码成功！');
+                            } else {
+                                this.nError('Reset Password', res.data['message']);
+                            }
+                        },
+                        err => {
+                            let errInfo = '';
+                            try {
+                                errInfo = err.response.data['message'];
+                            } catch (error) {
+                                errInfo = err;
+                            }
+                            this.nError('Reset Password', errInfo);
+                        });
                 }
             });
         },
         init () {
-            this.userForm.name = 'Lison';
-            this.userForm.cellphone = '17712345678';
-            this.initPhone = '17712345678';
-            this.userForm.company = 'TalkingData';
-            this.userForm.department = '可视化部门';
+            this.axios.get(this.Global.serverSrc + 'user/' + this.uid).then(
+                res => {
+                    if (res.data['status'] === true) {
+                        this.userForm = res.data['data'];
+                    } else {
+                        this.nError('Get User Failure', res.data['message']);
+                    }
+                },
+                err => {
+                    let errInfo = '';
+                    try {
+                        errInfo = err.response.data['message'];
+                    } catch (error) {
+                        errInfo = err;
+                    }
+                    this.nError('Get User Failure', errInfo);
+                });
         },
         cancelInputCodeBox () {
             this.inputCodeVisible = false;
@@ -250,6 +299,35 @@ export default {
                 this.$Message.success('保存成功');
                 this.save_loading = false;
             }, 1000);
+        },
+        // 重新定义错误消息
+        nError (title, info) {
+            this.$Notice.error({
+                title: title,
+                // 替换<>避免被解析为html标签
+                desc: info.toString().replace(/<|>/g, ''),
+                duration: 10
+            });
+        },
+        // 获取rsa 公钥
+        RSA () {
+            this.axios.get(this.Global.serverSrc + 'rsa').then(
+                res => {
+                    if (res.data['status'] === true) {
+                        this.publicKey = res.data['data'];
+                    } else {
+                        this.nError('加密失败:', res.data['message']);
+                    }
+                },
+                err => {
+                    let errInfo = '';
+                    try {
+                        errInfo = err.response.data['message'];
+                    } catch (error) {
+                        errInfo = err;
+                    }
+                    this.nError('加密失败:', errInfo);
+                });
         }
     },
     mounted () {

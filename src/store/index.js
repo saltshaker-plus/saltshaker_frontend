@@ -8,10 +8,14 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        //
+        globalInfo: {
+            uid: ''
+        }
     },
     mutations: {
-        //
+        setUserId (state, uid) {
+            state.globalInfo.uid = uid;
+        }
     },
     actions: {
 
