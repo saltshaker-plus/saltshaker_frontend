@@ -164,6 +164,10 @@ export default {
                                 Cookies.set('access', 0);
                                 // 设置UID
                                 this.$store.commit('setUserId', info['user']['uid']);
+                                // 存储在localStorage解决刷新页面vuex 的值消失的的问题
+                                localStorage.user = info['user']['uid'];
+//                                this.$store.commit('setUsername', this.form.userName);
+//                                localStorage.username = this.form.userName;
                                 this.$router.push({
                                     name: 'home_index'
                                 });
