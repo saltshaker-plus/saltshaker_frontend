@@ -1,20 +1,20 @@
 <template>
     <div>
-        <common-s-l-s
+        <create-s-l-s
                 :apiService="apiService"
                 :projectType="projectType"
                 :slsURI = "slsURI"
                 :productShow="true"
                 ref="childrenMethods">
-        </common-s-l-s>
+        </create-s-l-s>
     </div>
 </template>
 
 <script>
-    import CommonSLS from '../common-components/sls/sls-manage.vue';
+    import CreateSLS from '../common-components/sls/sls-create.vue';
     export default {
         components: {
-            CommonSLS
+            CreateSLS
         },
         data () {
             return {
