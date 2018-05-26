@@ -33,56 +33,81 @@
                             </Card>
                         </Col>
                         <Col span="18">
-                            <common-execute
-                                    :apiService="apiService"
-                                    :productShow="true"
-                                    :productId="productId"
-                                    :slsCommand="path"
-                                    :slsURI = "slsURI"
-                                    ref="childrenMethods">
-                                <FormItem label="SLS" prop="command" slot="command">
-                                    <highlight-code lang="yaml" style="overflow:auto">
-                                    {{fileContent}}
-                                    </highlight-code>
-                                </FormItem>
-                                <Button type="dashed" :disabled="editDisabled" @click="handleEdit()" slot="commitButton">编辑</Button>
-                            </common-execute>
+                            <Card dis-hover>
+                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="58">
+                                    <FormItem label="路径" prop="target">
+                                        <CheckboxGroup v-model="formValidate.target">
+                                             {{filePath[0].path}}
+                                        </CheckboxGroup>
+                                    </FormItem>
+                                    <FormItem label="文件名" prop="target">
+                                        <CheckboxGroup v-model="formValidate.target">
+                                             <Input placeholder="输入文件名"></Input>
+                                        </CheckboxGroup>
+                                    </FormItem>
+                                    <FormItem label="内容" prop="target">
+                                        <CheckboxGroup v-model="formValidate.target">
+                                              <Tabs>
+                                        <TabPane label="从文本输入框创建">
+                                            <MonacoEditor
+                                                height="400"
+                                                width="100%"
+                                                language="yaml"
+                                                srcPath="dist"
+                                                :code="fileContent"
+                                                :options="options"
+                                                :highlighted="highlightLines"
+                                                :changeThrottle="100"
+                                                theme="vs-dark"
+                                                @mounted="onMounted"
+                                                @codeChange="onCodeChange"
+                                                ref="vscode"
+                                                >
+                                            </MonacoEditor>
+                                        </TabPane>
+                                        <TabPane label="封装SLS">
+                                            <Upload
+                                                multiple
+                                                type="drag"
+                                                action="//jsonplaceholder.typicode.com/posts/">
+                                                <div style="padding: 20px 0">
+                                                    <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                                                    <p>点击或者拖拽上传</p>
+                                                </div>
+                                            </Upload>
+                                        </TabPane>
+                                        <TabPane label="从文件创建">
+                                            <Upload
+                                                multiple
+                                                type="drag"
+                                                action="//jsonplaceholder.typicode.com/posts/">
+                                                <div style="padding: 20px 0">
+                                                    <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                                                    <p>点击或者拖拽上传</p>
+                                                </div>
+                                            </Upload>
+                                        </TabPane>
+                                    </Tabs>
+                                        </CheckboxGroup>
+                                    </FormItem>
+                                    <FormItem>
+                                        <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
+                                        <Button type="ghost" @click="handleReset('formValidate')">重置</Button>
+                                    </FormItem>
+                                </Form>
+                            </Card>
                         </Col>
                     </Row>
                 </Card>
             </Col>
         </Row>
-        <Modal width="750px" v-model="edit" title="编辑">
-            <MonacoEditor
-                height="300"
-                width="100%"
-                language="yaml"
-                srcPath="dist"
-                :code="fileContent"
-                :options="options"
-                :highlighted="highlightLines"
-                :changeThrottle="700"
-                theme="vs-dark"
-                @mounted="onMounted"
-                @codeChange="onCodeChange"
-                ref="vscode"
-                >
-            </MonacoEditor>
-            <div slot="footer">
-                <Button type="text" @click="handleCancel">取消</Button>
-                <Button type="success" @click="handleCommit">提交</Button>
-            </div>
-        </Modal>
-
     </div>
 </template>
 
 <script>
-    import commonExecute from '../../common-components/execute/common-execute.vue';
     import MonacoEditor from 'vue-monaco-editor';
     export default {
         components: {
-            commonExecute,
             MonacoEditor
         },
         name: 'CommonSLS',
@@ -99,13 +124,14 @@
                 // 编辑
                 edit: false,
                 editDisabled: true,
-                filePath: '',
+                filePath: [''],
                 fileContent: '',
                 path: '',
                 apiHistory: '',
                 code: '',
                 options: {
                     selectOnLineNumbers: false,
+                    // 启用该编辑器将安装一个时间间隔来检查其容器dom节点大小是否已更改,启用此功能可能会对性能造成严重影响
                     automaticLayout: true
                 },
                 highlightLines: [
@@ -117,7 +143,19 @@
                         number: 0,
                         class: 'secondary-highlighted-line'
                     }
-                ]
+                ],
+                formValidate: {
+                    command: '',
+                    target: []
+                },
+                ruleValidate: {
+                    command: [
+                        { required: true, message: '请输选择要执行的SLS', trigger: 'blur' }
+                    ],
+                    target: [
+                        { required: true, type: 'array', message: '请勾选主机或者分组', trigger: 'change' }
+                    ]
+                }
             };
         },
         props: {
@@ -316,9 +354,8 @@
                     'project_type': this.projectType,
                     'branch': this.branchName,
                     'action': 'update',
-                    'content': this.code
+                    'content': this.fileContent
                 };
-                this.fileContent = this.code;
                 this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
                     res => {
                         if (res.data['status'] === true) {
@@ -368,8 +405,6 @@
             },
             onCodeChange (editor) {
                 console.log(this.editor.getValue());
-                this.code = this.editor.getValue();
-                console.log(this.code)
             },
             // 重载编辑框
             reload () {

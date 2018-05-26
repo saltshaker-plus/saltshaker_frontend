@@ -68,13 +68,14 @@
                         </FormItem>
                         <FormItem label="Shell" prop="shell" v-show="shell">
                             <MonacoEditor
-                                height="600"
-                                language="typescript"
+                                height="400"
+                                whith="100%"
+                                language="yaml"
                                 srcPath="dist"
                                 :code="code"
                                 :options="options"
                                 :highlighted="highlightLines"
-                                :changeThrottle="500"
+                                :changeThrottle="100"
                                 theme="vs-dark"
                                 @mounted="onMounted"
                                 @codeChange="onCodeChange"
@@ -221,9 +222,10 @@
                         { required: true, type: 'string', message: '请选择时间', trigger: 'change' }
                     ]
                 },
-                code: 'ggggggg',
+                code: '',
                 options: {
-                    selectOnLineNumbers: false
+                    selectOnLineNumbers: false,
+                    automaticLayout: true
                 },
                 highlightLines: [
                     {
