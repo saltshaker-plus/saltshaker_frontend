@@ -88,7 +88,7 @@ export const appRouter = [
         path: '/host',
         icon: 'ios-barcode',
         name: 'host',
-        title: '分组管理',
+        title: '主机管理',
         component: Main,
         children: [
             { path: 'index', title: '主机管理', name: 'host_index', component: () => import('@/views/host/host.vue') }
@@ -105,14 +105,14 @@ export const appRouter = [
         ]
     },
     {
-        path: '/sls',
-        icon: 'steam',
-        name: 'sls',
-        title: 'SLS管理',
+        path: '/file',
+        icon: 'document-text',
+        name: 'file',
+        title: '文件服务',
         component: Main,
         children: [
-            { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
-            { path: 'state_sls', title: 'State SLS', name: 'state sls', component: () => import('@/views/sls/state_sls.vue') }
+            // { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
+            { path: 'index', title: '文件服务', name: 'file_index', component: () => import('@/views/sls/state_sls.vue') }
         ]
     },
     {
