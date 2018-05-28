@@ -369,7 +369,6 @@
             onCodeChange (editor) {
                 console.log(this.editor.getValue());
                 this.code = this.editor.getValue();
-                console.log(this.code)
             },
             // 重载编辑框
             reload () {
@@ -387,13 +386,4 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
-</style>
-
-<style media="screen">
-  .secondary-highlighted-line {
-    background: green;
-  }
-  .primary-highlighted-line {
-    background: blue;
-  }
 </style>

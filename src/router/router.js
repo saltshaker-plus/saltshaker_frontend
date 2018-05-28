@@ -112,7 +112,7 @@ export const appRouter = [
         component: Main,
         children: [
             // { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
-            { path: 'index', title: '文件服务', name: 'file_index', component: () => import('@/views/sls/state_sls.vue') }
+            { path: 'index', title: '文件服务', name: 'file_index', component: () => import('@/views/fileserver/gitlab.vue') }
         ]
     },
     {
@@ -123,8 +123,8 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'shell', title: 'Shell', name: 'shell', component: () => import('@/views/execute/shell.vue') },
-            { path: 'module', title: 'Module', name: 'module', component: () => import('@/views/execute/module.vue') },
             { path: 'state', title: 'State', name: 'state', component: () => import('@/views/execute/state.vue') },
+            { path: 'module', title: 'Module', name: 'module', component: () => import('@/views/execute/module.vue') },
             { path: 'pillar', title: 'Pillar', name: 'pillar', component: () => import('@/views/execute/pillar.vue') }
         ]
     },
