@@ -33,7 +33,71 @@
                             </Card>
                         </Col>
                         <Col span="18">
-                            <slot name="right"></slot>
+                            <Card dis-hover>
+                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="58">
+                                    <FormItem label="文件">
+                                        <Input v-model="fileDir" laceholder="输入文件"></Input>
+                                    </FormItem>
+                                    <FormItem label="内容" prop="code">
+                                        <Tabs>
+                                            <TabPane label="从文本输入框创建">
+                                                <MonacoEditor
+                                                    height="500"
+                                                    width="100%"
+                                                    language="yaml"
+                                                    srcPath="dist"
+                                                    :code="fileContent"
+                                                    :options="options"
+                                                    :highlighted="highlightLines"
+                                                    :changeThrottle="100"
+                                                    theme="vs-dark"
+                                                    @mounted="onMounted"
+                                                    @codeChange="onCodeChange"
+                                                    ref="vscode"
+                                                    >
+                                                </MonacoEditor>
+                                            </TabPane>
+                                            <TabPane label="封装SLS" disabled>
+                                                <Upload
+                                                    multiple
+                                                    type="drag"
+                                                    action="//jsonplaceholder.typicode.com/posts/">
+                                                    <div style="padding: 20px 0">
+                                                        <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                                                        <p>点击或者拖拽上传</p>
+                                                    </div>
+                                                </Upload>
+                                            </TabPane>
+                                            <TabPane label="从文件创建">
+                                                <Upload
+                                                    multiple
+                                                    type="drag"
+                                                    :action="action"
+                                                    :data="uploadParameter"
+                                                    :with-credentials="true"
+                                                    :on-success="UploadSuccess"
+                                                    :on-error="UploadError">
+                                                    <div style="padding: 20px 0">
+                                                        <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                                                        <p>点击或者拖拽上传</p>
+                                                    </div>
+                                                </Upload>
+                                            </TabPane>
+                                        </Tabs>
+                                    </FormItem>
+                                    <FormItem>
+                                        <Button type="primary" @click="handleCreate('formValidate')">创建</Button>
+                                        <Button type="dashed" @click="handleEdit('formValidate')" :disabled="editDisabled">修改</Button>
+                                        <Poptip
+                                            confirm
+                                            :title="title"
+                                            @on-popper-show="PopperShow()"
+                                            @on-ok="handleDelete('formValidate')">
+                                            <Button type="error" :disabled="deleteDisabled">删除</Button>
+                                        </Poptip>
+                                    </FormItem>
+                                </Form>
+                            </Card>
                         </Col>
                     </Row>
                 </Card>
@@ -43,7 +107,11 @@
 </template>
 
 <script>
+    import MonacoEditor from 'vue-monaco-editor';
     export default {
+        components: {
+            MonacoEditor
+        },
         name: 'GitLab',
         data () {
             return {
@@ -55,25 +123,43 @@
                 fileTreeData: [],
                 fileTree: [],
                 fileListPathData: [],
-                // 编辑
-                edit: false,
+                // 删除
+                deleteDisabled: true,
                 editDisabled: true,
                 fileContent: '',
                 path: '',
                 filePath: [''],
-                apiHistory: '',
-                formValidate: {
-                    command: '',
-                    target: []
+                code: '',
+                options: {
+                    selectOnLineNumbers: false,
+                    // 启用该编辑器将安装一个时间间隔来检查其容器dom节点大小是否已更改,启用此功能可能会对性能造成严重影响
+                    automaticLayout: true
                 },
+                highlightLines: [
+                    {
+                        number: 0,
+                        class: 'primary-highlighted-line'
+                    },
+                    {
+                        number: 0,
+                        class: 'secondary-highlighted-line'
+                    }
+                ],
+                formValidate: {
+                    path: '',
+                    filename: '',
+                    code: ''
+                },
+                fileDir: '',
                 ruleValidate: {
-                    command: [
+                    path: [
                         { required: true, message: '请输选择要执行的SLS', trigger: 'blur' }
                     ],
-                    target: [
-                        { required: true, type: 'array', message: '请勾选主机或者分组', trigger: 'change' }
+                    fileDir: [
+                        { required: true, message: '文件名不能为空', trigger: 'blur' }
                     ]
-                }
+                },
+                title: ''
             };
         },
         props: {
@@ -93,11 +179,24 @@
                 required: true
             }
         },
+        computed: {
+            uploadParameter: function () {
+                let postData = {
+                    'path': this.fileDir,
+                    'project_type': this.projectType,
+                    'branch': this.branchName,
+                    'action': 'upload'
+                };
+                return postData;
+            },
+            action: function () {
+                return this.Global.serverSrc + 'gitlab/upload?product_id=' + this.productId;
+            }
+        },
         watch: {
             // 监控产品线变化
             productId () {
                 this.branch();
-                this.getProduct();
             },
             branchName () {
                 if (this.branchName !== '') {
@@ -114,10 +213,21 @@
                 if (this.fileContent !== '') {
                     this.editDisabled = false;
                 }
-                this.getFileContent();
+                // 重新加载 MonacoEditor
+                this.reload();
             },
             filePath () {
-                this.getFilePath();
+                if (this.filePath.length !== 0) {
+                    if (this.filePath[0].type !== 'tree') {
+                        this.deleteDisabled = false;
+                        this.editDisabled = false;
+                    } else {
+                        this.deleteDisabled = true;
+                        this.editDisabled = true;
+                        this.code = '';
+                        this.fileContent = '';
+                    }
+                }
             }
         },
         methods: {
@@ -216,7 +326,9 @@
             },
             handleContent (filePath) {
                 this.filePath = filePath;
-                console.log(filePath[0])
+                if (filePath.length !== 0) {
+                    this.fileDir = filePath[0].path;
+                }
                 if (filePath.length !== 0 && filePath[0]['type'] !== 'tree') {
                     this.fileContent = '';
                     this.path = filePath[0]['path'];
@@ -242,10 +354,10 @@
             // 展开树型结构获取gitlab数据
             loadData (item, callback) {
                 this.fileListPath(item['path']);
-                // fileListPath为异步方法,等待500ms
+                // fileListPath为异步方法,等待300ms
                 setTimeout(() => {
                     callback(this.fileListPathData);
-                }, 500);
+                }, 300);
             },
             // 重新定义错误消息
             nError (title, info) {
@@ -259,36 +371,26 @@
                 this.fileList();
                 // 调用hook进行更新
                 this.handleHook();
-                this.editDisabled = true;
-            },
-            handleCancel () {
-                // 取消编辑后再请求一次文件内容,以便恢复文件内容
-                // 暂时关闭
-                // this.handleContent(this.filePath);
-                this.edit = false;
             },
             handleEdit () {
-                this.edit = true;
-                this.code = this.fileContent;
-            },
-            handleCommit () {
                 let postData = {
                     'path': this.path,
                     'project_type': this.projectType,
                     'branch': this.branchName,
                     'action': 'update',
-                    'content': this.fileContent
+                    'content': this.code
                 };
                 this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.result = res.data['data'];
                             this.edit = false;
-                            this.$Message.success('成功！');
+                            this.$Message.success('修改成功！');
                             // 调用hook进行更新
                             this.handleHook();
+                            this.fileList();
                         } else {
-                            this.nError('Commit Failure', res.data['message']);
+                            this.nError('Modify Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -298,7 +400,72 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nError('Commit Failure', errInfo);
+                        this.nError('Modify Failure', errInfo);
+                    });
+            },
+            PopperShow () {
+                this.title = '你确定删除 ' + this.filePath[0].path + ' 这个文件吗?';
+            },
+            handleDelete (name) {
+                this.$refs[name].validate((valid) => {
+                    let postData = {
+                        'path': this.path,
+                        'project_type': this.projectType,
+                        'branch': this.branchName,
+                        'action': 'delete'
+                    };
+                    this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
+                        res => {
+                            if (res.data['status'] === true) {
+                                this.result = res.data['data'];
+                                this.edit = false;
+                                this.$Message.success('删除成功！');
+                                // 刷新gitlab file list
+                                this.fileList();
+                                this.filePath = [''];
+                            } else {
+                                this.nError('Delete Failure', res.data['message']);
+                            }
+                        },
+                        err => {
+                            let errInfo = '';
+                            try {
+                                errInfo = err.response.data['message'];
+                            } catch (error) {
+                                errInfo = err;
+                            }
+                            this.nError('Delete Failure', errInfo);
+                        });
+                });
+            },
+            handleCreate () {
+                let postData = {
+                    'path': this.fileDir,
+                    'project_type': this.projectType,
+                    'branch': this.branchName,
+                    'action': 'create',
+                    'content': this.code
+                };
+                this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.result = res.data['data'];
+                            this.edit = false;
+                            this.$Message.success('创建成功！');
+                            // 刷新gitlab file list
+                            this.fileList();
+                        } else {
+                            this.nError('Create Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Create Failure', errInfo);
                     });
             },
             handleHook () {
@@ -327,17 +494,22 @@
                 this.editor = editor;
             },
             onCodeChange (editor) {
-                console.log(this.editor.getValue());
+                this.code = this.editor.getValue();
             },
-            // 传递给父组件
-            getFileContent () {
-                this.$emit('getFileContentEvent', this.fileContent);
+            // 重载编辑框
+            reload () {
+                clearTimeout(time);
+                let time = setTimeout(() => {
+                    this.$refs.vscode.destroyMonaco();
+                    this.$refs.vscode.createMonaco();
+                }, 1);
             },
-            getFilePath () {
-                this.$emit('getFilePathEvent', this.filePath);
+            UploadSuccess () {
+                this.$Message.success('上传成功！');
+                this.fileList();
             },
-            getProduct () {
-                this.$emit('getProductEvent', this.productData, this.productId);
+            UploadError () {
+                this.nError('Upload Failure', 'File formats are not supported');
             }
         }
     };
