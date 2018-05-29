@@ -34,13 +34,13 @@
                         </Col>
                         <Col span="18">
                             <Card dis-hover>
-                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="58">
+                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="38">
                                     <FormItem label="文件">
-                                        <Input v-model="fileDir" laceholder="输入文件"></Input>
+                                        <Input v-model="fileDir" laceholder="输入文件路径或这文件名, 路径不用/前缀和/后缀"></Input>
                                     </FormItem>
                                     <FormItem label="内容" prop="code">
-                                        <Tabs>
-                                            <TabPane label="从文本输入框创建">
+                                        <Tabs v-model="tab" :style="[h]">
+                                            <TabPane  label="从文本输入框创建" name="text">
                                                 <MonacoEditor
                                                     height="500"
                                                     width="100%"
@@ -56,19 +56,21 @@
                                                     ref="vscode"
                                                     >
                                                 </MonacoEditor>
+                                                <br>
+                                                <Button type="primary" @click="handleCreate('formValidate')">创建</Button>
+                                                <Button type="dashed" @click="handleEdit('formValidate')" :disabled="editDisabled">修改</Button>
+                                                <Poptip
+                                                    confirm
+                                                    :title="title"
+                                                    @on-popper-show="PopperShow()"
+                                                    @on-ok="handleDelete('formValidate')">
+                                                    <Button type="error" :disabled="deleteDisabled">删除</Button>
+                                                </Poptip>
                                             </TabPane>
-                                            <TabPane label="封装SLS" disabled>
-                                                <Upload
-                                                    multiple
-                                                    type="drag"
-                                                    action="//jsonplaceholder.typicode.com/posts/">
-                                                    <div style="padding: 20px 0">
-                                                        <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-                                                        <p>点击或者拖拽上传</p>
-                                                    </div>
-                                                </Upload>
+                                            <TabPane label="封装SLS" disabled name="sls">
                                             </TabPane>
-                                            <TabPane label="从文件创建">
+                                            <TabPane label="从文件创建" name="upload">
+                                                <div style="padding: 1px">
                                                 <Upload
                                                     multiple
                                                     type="drag"
@@ -77,24 +79,14 @@
                                                     :with-credentials="true"
                                                     :on-success="UploadSuccess"
                                                     :on-error="UploadError">
-                                                    <div style="padding: 20px 0">
+                                                    <div style="padding: 0px 0px">
                                                         <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                                                         <p>点击或者拖拽上传</p>
                                                     </div>
                                                 </Upload>
+                                                    </div>
                                             </TabPane>
                                         </Tabs>
-                                    </FormItem>
-                                    <FormItem>
-                                        <Button type="primary" @click="handleCreate('formValidate')">创建</Button>
-                                        <Button type="dashed" @click="handleEdit('formValidate')" :disabled="editDisabled">修改</Button>
-                                        <Poptip
-                                            confirm
-                                            :title="title"
-                                            @on-popper-show="PopperShow()"
-                                            @on-ok="handleDelete('formValidate')">
-                                            <Button type="error" :disabled="deleteDisabled">删除</Button>
-                                        </Poptip>
                                     </FormItem>
                                 </Form>
                             </Card>
@@ -159,7 +151,11 @@
                         { required: true, message: '文件名不能为空', trigger: 'blur' }
                     ]
                 },
-                title: ''
+                title: '',
+                tab: 'text',
+                h: {
+                    height: '620px'
+                }
             };
         },
         props: {
@@ -180,6 +176,7 @@
             }
         },
         computed: {
+            // 文件上传附带的额外参数
             uploadParameter: function () {
                 let postData = {
                     'path': this.fileDir,
@@ -189,6 +186,7 @@
                 };
                 return postData;
             },
+            // 上传的地址
             action: function () {
                 return this.Global.serverSrc + 'gitlab/upload?product_id=' + this.productId;
             }
@@ -227,6 +225,13 @@
                         this.code = '';
                         this.fileContent = '';
                     }
+                }
+            },
+            tab () {
+                if (this.tab === 'text') {
+                    this.h.height = '620px';
+                } else if (this.tab === 'sls') {
+                    this.h.height = '320px';
                 }
             }
         },
@@ -388,7 +393,7 @@
                             this.$Message.success('修改成功！');
                             // 调用hook进行更新
                             this.handleHook();
-                            this.fileList();
+                            // this.fileList();
                         } else {
                             this.nError('Modify Failure', res.data['message']);
                         }
@@ -504,12 +509,14 @@
                     this.$refs.vscode.createMonaco();
                 }, 1);
             },
+            // 上传成功
             UploadSuccess () {
                 this.$Message.success('上传成功！');
                 this.fileList();
             },
+            // 上传失败
             UploadError () {
-                this.nError('Upload Failure', 'File formats are not supported');
+                this.nError('Upload Failure', 'The file path is incorrect or file formats are not supported');
             }
         }
     };
