@@ -34,9 +34,9 @@
                         </Col>
                         <Col span="18">
                             <Card dis-hover>
-                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="38">
-                                    <FormItem label="文件">
-                                        <Input v-model="fileDir" laceholder="输入文件路径或这文件名, 路径不用/前缀和/后缀"></Input>
+                                <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="46">
+                                    <FormItem label="文件" prop="fileDir">
+                                        <Input v-model="formValidate.fileDir" :disabled="inputDisabled"></Input>
                                     </FormItem>
                                     <FormItem label="内容" prop="code">
                                         <Tabs v-model="tab" :style="[h]">
@@ -57,8 +57,8 @@
                                                     >
                                                 </MonacoEditor>
                                                 <br>
-                                                <Button type="primary" @click="handleCreate('formValidate')">创建</Button>
-                                                <Button type="dashed" @click="handleEdit('formValidate')" :disabled="editDisabled">修改</Button>
+                                                <Button type="primary" @click="handleCreate('formValidate')" :disabled="createDisabled">创建</Button>
+                                                <Button type="primary" @click="handleEdit('formValidate')" :disabled="editDisabled">更新</Button>
                                                 <Poptip
                                                     confirm
                                                     :title="title"
@@ -69,7 +69,7 @@
                                             </TabPane>
                                             <TabPane label="封装SLS" disabled name="sls">
                                             </TabPane>
-                                            <TabPane label="从文件创建" name="upload">
+                                            <TabPane label="从文件创建" name="upload" :disabled="uploadDisabled">
                                                 <div style="padding: 1px">
                                                 <Upload
                                                     multiple
@@ -79,7 +79,7 @@
                                                     :with-credentials="true"
                                                     :on-success="UploadSuccess"
                                                     :on-error="UploadError">
-                                                    <div style="padding: 0px 0px">
+                                                    <div style="padding: 10px 0px">
                                                         <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                                                         <p>点击或者拖拽上传</p>
                                                     </div>
@@ -115,9 +115,11 @@
                 fileTreeData: [],
                 fileTree: [],
                 fileListPathData: [],
-                // 删除
                 deleteDisabled: true,
                 editDisabled: true,
+                createDisabled: false,
+                inputDisabled: false,
+                uploadDisabled: false,
                 fileContent: '',
                 path: '',
                 filePath: [''],
@@ -139,16 +141,15 @@
                 ],
                 formValidate: {
                     path: '',
-                    filename: '',
+                    fileDir: '',
                     code: ''
                 },
-                fileDir: '',
                 ruleValidate: {
                     path: [
                         { required: true, message: '请输选择要执行的SLS', trigger: 'blur' }
                     ],
                     fileDir: [
-                        { required: true, message: '文件名不能为空', trigger: 'blur' }
+                        { required: true, message: '请出入文件名或者文件路径', trigger: 'blur' }
                     ]
                 },
                 title: '',
@@ -179,7 +180,7 @@
             // 文件上传附带的额外参数
             uploadParameter: function () {
                 let postData = {
-                    'path': this.fileDir,
+                    'path': this.formValidate.fileDir,
                     'project_type': this.projectType,
                     'branch': this.branchName,
                     'action': 'upload'
@@ -219,12 +220,24 @@
                     if (this.filePath[0].type !== 'tree') {
                         this.deleteDisabled = false;
                         this.editDisabled = false;
+                        this.createDisabled = true;
+                        this.inputDisabled = true;
+                        this.uploadDisabled = true;
                     } else {
                         this.deleteDisabled = true;
                         this.editDisabled = true;
+                        this.createDisabled = false;
+                        this.inputDisabled = false;
+                        this.uploadDisabled = false;
                         this.code = '';
                         this.fileContent = '';
                     }
+                } else {
+                    this.deleteDisabled = true;
+                    this.editDisabled = true;
+                    this.createDisabled = false;
+                    this.inputDisabled = false;
+                    this.uploadDisabled = false;
                 }
             },
             tab () {
@@ -332,7 +345,7 @@
             handleContent (filePath) {
                 this.filePath = filePath;
                 if (filePath.length !== 0) {
-                    this.fileDir = filePath[0].path;
+                    this.formValidate.fileDir = filePath[0].path;
                 }
                 if (filePath.length !== 0 && filePath[0]['type'] !== 'tree') {
                     this.fileContent = '';
@@ -409,58 +422,28 @@
                     });
             },
             PopperShow () {
-                this.title = '你确定删除 ' + this.filePath[0].path + ' 这个文件吗?';
+                this.title = '你确定删除 ' + this.formValidate.fileDir + ' 这个文件吗?';
             },
-            handleDelete (name) {
-                this.$refs[name].validate((valid) => {
-                    let postData = {
-                        'path': this.path,
-                        'project_type': this.projectType,
-                        'branch': this.branchName,
-                        'action': 'delete'
-                    };
-                    this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
-                        res => {
-                            if (res.data['status'] === true) {
-                                this.result = res.data['data'];
-                                this.edit = false;
-                                this.$Message.success('删除成功！');
-                                // 刷新gitlab file list
-                                this.fileList();
-                                this.filePath = [''];
-                            } else {
-                                this.nError('Delete Failure', res.data['message']);
-                            }
-                        },
-                        err => {
-                            let errInfo = '';
-                            try {
-                                errInfo = err.response.data['message'];
-                            } catch (error) {
-                                errInfo = err;
-                            }
-                            this.nError('Delete Failure', errInfo);
-                        });
-                });
-            },
-            handleCreate () {
+            handleDelete () {
                 let postData = {
-                    'path': this.fileDir,
+                    'path': this.formValidate.fileDir,
                     'project_type': this.projectType,
                     'branch': this.branchName,
-                    'action': 'create',
-                    'content': this.code
+                    'action': 'delete'
                 };
                 this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.result = res.data['data'];
                             this.edit = false;
-                            this.$Message.success('创建成功！');
+                            this.$Message.success('删除成功！');
                             // 刷新gitlab file list
                             this.fileList();
+                            this.filePath = [];
+                            this.formValidate.fileDir = '';
+                            this.fileContent = '';
                         } else {
-                            this.nError('Create Failure', res.data['message']);
+                            this.nError('Delete Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -470,8 +453,47 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nError('Create Failure', errInfo);
+                        this.nError('Delete Failure', errInfo);
                     });
+            },
+            handleCreate (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        let postData = {
+                            'path': this.formValidate.fileDir,
+                            'project_type': this.projectType,
+                            'branch': this.branchName,
+                            'action': 'create',
+                            'content': this.code
+                        };
+                        this.axios.post(this.Global.serverSrc + 'gitlab/commit?product_id=' + this.productId, postData).then(
+                            res => {
+                                if (res.data['status'] === true) {
+                                    this.result = res.data['data'];
+                                    this.edit = false;
+                                    this.$Message.success('创建成功！');
+                                    // 刷新gitlab file list
+                                    this.fileList();
+                                    this.filePath = [];
+                                    this.formValidate.fileDir = '';
+                                    this.reload();
+                                } else {
+                                    this.nError('Create Failure', res.data['message']);
+                                }
+                            },
+                            err => {
+                                let errInfo = '';
+                                try {
+                                    errInfo = err.response.data['message'];
+                                } catch (error) {
+                                    errInfo = err;
+                                }
+                                this.nError('Create Failure', errInfo);
+                            });
+                    } else {
+                        this.$Message.error('请检查表单数据！');
+                    }
+                });
             },
             handleHook () {
                 let postData = {
@@ -517,6 +539,10 @@
             // 上传失败
             UploadError () {
                 this.nError('Upload Failure', 'The file path is incorrect or file formats are not supported');
+            },
+            // 表单重置
+            handleReset (name) {
+                this.$refs[name].resetFields();
             }
         }
     };
