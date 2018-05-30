@@ -36,7 +36,7 @@
                             <Card dis-hover>
                                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="46">
                                     <FormItem label="文件" prop="fileDir">
-                                        <Input v-model="formValidate.fileDir" :disabled="inputDisabled"></Input>
+                                        <Input v-model="formValidate.fileDir" :disabled="inputDisabled" placeholder="点击左侧树型结构获取目录，输入文件名或者路径，如：a/b/top.sls，目录不存在自动创建" ></Input>
                                     </FormItem>
                                     <FormItem label="内容" prop="code">
                                         <Tabs v-model="tab" :style="[h]">
@@ -78,7 +78,8 @@
                                                     :data="uploadParameter"
                                                     :with-credentials="true"
                                                     :on-success="UploadSuccess"
-                                                    :on-error="UploadError">
+                                                    :on-error="UploadError"
+                                                    :before-upload="beforeUpdate">
                                                     <div style="padding: 10px 0px">
                                                         <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                                                         <p>点击或者拖拽上传</p>
@@ -149,7 +150,7 @@
                         { required: true, message: '请输选择要执行的SLS', trigger: 'blur' }
                     ],
                     fileDir: [
-                        { required: true, message: '请出入文件名或者文件路径', trigger: 'blur' }
+                        { required: true, message: '点击左侧树型结构获取目录，创建请输入文件名、上传请输入文件路径', trigger: 'blur' }
                     ]
                 },
                 title: '',
@@ -348,6 +349,8 @@
                     this.formValidate.fileDir = filePath[0].path;
                 }
                 if (filePath.length !== 0 && filePath[0]['type'] !== 'tree') {
+                    // 如果点击的是文件切回Tab 为 text
+                    this.tab = 'text';
                     this.fileContent = '';
                     this.path = filePath[0]['path'];
                     this.axios.get(this.Global.serverSrc + this.apiService + '/content?product_id=' + this.productId + '&project_type=' + this.projectType + '&branch=' + this.branchName + '&path=' + this.path).then(
@@ -421,6 +424,7 @@
                         this.nError('Modify Failure', errInfo);
                     });
             },
+            // 删除提示
             PopperShow () {
                 this.title = '你确定删除 ' + this.formValidate.fileDir + ' 这个文件吗?';
             },
@@ -539,6 +543,18 @@
             // 上传失败
             UploadError () {
                 this.nError('Upload Failure', 'The file path is incorrect or file formats are not supported');
+            },
+            // 长传前检查表单
+            beforeUpdate () {
+                let form = false;
+                this.$refs['formValidate'].validate((valid) => {
+                    if (valid) {
+                        form = true;
+                    } else {
+                        form = false;
+                    }
+                });
+                return form;
             },
             // 表单重置
             handleReset (name) {
