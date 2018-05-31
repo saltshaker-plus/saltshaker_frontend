@@ -111,7 +111,7 @@
                     {
                         title: 'Master API 地址',
                         key: 'salt_master_url',
-                        width: 160,
+                        width: 180,
                         sortable: true
                     },
                     {
@@ -129,7 +129,7 @@
                     {
                         title: 'GitLab 地址',
                         key: 'gitlab_url',
-                        width: 160,
+                        width: 180,
                         sortable: true
                     },
                     {

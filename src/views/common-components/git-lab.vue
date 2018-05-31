@@ -544,7 +544,7 @@
             UploadError () {
                 this.nError('Upload Failure', 'The file path is incorrect or file formats are not supported');
             },
-            // 长传前检查表单
+            // 上传前检查表单
             beforeUpdate () {
                 let form = false;
                 this.$refs['formValidate'].validate((valid) => {
