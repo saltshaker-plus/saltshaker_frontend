@@ -4,6 +4,7 @@
                 :cColumns="cColumns"
                 :apiService="apiService"
                 @getProductEvent="getProductEvent"
+                ref="childrenMethods"
                 :productShow="true">
             <Button slot="create" type="primary" @click="add('formValidate')">创建Job</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName" width="600px">
@@ -11,7 +12,7 @@
                     <FormItem>
                         <Steps :current="current">
                             <Step title="基本配置"></Step>
-                            <Step title="SLS配置"></Step>
+                            <Step title="执行配置"></Step>
                             <Step title="配置成功"></Step>
                         </Steps>
                     </FormItem>
@@ -32,7 +33,7 @@
                         </FormItem>
                         <FormItem label="周期">
                             <RadioGroup v-model="formValidate.period">
-                                <Radio label="oneTime">一次</Radio>
+                                <Radio label="once">一次</Radio>
                                 <Radio label="period">周期性</Radio>
                             </RadioGroup>
                         </FormItem>
@@ -40,13 +41,13 @@
                             <Row>
                                 <Col span="9">
                                     <FormItem prop="date">
-                                        <DatePicker type="date" placeholder="Select date" v-model="formValidate.date"></DatePicker>
+                                        <DatePicker type="date" :options="optionsDate" placeholder="Select date" v-model="formValidate.date"></DatePicker>
                                     </FormItem>
                                 </Col>
                                 <Col span="2" style="text-align: center">-</Col>
                                 <Col span="13">
                                     <FormItem prop="time">
-                                        <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
+                                        <TimePicker type="time" :options="optionsTime" placeholder="Select time" v-model="formValidate.time"></TimePicker>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -60,7 +61,7 @@
                                 <span @click="handleModule()"><Radio label="module">Module</Radio></span>
                             </RadioGroup>
                         </FormItem>
-                        <FormItem label="SLS" prop="sls" v-show="sls">
+                        <FormItem label="SLS" v-show="sls">
                             <Select v-model="branchName">
                                 <Option v-for="item in branchData" :value="item" :key="item">{{ item }}</Option>
                             </Select>
@@ -103,6 +104,9 @@
 </template>
 
 <script>
+    function nCopy (data) {
+        return JSON.parse(JSON.stringify(data));
+    };
     import CommonTable from '../common-components/table/table.vue';
     import MonacoEditor from 'vue-monaco-editor';
     export default {
@@ -112,7 +116,7 @@
         },
         data () {
             return {
-                apiService: 'job',
+                apiService: 'period',
                 productData: [],
                 productId: '',
                 // 删除数据
@@ -142,31 +146,20 @@
                 module: false,
                 cColumns: [
                     {
-                        title: 'Job ID',
-                        key: 'id',
+                        title: 'Job 名',
+                        key: 'name',
                         sortable: true,
-                        width: 195,
                         render: (h, params) => {
                             return h('div', [
-                                h('Button', {
+                                h('Tooltip', {
                                     props: {
-                                        type: 'text',
-                                        size: 'small'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.showInfo = true;
-                                            this.result = params.row.return;
-                                        }
+                                        content: params.row.id,
+                                        transfer: true,
+                                        placement: 'top-start'
                                     }
-                                }, params.row.jid)
+                                }, params.row.name)
                             ]);
                         }
-                    },
-                    {
-                        title: 'Job',
-                        key: 'name',
-                        sortable: true
                     },
                     {
                         title: '描述',
@@ -176,22 +169,151 @@
                     {
                         title: '目标',
                         key: 'target',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return h('ul', params.row.target.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item.name);
+                            })
+                            );
+                        }
                     },
                     {
-                        title: 'SLS',
-                        key: 'sls',
+                        title: '类型',
+                        key: 'type',
                         sortable: true
                     },
                     {
                         title: '并行数',
                         key: 'concurrent',
+                        sortable: true
+                    },
+                    {
+                        title: '周期',
+                        key: 'period',
+                        sortable: true
+                    },
+                    {
+                        title: '时间',
+                        key: 'data',
                         sortable: true,
                         render: (h, params) => {
-                            return this.convertTime(params.row._stamp);
+                            return params.row.date + ' ' + params.row.time;
+                        }
+                    },
+                    {
+                        title: '状态',
+                        key: 'date',
+                        sortable: true,
+                        render: (h, params) => {
+                            let tagColor = 'green';
+                            if (params.row.status === 'down') {
+                                tagColor = 'red';
+                            }
+                            return h('div', [
+                                h('Tag', {
+                                    props: {
+                                        'color': tagColor
+                                    }
+                                }, 'running')
+                            ]);
+                        }
+                    },
+                    {
+                        title: '操作',
+                        key: 'action',
+                        width: 170,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.formView = true;
+                                            this.optionType = 'edit';
+                                            this.optionTypeName = '编辑';
+                                            this.id = params.row.id;
+                                            this.formValidate.name = params.row.name;
+                                            this.formValidate.description = params.row.description;
+                                            this.formValidate.sls = params.row.sls;
+                                            this.formValidate.date = params.row.date;
+                                            this.formValidate.time = params.row.time;
+                                            this.formValidate.period = params.row.period;
+                                            this.formValidate.concurrent = params.row.concurrent;
+                                            this.formValidate.target = params.row.target.map(item => {
+                                                return item.id;
+                                            });
+                                            this.formView = true;
+                                            this.first = true;
+                                            this.second = false;
+                                            this.previousShow = false;
+                                        }
+                                    }
+                                }, '编辑'),
+                                h('Poptip', {
+                                    props: {
+                                        confirm: true,
+                                        title: '确定要删除 ' + params.row.name + ' 吗?',
+                                        transfer: true,
+                                        placement: 'top-end'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        'on-ok': () => {
+                                            this.delId = params.row.id;
+                                            this.delIndex = params.index;
+                                            this.del();
+                                        }
+                                    }
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'error',
+                                            size: 'small'
+                                        }
+                                    }, '删除')
+                                ]),
+                                h('Button', {
+                                    props: {
+                                        type: 'default',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.optionType = 'edit';
+                                            this.optionTypeName = '编辑';
+                                            this.id = params.row.id;
+                                            this.formValidate = params.row;
+                                        }
+                                    }
+                                }, '暂停')
+                            ]);
                         }
                     }
                 ],
+                optionsDate: {
+                    disabledDate (date) {
+                        return date && date.valueOf() < Date.now() - 86400000;
+                    }
+                },
+                optionsTime: {
+                    disabledDate (time) {
+                        return time && time.valueOf() < Date.now() - 86400000;
+                    }
+                },
                 // 表单验证
                 formValidate: {
                     name: '',
@@ -286,7 +408,7 @@
             add (name) {
                 this.handleReset(name);
                 this.optionType = 'add';
-                this.optionTypeName = '添加';
+                this.optionTypeName = '创建';
                 this.formView = true;
                 this.first = true;
                 this.second = false;
@@ -296,16 +418,9 @@
             handleSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        if (this.formValidate.file_server === 'rsync') {
-                            this.formValidate.gitlab_url = '';
-                            this.formValidate.api_version = '';
-                            this.formValidate.private_token = '';
-                            this.formValidate.state_project = '';
-                            this.formValidate.pillar_project = '';
-                        };
                         // 编辑
                         if (this.optionType === 'edit') {
-                            this.axios.put(this.Global.serverSrc + this.apiService + '/' + this.id,
+                            this.axios.put(this.Global.serverSrc + 'period/' + this.id + '?product_id=' + this.productId,
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {
@@ -327,7 +442,7 @@
                                 });
                         } else {
                             // 添加
-                            this.axios.post(this.Global.serverSrc + this.apiService,
+                            this.axios.post(this.Global.serverSrc + 'period?product_id=' + this.productId,
                                 this.formValidate).then(
                                 res => {
                                     if (res.data['status'] === true) {
