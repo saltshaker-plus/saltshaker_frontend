@@ -16,7 +16,7 @@
                         <Input v-model="formValidate.description" placeholder="输入描述"></Input>
                     </FormItem>
                     <FormItem label="目标" prop="target">
-                        <Select v-model="formValidate.target" multiple >
+                        <Select v-model="formValidate.target" multiple>
                             <Option v-for="item in targetData" :value="item.id" :key="item.id" placeholder="选择目标">{{ item.name }}</Option>
                         </Select>
                     </FormItem>
@@ -213,7 +213,7 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 170,
+                        width: 220,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -277,23 +277,13 @@
                                         }
                                     }, '删除')
                                 ]),
-                                h('Dropdown', {}, [
-                                    h('Button', {
-                                        props: {
-                                            type: 'default',
-                                            size: 'small'
-                                        }
-                                    }, '更多'),
-                                    h('DropdownMenu', this.$scopedSlots.list, {}, [
-                                        h('DropdownItem', {}, [
-                                            h('div', {}, 'df')
-                                        ])
-                                    ])
-                                ]),
                                 h('Button', {
                                     props: {
                                         type: 'default',
                                         size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
                                     },
                                     on: {
                                         click: () => {
@@ -303,7 +293,22 @@
                                             this.formValidate = params.row;
                                         }
                                     }
-                                }, '暂停')
+                                }, '暂停'),
+                                h('Button', {
+                                    props: {
+                                        type: 'default',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            let query = {id: params.row.id};
+                                            this.$router.push({
+                                                name: 'task',
+                                                query: query
+                                            });
+                                        }
+                                    }
+                                }, '详情')
                             ]);
                         }
                     }
