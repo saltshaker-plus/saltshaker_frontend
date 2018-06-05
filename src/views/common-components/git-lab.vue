@@ -406,12 +406,12 @@
                         if (res.data['status'] === true) {
                             this.result = res.data['data'];
                             this.edit = false;
-                            this.$Message.success('修改成功！');
+                            this.$Message.success('更新成功！');
                             // 调用hook进行更新
                             this.handleHook();
                             // this.fileList();
                         } else {
-                            this.nError('Modify Failure', res.data['message']);
+                            this.nError('Update Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -421,7 +421,7 @@
                         } catch (error) {
                             errInfo = err;
                         }
-                        this.nError('Modify Failure', errInfo);
+                        this.nError('Update Failure', errInfo);
                     });
             },
             // 删除提示
