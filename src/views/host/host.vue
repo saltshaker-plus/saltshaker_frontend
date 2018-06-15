@@ -25,7 +25,7 @@
                     </FormItem>
                 </Form>
                 <div slot="footer">
-                    <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
+                    <Button type="ghost" @click="handleCancel()" style="margin-left: 8px">取消</Button>
                 </div>
             </Modal>
         </common-table>
@@ -270,11 +270,14 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
+            handleCancel () {
+                this.formView = false;
+            },
             handleRemove (index) {
                 this.formDynamic.items[index].status = 0;
             },
             handleTagAdd (name) {
-                for (var i = 1; i < this.formValidate.tag.length; i++) {
+                for (var i = 0; i < this.formValidate.tag.length; i++) {
                     if (this.formValidate.tag[i]['name'] === this.formValidate.tagName) {
                         this.$Message.error('标签不能重复！');
                         return;
