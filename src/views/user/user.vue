@@ -282,7 +282,8 @@
                 formValidate: {
                     username: '',
                     mail: '',
-                    product: []
+                    product: [],
+                    role: []
                 },
                 ruleValidate: {
                     username: [
