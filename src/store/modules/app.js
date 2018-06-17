@@ -38,11 +38,34 @@ const app = {
             state.tagsList.push(...list);
         },
         updateMenulist (state) {
-            let accessCode = parseInt(Cookies.get('access'));
+            // let accessCode = parseInt(Cookies.get('access'));
+            let accessCode = localStorage.menu.split(',');
+            let menu = accessCode.map((item) => {
+                return parseInt(item);
+            });
             let menuList = [];
-            appRouter.forEach((item, index) => {
-                if (item.access !== undefined) {
-                    if (Util.showThisRoute(item.access, accessCode)) {
+            menu.forEach((code) => {
+                appRouter.forEach((item, index) => {
+                    if (item.access !== undefined) {
+                        if (Util.showThisRoute(item.access, code)) {
+                            if (item.children.length === 1) {
+                                menuList.push(item);
+                            } else {
+                                let len = menuList.push(item);
+                                let childrenArr = [];
+                                childrenArr = item.children.filter(child => {
+                                    if (child.access !== undefined) {
+                                        if (menu.includes(child.access)) {
+                                            return child;
+                                        }
+                                    } else {
+                                        return child;
+                                    }
+                                });
+                                menuList[len - 1].children = childrenArr;
+                            }
+                        }
+                    } else {
                         if (item.children.length === 1) {
                             menuList.push(item);
                         } else {
@@ -50,40 +73,23 @@ const app = {
                             let childrenArr = [];
                             childrenArr = item.children.filter(child => {
                                 if (child.access !== undefined) {
-                                    if (child.access === accessCode) {
+                                    if (Util.showThisRoute(child.access, code)) {
                                         return child;
                                     }
                                 } else {
                                     return child;
                                 }
                             });
-                            menuList[len - 1].children = childrenArr;
-                        }
-                    }
-                } else {
-                    if (item.children.length === 1) {
-                        menuList.push(item);
-                    } else {
-                        let len = menuList.push(item);
-                        let childrenArr = [];
-                        childrenArr = item.children.filter(child => {
-                            if (child.access !== undefined) {
-                                if (Util.showThisRoute(child.access, accessCode)) {
-                                    return child;
-                                }
+                            if (childrenArr === undefined || childrenArr.length === 0) {
+                                menuList.splice(len - 1, 1);
                             } else {
-                                return child;
+                                let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
+                                handledItem.children = childrenArr;
+                                menuList.splice(len - 1, 1, handledItem);
                             }
-                        });
-                        if (childrenArr === undefined || childrenArr.length === 0) {
-                            menuList.splice(len - 1, 1);
-                        } else {
-                            let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
-                            handledItem.children = childrenArr;
-                            menuList.splice(len - 1, 1, handledItem);
                         }
                     }
-                }
+                });
             });
             state.menuList = menuList;
         },

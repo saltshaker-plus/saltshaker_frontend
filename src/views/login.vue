@@ -147,7 +147,7 @@ export default {
                     let jse = new jsEncrypt();
                     jse.setPublicKey(this.publicKey);
                     let passwordRsa = jse.encrypt(this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                    this.$store.commit('setAvator', 'https://avatars2.githubusercontent.com/u/13944988?s=40&v=4');
                     let postData = {
                         'username': this.form.userName,
                         'password': passwordRsa
@@ -161,13 +161,15 @@ export default {
                                 let expireDays = info['token']['expires'] / 60 / 60 / 24;
                                 Cookies.set(info['token']['key'], info['token']['value'], { expires: expireDays });
                                 Cookies.set('tag', info['token']['key']);
-                                Cookies.set('access', 0);
+                                // Cookies.set('access', 0);
                                 // 设置UID
                                 this.$store.commit('setUserId', info['user']['uid']);
                                 // 存储在localStorage解决刷新页面vuex 的值消失的的问题
                                 localStorage.user = info['user']['uid'];
-//                                this.$store.commit('setUsername', this.form.userName);
-//                                localStorage.username = this.form.userName;
+                                // 存储菜单信息
+                                localStorage.menu = info['user']['menu'];
+                                // this.$store.commit('setUsername', this.form.userName);
+                                // localStorage.username = this.form.userName;
                                 this.$router.push({
                                     name: 'home_index'
                                 });

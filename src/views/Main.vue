@@ -89,7 +89,7 @@
         data () {
             return {
                 // 控制左侧菜单栏是否折叠
-                shrink: true,
+                shrink: false,
                 userName: '',
                 isFullScreen: false,
                 openedSubmenuArr: this.$store.state.app.openedSubmenuArr
