@@ -62,6 +62,7 @@
                                     </DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
+                            <slot name="customFunction"></slot>
                         </div>
                         <br>
                         <Table :border="showBorder" :loading="loading" :data="tableData" :columns="filterColumns"  stripe ref="table" @on-selection-change="handleRowChange"></Table>

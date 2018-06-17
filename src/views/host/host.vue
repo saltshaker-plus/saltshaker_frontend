@@ -7,6 +7,7 @@
                 @getRowEvent="getRowEvent"
                 :productShow="true"
                 ref="childrenMethods">
+            <Button slot="create" type="primary" @click="sync()">同步主机</Button>
             <Button slot="create" type="primary" @click="add('formValidate')" v-show="false">创建主机</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="70" inline>
@@ -24,6 +25,16 @@
                         <Button icon="ios-plus-empty" type="dashed" size="small" @click="handleTagAdd('formValidate')">添加标签</Button>
                     </FormItem>
                 </Form>
+                <div slot="footer">
+                    <Button type="ghost" @click="handleCancel()" style="margin-left: 8px">取消</Button>
+                </div>
+            </Modal>
+            <Modal slot="option" v-model="syncHost" title="同步主机" @on-ok="handleSubmit">
+                <div style="text-align:center">
+                    此功能会根据Minion状态同步主机信息，以确保数据一致性
+                    <Button type="success" size="small" @click="handleSync()">同步</Button>
+                    <Progress v-show="progress" :percent="percent" status="active"></Progress>
+                </div>
                 <div slot="footer">
                     <Button type="ghost" @click="handleCancel()" style="margin-left: 8px">取消</Button>
                 </div>
@@ -49,6 +60,9 @@
                 // 编辑数据
                 formView: false,
                 buttonShow: false,
+                syncHost: false,
+                progress: false,
+                percent: 0,
                 count: [],
                 id: '',
                 optionType: '',
@@ -272,6 +286,7 @@
             },
             handleCancel () {
                 this.formView = false;
+                this.syncHost = false;
             },
             handleRemove (index) {
                 this.formDynamic.items[index].status = 0;
@@ -337,6 +352,33 @@
                             errInfo = err;
                         }
                         this.nError('Delete Failure', errInfo);
+                    });
+            },
+            sync () {
+                this.syncHost = true;
+                this.progress = false;
+            },
+            handleSync () {
+                this.progress = true;
+                this.axios.get(this.Global.serverSrc + this.apiService + '/sync?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.percent = 100;
+                            this.tableList();
+                        } else {
+                            this.loading = false;
+                            this.nError('Sync Host Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.loading = false;
+                        this.nError('Get Product Failure', errInfo);
                     });
             }
         }
