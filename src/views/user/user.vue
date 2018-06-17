@@ -12,7 +12,7 @@
                     </FormItem>
                     <FormItem label="角色" prop="role">
                         <CheckboxGroup v-model="formValidate.role">
-                            <Checkbox v-for="item in userInfo.role" :key="item.id" :label="item.id">{{item.name}}</Checkbox>
+                            <Checkbox v-for="item in userInfo.role" :key="item.id" :label="item.id" v-if="item.tag != 1">{{item.name}}</Checkbox>
                         </CheckboxGroup>
                     </FormItem>
                     <FormItem label="产品线" prop="product">
