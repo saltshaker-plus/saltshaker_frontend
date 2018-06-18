@@ -19,10 +19,9 @@ export default {
             let data2 = [];
             for (let i = 0; i < 20; i++) {
                 xAxisData.push('类目' + i);
-                data1.push((Math.sin(i / 5) * (i / 5 - 10) + i / 6) * 5);
-                data2.push((Math.cos(i / 5) * (i / 5 - 10) + i / 6) * 5);
+                data1.push((Math.sin(i / 5) * (i / 5 - 10) + i / 6));
+                data2.push((Math.cos(i / 5) * (i / 5 - 10) + i / 6));
             }
-
             const option = {
                 tooltip: {
                     trigger: 'axis',
@@ -32,9 +31,9 @@ export default {
                 },
                 grid: {
                     top: 0,
-                    left: '2%',
-                    right: '4%',
-                    bottom: '3%',
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     containLabel: true
                 },
                 xAxis: {
@@ -43,30 +42,26 @@ export default {
                 },
                 yAxis: {
                     type: 'category',
-                    data: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'],
+                    data: ['Down', 'Rejected', 'Unaccepted', 'Accepted', 'Up'],
                     nameTextStyle: {
                         color: '#c3c3c3'
                     }
                 },
                 series: [
                     {
-                        name: '访问量',
+                        name: 'Minion',
                         type: 'bar',
                         data: [
-                            {value: 453682, name: 'Mon', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 879545, name: 'Tues', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 2354678, name: 'Wed', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1598403, name: 'Thur', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 543250, name: 'Fri', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1305923, name: 'Sat', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1103456, name: 'Sun', itemStyle: {normal: {color: '#2d8cf0'}}}
+                            {value: 678, name: 'Down', itemStyle: {normal: {color: '#f02513'}}},
+                            {value: 403, name: 'Rejected', itemStyle: {normal: {color: '#f08b4c'}}},
+                            {value: 250, name: 'Unaccepted', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 523, name: 'Accepted', itemStyle: {normal: {color: '#f0e334'}}},
+                            {value: 456, name: 'Up', itemStyle: {normal: {color: '#13f01e'}}}
                         ]
                     }
                 ]
             };
-
             visiteVolume.setOption(option);
-
             window.addEventListener('resize', function () {
                 visiteVolume.resize();
             });

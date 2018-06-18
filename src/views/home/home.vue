@@ -8,59 +8,22 @@
             <Col :md="24" :lg="8">
                 <Row class-name="home-page-row1" :gutter="10">
                     <Col :md="12" :lg="24" :style="{marginBottom: '10px'}">
-                        <Card>
-                            <Row type="flex" class="user-infor">
-                                <Col span="8">
-                                    <Row class-name="made-child-con-middle" type="flex" align="middle">
-                                        <img class="avator-img" :src="avatorPath" />
-                                    </Row>
-                                </Col>
-                                <Col span="16" style="padding-left:6px;">
-                                    <Row class-name="made-child-con-middle" type="flex" align="middle">
-                                        <div>
-                                            <b class="card-user-infor-name">Admin</b>
-                                            <p>super admin</p>
-                                        </div>
-                                    </Row>
-                                </Col>
-                            </Row>
-                            <div class="line-gray"></div>
-                            <Row class="margin-top-8">
-                                <Col span="8"><p class="notwrap">上次登录时间:</p></Col>
-                                <Col span="16" class="padding-left-8">2017.09.12-13:32:20</Col>
-                            </Row>
-                            <Row class="margin-top-8">
-                                <Col span="8"><p class="notwrap">上次登录地点:</p></Col>
-                                <Col span="16" class="padding-left-8">北京</Col>
+                        <Card dis-hover>
+                            <Row>
+                                <Select v-model="productId">
+                                    <Option v-for="item in productData" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                                </Select>
                             </Row>
                         </Card>
                     </Col>
                     <Col :md="12" :lg="24" :style="{marginBottom: '10px'}">
-                        <Card>
+                        <Card dis-hover>
                             <p slot="title" class="card-title">
-                                <Icon type="android-checkbox-outline"></Icon>
-                                待办事项
+                                <Icon type="android-map"></Icon>
+                                Minion 状态
                             </p>
-                            <a type="text" slot="extra" @click.prevent="addNewToDoItem">
-                                <Icon type="plus-round"></Icon>
-                            </a>
-                            <Modal
-                                v-model="showAddNewTodo"
-                                title="添加新的待办事项"
-                                @on-ok="addNew"
-                                @on-cancel="cancelAdd">
-                                <Row type="flex" justify="center">
-                                    <Input v-model="newToDoItemValue" icon="compose" placeholder="请输入..." style="width: 300px" />
-                                </Row>
-                                <Row slot="footer">
-                                    <Button type="text" @click="cancelAdd">取消</Button>
-                                    <Button type="primary" @click="addNew">确定</Button>
-                                </Row>
-                            </Modal>
-                            <div class="to-do-list-con">
-                                <div v-for="(item, index) in toDoList" :key="'todo-item' + (toDoList.length - index)" class="to-do-item">
-                                    <to-do-list-item :content="item.title"></to-do-list-item>
-                                </div>
+                            <div class="data-source-row">
+                                <visite-volume></visite-volume>
                             </div>
                         </Card>
                     </Col>
@@ -72,9 +35,9 @@
                         <infor-card
                             id-name="user_created_count"
                             :end-val="count.createUser"
-                            iconType="android-person-add"
+                            iconType="android-apps"
                             color="#2d8cf0"
-                            intro-text="今日新增用户"
+                            intro-text="Minion总数"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
@@ -93,7 +56,7 @@
                             :end-val="count.collection"
                             iconType="upload"
                             color="#ffd572"
-                            intro-text="今日数据采集量"
+                            intro-text="事件总数"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
@@ -107,28 +70,23 @@
                     </Col>
                 </Row>
                 <Row>
-                    <Card :padding="0">
+                    <Card :padding="0" dis-hover>
                         <p slot="title" class="card-title">
-                            <Icon type="map"></Icon>
-                            今日服务调用地理分布
+                            <Icon type="ios-stopwatch-outline"></Icon>
+                            周期 Job
                         </p>
                         <div class="map-con">
-                            <Col span="10">
-                                <map-data-table :cityData="cityData" height="281" :style-obj="{margin: '12px 0 0 11px'}"></map-data-table>
-                            </Col>
-                            <Col span="14" class="map-incon">
-                                <Row type="flex" justify="center" align="middle">
-                                    <home-map :city-data="cityData"></home-map>
-                                </Row>
+                            <Col span="24">
+                                <job-data-table height="288" :productId="productId" :style-obj="{margin: '5px 0 0 0px'}"></job-data-table>
                             </Col>
                         </div>
                     </Card>
                 </Row>
             </Col>
         </Row>
-        <Row :gutter="10" class="margin-top-10">
-            <Col :md="24" :lg="8" :style="{marginBottom: '10px'}">
-                <Card>
+        <Row :gutter="10">
+            <Col :md="24" :lg="12" :style="{marginTop: '10px'}">
+                <Card dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="android-map"></Icon>
                         上周每日来访量统计
@@ -138,123 +96,122 @@
                     </div>
                 </Card>
             </Col>
-            <Col :md="24" :lg="8" :style="{marginBottom: '10px'}">
-                <Card>
+            <Col :md="24" :lg="12" :style="{marginTop: '10px'}">
+                <Card dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="ios-pulse-strong"></Icon>
-                        数据来源统计
+                        Grains 信息统计
+                        <Dropdown style="float: right;" placement="bottom-end">
+                            <a href="javascript:void(0)">
+                                {{itemName}}
+                                <Icon type="arrow-down-b"></Icon>
+                            </a>
+                            <DropdownMenu slot="list">
+                                <DropdownItem>
+                                    <div @click="changedItem('os', '操作系统版本')">操作系统版本</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('saltversion', 'Salt Minion版本')">Salt Minion版本</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('kernelrelease', '内核')">内核</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('manufacturer', '服务器品牌')">服务器品牌</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('productname', '服务器型号')">服务器型号</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('num_cpus', 'CPU数')">CPU数</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('cpu_model', 'CPU类型')">CPU类型</div>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <div @click="changedItem('mem_total', '内存大小')">内存大小</div>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                     </p>
                     <div class="data-source-row">
-                        <data-source-pie></data-source-pie>
+                        <grains-pie :productId="productId" :item="item" :itemName="itemName"></grains-pie>
                     </div>
                 </Card>
             </Col>
-            <Col :md="24" :lg="8">
-                <Card>
-                    <p slot="title" class="card-title">
-                        <Icon type="android-wifi"></Icon>
-                        各类用户服务调用变化统计
-                    </p>
-                    <div class="data-source-row">
-                        <user-flow></user-flow>
-                    </div>
-                </Card>
-            </Col>
-        </Row>
-        <Row class="margin-top-10">
-            <Card>
-                <p slot="title" class="card-title">
-                    <Icon type="ios-shuffle-strong"></Icon>
-                    上周每日服务调用量(万)
-                </p>
-                <div class="line-chart-con">
-                    <service-requests></service-requests>
-                </div>
-            </Card>
         </Row>
     </div>
 </template>
 
 <script>
-import cityData from './map-data/get-city-value.js';
-import homeMap from './components/map.vue';
-import dataSourcePie from './components/dataSourcePie.vue';
+import grainsPie from './components/grainsPie.vue';
 import visiteVolume from './components/visiteVolume.vue';
-import serviceRequests from './components/serviceRequests.vue';
-import userFlow from './components/userFlow.vue';
 import countUp from './components/countUp.vue';
 import inforCard from './components/inforCard.vue';
-import mapDataTable from './components/mapDataTable.vue';
-import toDoListItem from './components/toDoListItem.vue';
+import jobDataTable from './components/jobDataTable.vue';
 
 export default {
     name: 'home',
     components: {
-        homeMap,
-        dataSourcePie,
+        grainsPie,
         visiteVolume,
-        serviceRequests,
-        userFlow,
         countUp,
         inforCard,
-        mapDataTable,
-        toDoListItem
+        jobDataTable
     },
     data () {
         return {
-            toDoList: [
-                {
-                    title: '去iView官网学习完整的iView组件'
-                },
-                {
-                    title: '去iView官网学习完整的iView组件'
-                },
-                {
-                    title: '去iView官网学习完整的iView组件'
-                },
-                {
-                    title: '去iView官网学习完整的iView组件'
-                },
-                {
-                    title: '去iView官网学习完整的iView组件'
-                }
-            ],
             count: {
                 createUser: 496,
                 visit: 3264,
                 collection: 24389305,
                 transfer: 39503498
             },
-            cityData: cityData,
-            showAddNewTodo: false,
-            newToDoItemValue: ''
+            productData: this.productList(),
+            productId: '',
+            item: 'os',
+            itemName: '操作系统版本'
         };
     },
-    computed: {
-        avatorPath () {
-            return localStorage.avatorImgPath;
-        }
-    },
     methods: {
-        addNewToDoItem () {
-            this.showAddNewTodo = true;
+        changedItem (item, itemName) {
+            this.item = item;
+            this.itemName = itemName;
         },
-        addNew () {
-            if (this.newToDoItemValue.length !== 0) {
-                this.toDoList.unshift({
-                    title: this.newToDoItemValue
+        productList () {
+            this.axios.get(this.Global.serverSrc + 'product').then(
+                res => {
+                    if (res.data['status'] === true) {
+                        this.productData = res.data['data'];
+                        if (this.productData.length > 0) {
+                            this.productId = this.productData[0].id;
+                        } else {
+                            this.loading = false;
+                        }
+                    } else {
+                        this.loading = false;
+                        this.nError('Get Product Failure', res.data['message']);
+                    }
+                },
+                err => {
+                    let errInfo = '';
+                    try {
+                        errInfo = err.response.data['message'];
+                    } catch (error) {
+                        errInfo = err;
+                    }
+                    this.loading = false;
+                    this.nError('Get Product Failure', errInfo);
                 });
-                setTimeout(() => {
-                    this.newToDoItemValue = '';
-                }, 200);
-                this.showAddNewTodo = false;
-            } else {
-                this.$Message.error('请输入待办事项内容');
-            }
         },
-        cancelAdd () {
-            this.showAddNewTodo = false;
-            this.newToDoItemValue = '';
+        // 重新定义错误消息
+        nError (title, info) {
+            this.$Notice.error({
+                title: title,
+                // 替换<>避免被解析为html标签
+                desc: info.toString().replace(/<|>/g, ''),
+                duration: 10
+            });
         }
     }
 };
