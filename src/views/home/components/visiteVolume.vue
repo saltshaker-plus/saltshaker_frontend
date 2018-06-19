@@ -52,11 +52,11 @@ export default {
                         name: 'Minion',
                         type: 'bar',
                         data: [
-                            {value: 678, name: 'Down', itemStyle: {normal: {color: '#f02513'}}},
-                            {value: 403, name: 'Rejected', itemStyle: {normal: {color: '#f08b4c'}}},
+                            {value: 678, name: 'Down', itemStyle: {normal: {color: '#f25e43'}}},
+                            {value: 403, name: 'Rejected', itemStyle: {normal: {color: '#ffd572'}}},
                             {value: 250, name: 'Unaccepted', itemStyle: {normal: {color: '#2d8cf0'}}},
                             {value: 523, name: 'Accepted', itemStyle: {normal: {color: '#f0e334'}}},
-                            {value: 456, name: 'Up', itemStyle: {normal: {color: '#13f01e'}}}
+                            {value: 456, name: 'Up', itemStyle: {normal: {color: '#64d572'}}}
                         ]
                     }
                 ]
