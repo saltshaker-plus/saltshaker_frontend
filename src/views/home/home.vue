@@ -23,7 +23,7 @@
                                 Minion 状态
                             </p>
                             <div class="data-source-row">
-                                <visite-volume></visite-volume>
+                                <minion-status :productId="productId"></minion-status>
                             </div>
                         </Card>
                     </Col>
@@ -34,7 +34,7 @@
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="user_created_count"
-                            :end-val="count.createUser"
+                            :end-val="count.minion"
                             iconType="android-apps"
                             color="#2d8cf0"
                             intro-text="Minion总数"
@@ -43,17 +43,17 @@
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="visit_count"
-                            :end-val="count.visit"
+                            :end-val="count.period"
                             iconType="ios-eye"
                             color="#64d572"
                             :iconSize="50"
-                            intro-text="今日浏览量"
+                            intro-text="活跃Job总数"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="collection_count"
-                            :end-val="count.collection"
+                            :end-val="count.event"
                             iconType="upload"
                             color="#ffd572"
                             intro-text="事件总数"
@@ -62,10 +62,10 @@
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="transfer_count"
-                            :end-val="count.transfer"
+                            :end-val="count.log"
                             iconType="shuffle"
                             color="#f25e43"
-                            intro-text="今日服务调用量"
+                            intro-text="日志总数"
                         ></infor-card>
                     </Col>
                 </Row>
@@ -85,18 +85,7 @@
             </Col>
         </Row>
         <Row :gutter="10">
-            <Col :md="24" :lg="12" :style="{marginTop: '10px'}">
-                <Card dis-hover>
-                    <p slot="title" class="card-title">
-                        <Icon type="android-map"></Icon>
-                        上周每日来访量统计
-                    </p>
-                    <div class="data-source-row">
-                        <visite-volume></visite-volume>
-                    </div>
-                </Card>
-            </Col>
-            <Col :md="24" :lg="12" :style="{marginTop: '10px'}">
+            <Col :md="24" :lg="24" :style="{marginTop: '10px'}">
                 <Card dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="ios-pulse-strong"></Icon>
@@ -145,7 +134,7 @@
 
 <script>
 import grainsPie from './components/grainsPie.vue';
-import visiteVolume from './components/visiteVolume.vue';
+import minionStatus from './components/minionStatus.vue';
 import countUp from './components/countUp.vue';
 import inforCard from './components/inforCard.vue';
 import jobDataTable from './components/jobDataTable.vue';
@@ -154,7 +143,7 @@ export default {
     name: 'home',
     components: {
         grainsPie,
-        visiteVolume,
+        minionStatus,
         countUp,
         inforCard,
         jobDataTable
@@ -162,16 +151,21 @@ export default {
     data () {
         return {
             count: {
-                createUser: 496,
-                visit: 3264,
-                collection: 24389305,
-                transfer: 39503498
+                minion: 0,
+                period: 0,
+                event: 0,
+                log: 0
             },
             productData: this.productList(),
             productId: '',
             item: 'os',
             itemName: '操作系统版本'
         };
+    },
+    watch: {
+        productId () {
+            this.titleInfo();
+        }
     },
     methods: {
         changedItem (item, itemName) {
@@ -202,6 +196,25 @@ export default {
                     }
                     this.loading = false;
                     this.nError('Get Product Failure', errInfo);
+                });
+        },
+        titleInfo () {
+            this.axios.get(this.Global.serverSrc + 'dashboard/title?product_id=' + this.productId).then(
+                res => {
+                    if (res.data['status'] === true) {
+                        this.count = res.data['data'];
+                    } else {
+                        this.nError('Get Title Failure', res.data['message']);
+                    }
+                },
+                err => {
+                    let errInfo = '';
+                    try {
+                        errInfo = err.response.data['message'];
+                    } catch (error) {
+                        errInfo = err;
+                    }
+                    this.nError('Get Title Failure', errInfo);
                 });
         },
         // 重新定义错误消息

@@ -26,7 +26,7 @@ export default {
         itemName: {
             type: String,
             required: true
-        },
+        }
     },
     watch: {
         productId () {
