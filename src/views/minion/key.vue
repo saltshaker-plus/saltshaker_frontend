@@ -60,6 +60,9 @@
                             if (params.row.minions_status === 'Accepted') {
                                 tagColor = 'green';
                             }
+                            if (params.row.minions_status === 'Unaccepted') {
+                                tagColor = 'yellow';
+                            }
                             return h('div', [
                                 h('Tag', {
                                     props: {
