@@ -54,7 +54,20 @@
                     {
                         title: '状态',
                         key: 'minions_status',
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            let tagColor = 'red';
+                            if (params.row.minions_status === 'Accepted') {
+                                tagColor = 'green';
+                            }
+                            return h('div', [
+                                h('Tag', {
+                                    props: {
+                                        'color': tagColor
+                                    }
+                                }, params.row.minions_status)
+                            ]);
+                        }
                     },
                     {
                         title: '接受 Key',
