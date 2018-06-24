@@ -85,7 +85,18 @@
             </Col>
         </Row>
         <Row :gutter="10">
-            <Col :md="24" :lg="24" :style="{marginTop: '10px'}">
+            <Col :md="12" :lg="6" :style="{marginBottom: '10px'}">
+                <Card dis-hover>
+                    <p slot="title" class="card-title">
+                        <Icon type="android-map"></Icon>
+                        服务状态
+                    </p>
+                    <div class="data-source-row">
+                        <!--<minion-status :productId="productId"></minion-status>-->
+                    </div>
+                </Card>
+            </Col>
+            <Col :md="12" :lg="18" :style="{marginBottom: '10px'}">
                 <Card dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="ios-pulse-strong"></Icon>
@@ -135,7 +146,6 @@
 <script>
 import grainsPie from './components/grainsPie.vue';
 import minionStatus from './components/minionStatus.vue';
-import countUp from './components/countUp.vue';
 import inforCard from './components/inforCard.vue';
 import jobDataTable from './components/jobDataTable.vue';
 
@@ -144,7 +154,6 @@ export default {
     components: {
         grainsPie,
         minionStatus,
-        countUp,
         inforCard,
         jobDataTable
     },

@@ -12,16 +12,10 @@
             </Col>
             <Col span="16" class="height-100">
                 <Row type="flex" align="middle" justify="center" class="height-100">
-                    <count-up 
-                        class="infor-card-count user-created-count" 
-                        :id-name="idName" 
-                        :end-val="endVal" 
-                        :color="color"
-                        :countSize="countSize"
-                        :countWeight="countWeight"
-                    >
+                    <div>
+                        <p :style="{textAlign: 'center', color: color, fontSize: countSize, fontWeight: countWeight}"><span v-cloak :id="idName"></span><span>{{ endVal }} </span></p>
                         <p class="infor-intro-text" slot="intro">{{ introText }}</p>
-                    </count-up>
+                    </div>
                 </Row>
             </Col>
         </div>
@@ -29,13 +23,9 @@
 </template>
 
 <script>
-import countUp from './countUp.vue';
 
 export default {
     name: 'inforCard',
-    components: {
-        countUp
-    },
     props: {
         idName: String,
         endVal: Number,

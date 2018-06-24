@@ -54,8 +54,7 @@ export default {
                         this.seriesData = res.data['data']['seriesData'];
                         const option = {
                             title: {
-                                x: 'center',
-                                text: this.itemName
+                                x: 'center'
                             },
                             tooltip: {
                                 trigger: 'item',
