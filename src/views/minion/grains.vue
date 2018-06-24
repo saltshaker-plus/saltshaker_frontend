@@ -6,12 +6,23 @@
             @getProductEvent="getProductEvent"
             :productShow="true"
             ref="childrenMethods">
+            <Button slot="create" type="primary" @click="sync()">同步Grains</Button>
         </common-table>
         <Modal width="650px" v-model="showInfo" title="详情" :styles="{top: '20px'}">
             <highlight-code lang="json" style="overflow:auto" v-if="result">
                 {{result}}
             </highlight-code>
             <div slot="footer"></div>
+        </Modal>
+        <Modal slot="option" v-model="syncHost" title="同步主机">
+            <div style="text-align:center">
+                此功能会根据Minion状态同步Grains信息，以确保数据一致性
+                <Button type="success" size="small" @click="handleSync()">同步</Button>
+                <Progress v-show="progress" :percent="percent" status="active"></Progress>
+            </div>
+            <div slot="footer">
+                <Button type="ghost" @click="handleCancel()" style="margin-left: 8px">取消</Button>
+            </div>
         </Modal>
 </div>
 
@@ -29,6 +40,9 @@
                 showInfo: false,
                 result: '',
                 productId: '',
+                syncHost: false,
+                progress: false,
+                percent: 0,
                 cColumns: [
                     {
                         title: 'id',
@@ -241,6 +255,10 @@
                 this.productData = productData;
                 this.productId = productId;
             },
+            // 调用子组件进行数据刷新
+            tableList () {
+                this.$refs.childrenMethods.tableList();
+            },
             // 调用子组件消息通知
             nError (title, info) {
                 this.$refs.childrenMethods.nError(title, info);
@@ -266,6 +284,38 @@
                             errInfo = err;
                         }
                         this.result = '';
+                        this.loading = false;
+                        this.nError('Get Grains Failure', errInfo);
+                    });
+            },
+            handleCancel () {
+                this.formView = false;
+                this.syncHost = false;
+            },
+            sync () {
+                this.syncHost = true;
+                this.progress = false;
+                this.percent = 0;
+            },
+            handleSync () {
+                this.progress = true;
+                this.axios.get(this.Global.serverSrc + 'grains/sync?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.percent = 100;
+                            this.tableList();
+                        } else {
+                            this.loading = false;
+                            this.nError('Sync Grains Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
                         this.loading = false;
                         this.nError('Get Grains Failure', errInfo);
                     });

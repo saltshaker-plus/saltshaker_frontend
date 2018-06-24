@@ -1,21 +1,21 @@
 <template>
     <div>
         <common-table :cColumns="cColumns" :apiService="apiService" :productShow="false" ref="childrenMethods">
-            <Button slot="create" type="primary" @click="add('formValidate')">创建用户</Button>
+            <Button slot="create" type="primary" @click="add('formValidate')" v-show="access">创建用户</Button>
             <Modal slot="option" v-model="formView"  :title="optionTypeName" width="650px">
                 <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="60">
-                    <FormItem label="用户名" prop="username">
+                    <FormItem label="用户名" prop="username" v-show="access">
                         <Input v-model="formValidate.username" placeholder="输入用户名"></Input>
                     </FormItem>
-                    <FormItem label="邮箱" prop="mail">
+                    <FormItem label="邮箱" prop="mail" v-show="access">
                         <Input v-model="formValidate.mail" placeholder="输入你的邮箱"></Input>
                     </FormItem>
-                    <FormItem label="角色" prop="role">
+                    <FormItem label="角色" prop="role" v-show="access">
                         <CheckboxGroup v-model="formValidate.role">
                             <Checkbox v-for="item in userInfo.role" :key="item.id" :label="item.id" v-if="item.tag != 1">{{item.name}}</Checkbox>
                         </CheckboxGroup>
                     </FormItem>
-                    <FormItem label="产品线" prop="product">
+                    <FormItem label="产品线">
                         <CheckboxGroup v-model="formValidate.product">
                             <Checkbox v-for="item in userInfo.product" :key="item.id" :label="item.id" @click.prevent.native="handleCheckProduct(item.id)">{{item.name}}</Checkbox>
                         </CheckboxGroup>
@@ -311,7 +311,8 @@
                 listStyleACL: {
                     width: '250px',
                     height: '200px'
-                }
+                },
+                access: localStorage.menu.includes(-1)
             };
         },
         methods: {

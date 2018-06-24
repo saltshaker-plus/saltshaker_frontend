@@ -83,7 +83,7 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'status', title: '状态信息', name: 'status', access: 1, component: () => import('@/views/minion/status.vue') },
-            { path: 'key', title: 'Key管理', name: 'key', access: 101, component: () => import('@/views/minion/key.vue') },
+            { path: 'key', title: 'Key管理', name: 'key', access: 111, component: () => import('@/views/minion/key.vue') },
             { path: 'grains', title: 'Grains', name: 'grains', access: 1, component: () => import('@/views/minion/grains.vue') }
         ]
     },
@@ -165,11 +165,11 @@ export const appRouter = [
         access: 0,
         component: Main,
         children: [
-            { path: 'user', title: '用户管理', name: 'user', access: 0, component: () => import('@/views/user/user.vue') },
-            { path: 'role', title: '角色管理', name: 'role', access: 0, component: () => import('@/views/role/role.vue') },
-            { path: 'token', title: 'Token管理', name: 'token', access: 0, component: () => import('@/views/error-page/error-page.vue') },
-            { path: 'log', title: '操作日志', name: 'log', access: 0, component: () => import('@/views/audit_log/audit_log.vue') },
-            { path: 'tools', title: '系统工具', name: 'tools', access: 0, component: () => import('@/views/error-page/error-page.vue') }
+            { path: 'user', title: '用户管理', name: 'user', access: 100, component: () => import('@/views/user/user.vue') },
+            { path: 'role', title: '角色管理', name: 'role', access: 101, component: () => import('@/views/role/role.vue') },
+            { path: 'token', title: 'Token管理', name: 'token', access: 102, component: () => import('@/views/error-page/error-page.vue') },
+            { path: 'log', title: '操作日志', name: 'log', access: 103, component: () => import('@/views/audit_log/audit_log.vue') },
+            { path: 'tools', title: '系统工具', name: 'tools', access: 104, component: () => import('@/views/error-page/error-page.vue') }
         ]
     },
     // {

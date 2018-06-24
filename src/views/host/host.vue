@@ -29,7 +29,7 @@
                     <Button type="ghost" @click="handleCancel()" style="margin-left: 8px">取消</Button>
                 </div>
             </Modal>
-            <Modal slot="option" v-model="syncHost" title="同步主机" @on-ok="handleSubmit">
+            <Modal slot="option" v-model="syncHost" title="同步主机">
                 <div style="text-align:center">
                     此功能会根据Minion状态同步主机信息，以确保数据一致性
                     <Button type="success" size="small" @click="handleSync()">同步</Button>
@@ -287,6 +287,7 @@
             handleCancel () {
                 this.formView = false;
                 this.syncHost = false;
+                this.percent = 0;
             },
             handleRemove (index) {
                 this.formDynamic.items[index].status = 0;
@@ -378,7 +379,7 @@
                             errInfo = err;
                         }
                         this.loading = false;
-                        this.nError('Get Product Failure', errInfo);
+                        this.nError('Get Host Failure', errInfo);
                     });
             }
         }
