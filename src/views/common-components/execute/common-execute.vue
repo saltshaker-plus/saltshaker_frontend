@@ -100,7 +100,7 @@ Minion: {{minion}}
                     {
                         title: '分组',
                         key: 'name',
-                        width: 145,
+                        width: 200,
                         render: (h, params) => {
                             return h('CheckboxGroup', [
                                 h('Checkbox', {
