@@ -20,11 +20,60 @@ export default {
                 {
                     title: '',
                     key: 'key',
-                    width: 200
+                    // className: 'demo-table-info-column',
+                    width: 150
                 },
                 {
                     title: '',
-                    key: 'value'
+                    key: 'value',
+                    render: (h, params) => {
+                        if (params.row.key === '目标组') {
+                            return h('ul', params.row.value.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item.name);
+                            })
+                            );
+                        } else if (params.row.key === '结果') {
+                            return h('ul', params.row.value.map(item => {
+                                return h('li', [
+                                    h('Tag', {
+                                        props: {
+                                            'color': 'green'
+                                        }
+                                    }, item.time),
+                                    h('div', Object.keys(item.result).map(k => {
+                                        return h('highlight-code', {
+                                            props: {
+                                                'lang': 'yaml',
+                                                'style': 'overflow:auto'
+                                            }
+                                        }, 'Minion: ' + k + '\n' + item.result[k]);
+                                    }))
+                                ]);
+                            }));
+                        } else if (params.row.key === 'ID') {
+                            return h('div', [
+                                h('Tag', {
+                                    props: {
+                                        'color': 'green'
+                                    }
+                                }, params.row.value)
+                            ]);
+                        } else if (params.row.key === 'Shell') {
+                            return h('highlight-code', {
+                                props: {
+                                    'lang': 'yaml',
+                                    'style': 'overflow:auto'
+                                }
+                            }, params.row.value);
+                        } else {
+                            return params.row.value;
+                        }
+                    }
                 }
             ],
             task: []
@@ -39,9 +88,68 @@ export default {
                 res => {
                     if (res.data['status'] === true) {
                         this.period = res.data['data'];
-                        for (var key of Object.keys(this.period)) {
-                            this.task.push({'key': key, 'value': this.period[key]});
-                        }
+                        this.task.push(
+                            {
+                                key: 'ID',
+                                value: this.period['id']
+                            },
+                            {
+                                key: '创建时间',
+                                value: this.period['timestamp']
+                            },
+                            {
+                                key: 'Job名',
+                                value: this.period['name']
+                            },
+                            {
+                                key: '描述',
+                                value: this.period['description']
+                            },
+                            {
+                                key: '产品',
+                                value: this.period['product_id']
+                            },
+                            {
+                                key: '周期',
+                                value: this.period['period']
+                            },
+                            {
+                                key: '周期时间',
+                                value: this.period['date'].split('T')[0] + ' ' + this.period['time']
+                            },
+                            {
+                                key: '类型',
+                                value: this.period['type']
+                            },
+                            {
+                                key: 'SLS',
+                                value: this.period['sls']
+                            },
+                            {
+                                key: 'Shell',
+                                value: this.period['shell']
+                            },
+                            {
+                                key: 'Cron',
+                                value: this.period['cron']
+                            },
+                            {
+                                key: '目标组',
+                                value: this.period['target']
+                            },
+                            {
+                                key: '并发',
+                                value: this.period['concurrent']
+                            },
+                            {
+                                key: '结果',
+                                value: this.period['results'],
+//                                cellClassName: {
+//                                    key: 'demo-table-info-row',
+//                                    value: 'demo-table-info-column'
+//                                }
+                            }
+                        );
                     } else {
                         this.nError('Get Task Failure', res.data['message']);
                     }
@@ -76,3 +184,29 @@ export default {
     }
 };
 </script>
+<style>
+    .ivu-table .demo-table-info-row td{
+        background-color: #2db7f5;
+        color: #fff;
+    }
+    .ivu-table .demo-table-error-row td{
+        background-color: #ff6600;
+        color: #fff;
+    }
+    .ivu-table td.demo-table-info-column{
+        background-color: #64d572;
+        color: #fff;
+    }
+    .ivu-table .demo-table-info-cell-name {
+        background-color: #2db7f5;
+        color: #fff;
+    }
+    .ivu-table .demo-table-info-cell-age {
+        background-color: #ff6600;
+        color: #fff;
+    }
+    .ivu-table .demo-table-info-cell-address {
+        background-color: #187;
+        color: #fff;
+    }
+</style>
