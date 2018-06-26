@@ -73,7 +73,7 @@
                             theme="vs-dark"
                             @mounted="onMounted"
                             @codeChange="onCodeChange"
-                            v-model="formValidate.shell"
+                            ref="vscode"
                             >
                         </MonacoEditor>
                     </FormItem>
@@ -175,22 +175,13 @@
                         sortable: true
                     },
                     {
-                        title: '并行数',
-                        key: 'concurrent',
-                        sortable: true
-                    },
-                    {
                         title: '周期',
                         key: 'period',
                         sortable: true
                     },
                     {
-                        title: '时间',
-                        key: 'data',
-                        sortable: true,
-                        render: (h, params) => {
-                            return params.row.date.split('T')[0] + ' ' + params.row.time;
-                        }
+                        title: '创建时间',
+                        key: 'timestamp'
                     },
                     {
                         title: '状态',
@@ -213,7 +204,7 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 220,
+                        width: 260,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
@@ -242,6 +233,7 @@
                                                 this.handleSLS();
                                             } else {
                                                 this.handleShell();
+                                                this.reload();
                                             }
                                             this.formValidate.sls = params.row.sls;
                                             this.formValidate.shell = params.row.shell;
@@ -294,6 +286,21 @@
                                         }
                                     }
                                 }, '暂停'),
+                                h('Button', {
+                                    props: {
+                                        type: 'default',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.id = params.row.id;
+                                            this.handleReopen();
+                                        }
+                                    }
+                                }, '重开'),
                                 h('Button', {
                                     props: {
                                         type: 'default',
@@ -545,6 +552,26 @@
                         this.nError('Get File Tree Failure', errInfo);
                     });
             },
+            handleReopen () {
+                this.axios.get(this.Global.serverSrc + 'period/reopen/' + this.id + '?product_id=' + this.productId,
+                    this.formValidate).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                        } else {
+                            this.nError('Reopen Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Reopen Failure', errInfo);
+                    });
+            },
             // 传入path获取gitlab对应数据
             fileListPath (path) {
                 this.fileContent = '';
@@ -604,7 +631,14 @@
             },
             onCodeChange (editor) {
                 this.formValidate.shell = this.editor.getValue();
-                console.log(this.formValidate.shell)
+            },
+            // 重载编辑框
+            reload () {
+                clearTimeout(time);
+                let time = setTimeout(() => {
+                    this.$refs.vscode.destroyMonaco();
+                    this.$refs.vscode.createMonaco();
+                }, 1);
             }
         }
     };
