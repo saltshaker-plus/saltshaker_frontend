@@ -131,6 +131,8 @@
                 slsShow: true,
                 shellShow: false,
                 moduleShow: false,
+                // 关闭清理定时刷新
+                timer: null,
                 cColumns: [
                     {
                         title: 'Job 名',
@@ -185,11 +187,11 @@
                     },
                     {
                         title: '状态',
-                        key: 'date',
+                        key: 'status',
                         sortable: true,
                         render: (h, params) => {
                             let tagColor = 'green';
-                            if (params.row.status === 'down') {
+                            if (params.row.status === '失败') {
                                 tagColor = 'red';
                             }
                             return h('div', [
@@ -197,7 +199,7 @@
                                     props: {
                                         'color': tagColor
                                     }
-                                }, 'running')
+                                }, params.row.status)
                             ]);
                         }
                     },
@@ -640,6 +642,14 @@
                     this.$refs.vscode.createMonaco();
                 }, 1);
             }
+        },
+        // 定时刷新
+        mounted () {
+            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000);
+        },
+        // 关闭销毁
+        beforeDestroy () {
+            clearInterval(this.timer);
         }
     };
 </script>
