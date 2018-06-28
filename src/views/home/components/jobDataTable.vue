@@ -64,11 +64,11 @@ export default {
                 },
                 {
                     title: '状态',
-                    key: 'date',
+                    key: 'status',
                     sortable: true,
                     render: (h, params) => {
                         let tagColor = 'green';
-                        if (params.row.status === 'down') {
+                        if (params.row.status === '失败') {
                             tagColor = 'red';
                         }
                         return h('div', [
@@ -76,7 +76,7 @@ export default {
                                 props: {
                                     'color': tagColor
                                 }
-                            }, 'running')
+                            }, params.row.status)
                         ]);
                     }
                 }
