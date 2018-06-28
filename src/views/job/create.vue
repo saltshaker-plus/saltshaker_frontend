@@ -555,7 +555,7 @@
                     });
             },
             handleReopen () {
-                this.axios.get(this.Global.serverSrc + 'period/reopen/' + this.id + '?product_id=' + this.productId,
+                this.axios.put(this.Global.serverSrc + 'period/reopen/' + this.id + '?product_id=' + this.productId,
                     this.formValidate).then(
                     res => {
                         if (res.data['status'] === true) {

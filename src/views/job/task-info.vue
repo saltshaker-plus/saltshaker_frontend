@@ -16,6 +16,8 @@ export default {
     data () {
         return {
             period: '',
+            // 关闭清理定时刷新
+            timer: null,
             columns: [
                 {
                     title: '',
@@ -88,6 +90,7 @@ export default {
                 res => {
                     if (res.data['status'] === true) {
                         this.period = res.data['data'];
+                        this.task = [];
                         this.task.push(
                             {
                                 key: 'ID',
@@ -143,7 +146,7 @@ export default {
                             },
                             {
                                 key: '结果',
-                                value: this.period['results'],
+                                value: this.period['result'],
 //                                cellClassName: {
 //                                    key: 'demo-table-info-row',
 //                                    value: 'demo-table-info-column'
@@ -176,11 +179,16 @@ export default {
     },
     mounted () {
         this.init();
+        this.timer = setInterval(this.getPeriod, 5000);
     },
     watch: {
         '$route' () {
             this.init();
         }
+    },
+    // 关闭销毁
+    beforeDestroy () {
+        clearInterval(this.timer);
     }
 };
 </script>
