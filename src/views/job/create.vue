@@ -20,8 +20,16 @@
                             <Option v-for="item in targetData" :value="item.id" :key="item.id" placeholder="选择目标">{{ item.name }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="并行数" prop="concurrent">
-                        <InputNumber :min="0" v-model="formValidate.concurrent"></InputNumber>
+                    <FormItem label="并行数">
+                         <Row>
+                            <Col span="10">
+                                <InputNumber :min="0" v-model="formValidate.concurrent"></InputNumber>
+                            </Col>
+                            <Col span="4" style="text-align: right; padding-right: 13px">并行间隔</Col>
+                            <Col span="10">
+                                <InputNumber :min="0" v-model="formValidate.interval" placeholder="单位秒，默认60s"></InputNumber>
+                            </Col>
+                         </Row>
                     </FormItem>
                     <FormItem label="周期">
                         <RadioGroup v-model="formValidate.period">
@@ -230,6 +238,7 @@
                                             this.formValidate.time = params.row.time;
                                             this.formValidate.period = params.row.period;
                                             this.formValidate.concurrent = params.row.concurrent;
+                                            this.formValidate.interval = params.row.interval;
                                             this.formValidate.type = params.row.type;
                                             if (params.row.type === 'sls') {
                                                 this.handleSLS();
@@ -335,6 +344,7 @@
                     sls: '',
                     shell: '',
                     concurrent: 0,
+                    interval: 60,
                     period: 'period',
                     type: 'sls'
                 },
