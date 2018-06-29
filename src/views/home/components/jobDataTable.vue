@@ -68,7 +68,7 @@ export default {
                     sortable: true,
                     render: (h, params) => {
                         let tagColor = 'green';
-                        if (params.row.status === '失败') {
+                        if (params.row.status.id === 4) {
                             tagColor = 'red';
                         }
                         return h('div', [
@@ -76,7 +76,7 @@ export default {
                                 props: {
                                     'color': tagColor
                                 }
-                            }, params.row.status)
+                            }, params.row.status.name)
                         ]);
                     }
                 }
