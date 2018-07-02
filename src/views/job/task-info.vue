@@ -140,6 +140,14 @@ export default {
                                 value: this.period['date'].split('T')[0] + ' ' + this.period['time']
                             },
                             {
+                                key: '并行',
+                                value: this.period['concurrent']
+                            },
+                            {
+                                key: '并行间隔',
+                                value: this.period['interval'] + 's'
+                            },
+                            {
                                 key: '类型',
                                 value: this.period['type']
                             },
@@ -158,10 +166,6 @@ export default {
                             {
                                 key: '目标组',
                                 value: this.period['target']
-                            },
-                            {
-                                key: '并发',
-                                value: this.period['concurrent']
                             },
                             {
                                 key: '审计',
