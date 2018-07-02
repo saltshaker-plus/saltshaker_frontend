@@ -42,6 +42,7 @@ export default {
                         } else if (params.row.key === '结果') {
                             return h('ul', params.row.value.map(item => {
                                 return h('li', [
+                                    h('Tag', item.option),
                                     h('Tag', {
                                         props: {
                                             'color': 'green'
@@ -72,6 +73,28 @@ export default {
                                     'style': 'overflow:auto'
                                 }
                             }, params.row.value);
+                        } else if (params.row.key === '定时时间') {
+                            if (params.row.value !== ' ') {
+                                return params.row.value;
+                            } else {
+                                return '立即';
+                            }
+                        } else if (params.row.key === '审计') {
+                            return h('ul', params.row.value.map(item => {
+                                return h('li', [
+                                    h('Tag', {
+                                        props: {
+                                            'color': 'yellow'
+                                        }
+                                    }, item.timestamp),
+                                    h('Tag', {
+                                        props: {
+                                            'color': 'green'
+                                        }
+                                    }, item.user),
+                                    h('Tag', {}, item.option)
+                                ]);
+                            }));
                         } else {
                             return params.row.value;
                         }
@@ -97,10 +120,6 @@ export default {
                                 value: this.period['id']
                             },
                             {
-                                key: '创建时间',
-                                value: this.period['timestamp']
-                            },
-                            {
                                 key: 'Job名',
                                 value: this.period['name']
                             },
@@ -117,7 +136,7 @@ export default {
                                 value: this.period['period']
                             },
                             {
-                                key: '周期时间',
+                                key: '定时时间',
                                 value: this.period['date'].split('T')[0] + ' ' + this.period['time']
                             },
                             {
@@ -143,6 +162,10 @@ export default {
                             {
                                 key: '并发',
                                 value: this.period['concurrent']
+                            },
+                            {
+                                key: '审计',
+                                value: this.period['audit']
                             },
                             {
                                 key: '结果',

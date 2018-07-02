@@ -37,20 +37,29 @@
                             <Radio label="period">周期性</Radio>
                         </RadioGroup>
                     </FormItem>
-                    <FormItem label="时间">
+                    <FormItem label="时间" v-show="formValidate.period === 'once'">
                         <Row>
-                            <Col span="9">
+                            <Col span="6">
+                                <RadioGroup v-model="formValidate.time_type">
+                                    <Radio label="now">立即</Radio>
+                                    <Radio label="timing">定时</Radio>
+                                </RadioGroup>
+                            </Col>
+                            <Col span="8" v-if="formValidate.time_type === 'timing'">
                                 <FormItem prop="date">
                                     <DatePicker type="date" :options="optionsDate" placeholder="Select date" v-model="formValidate.date"></DatePicker>
                                 </FormItem>
                             </Col>
-                            <Col span="2" style="text-align: center">-</Col>
-                            <Col span="13">
+                            <Col span="1" style="text-align: center" v-show="formValidate.time_type === 'timing'">-</Col>
+                            <Col span="9" v-if="formValidate.time_type === 'timing'">
                                 <FormItem prop="time">
                                     <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
                                 </FormItem>
                             </Col>
                         </Row>
+                    </FormItem>
+                    <FormItem label="周期" v-show="formValidate.period === 'period'">
+                        <Input v-model="formValidate.cron"></Input>
                     </FormItem>
                     <FormItem label="类型">
                         <RadioGroup v-model="formValidate.type">
@@ -214,9 +223,18 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 260,
+                        width: 330,
                         align: 'center',
                         render: (h, params) => {
+                            let pause = true;
+                            let play = true;
+                            if (params.row.concurrent !== 0) {
+                                if (params.row.action === 'play') {
+                                    pause = false;
+                                } else {
+                                    play = false;
+                                }
+                            }
                             return h('div', [
                                 h('Button', {
                                     props: {
@@ -234,8 +252,14 @@
                                             this.id = params.row.id;
                                             this.formValidate.name = params.row.name;
                                             this.formValidate.description = params.row.description;
-                                            this.formValidate.date = params.row.date;
-                                            this.formValidate.time = params.row.time;
+                                            this.formValidate.time_type = params.row.time_type;
+                                            if (this.formValidate.time_type === 'now') {
+                                                this.formValidate.date = '';
+                                                this.formValidate.time = '';
+                                            } else {
+                                                this.formValidate.date = params.row.date;
+                                                this.formValidate.time = params.row.time;
+                                            }
                                             this.formValidate.period = params.row.period;
                                             this.formValidate.concurrent = params.row.concurrent;
                                             this.formValidate.interval = params.row.interval;
@@ -283,20 +307,35 @@
                                 h('Button', {
                                     props: {
                                         type: 'default',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled: pause
                                     },
                                     style: {
                                         marginRight: '5px'
                                     },
                                     on: {
                                         click: () => {
-                                            this.optionType = 'edit';
-                                            this.optionTypeName = '编辑';
                                             this.id = params.row.id;
-                                            this.formValidate = params.row;
+                                            this.handlePause();
                                         }
                                     }
                                 }, '暂停'),
+                                h('Button', {
+                                    props: {
+                                        type: 'default',
+                                        size: 'small',
+                                        disabled: play
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.id = params.row.id;
+                                            this.handlePlay();
+                                        }
+                                    }
+                                }, '继续'),
                                 h('Button', {
                                     props: {
                                         type: 'default',
@@ -346,7 +385,8 @@
                     concurrent: 0,
                     interval: 60,
                     period: 'period',
-                    type: 'sls'
+                    type: 'sls',
+                    time_type: 'now'
                 },
                 ruleValidate: {
                     name: [
@@ -429,9 +469,23 @@
                 this.optionType = 'add';
                 this.optionTypeName = '创建';
                 this.formView = true;
+                this.formValidate.date = '';
+                this.formValidate.time = '';
+                this.formValidate.concurrent = 0;
+                this.formValidate.interval = 60;
+                this.formValidate.time_type = 'now';
+                this.formValidate.period = 'period';
+                this.formValidate.type = 'sls';
+                this.slsShow = true;
+                this.shellShow = false;
+                // 假如打开编辑，在添加后进行编辑框的内容清除
+                if (this.editor !== undefined) {
+                    this.reload();
+                }
             },
             handleCancel () {
                 this.formView = false;
+                this.handleReset('formValidate');
             },
             // 表单提
             handleSubmit (name) {
@@ -565,8 +619,7 @@
                     });
             },
             handleReopen () {
-                this.axios.put(this.Global.serverSrc + 'period/reopen/' + this.id + '?product_id=' + this.productId,
-                    this.formValidate).then(
+                this.axios.put(this.Global.serverSrc + 'period/reopen/' + this.id + '?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.$Message.success('成功！');
@@ -582,6 +635,46 @@
                             errInfo = err;
                         }
                         this.nError('Reopen Failure', errInfo);
+                    });
+            },
+            handlePause () {
+                this.axios.put(this.Global.serverSrc + 'period/pause/' + this.id + '?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                            this.tableList();
+                        } else {
+                            this.nError('Pause Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Pause Failure', errInfo);
+                    });
+            },
+            handlePlay () {
+                this.axios.put(this.Global.serverSrc + 'period/play/' + this.id + '?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                            this.tableList();
+                        } else {
+                            this.nError('Play Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Play Failure', errInfo);
                     });
             },
             // 传入path获取gitlab对应数据
