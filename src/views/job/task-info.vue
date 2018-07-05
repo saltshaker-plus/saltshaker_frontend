@@ -49,12 +49,22 @@ export default {
                                         }
                                     }, item.time),
                                     h('div', Object.keys(item.result).map(k => {
-                                        return h('highlight-code', {
-                                            props: {
-                                                'lang': 'yaml',
-                                                'style': 'overflow:auto'
-                                            }
-                                        }, 'Minion: ' + k + '\n' + item.result[k]);
+                                        // 执行SLS的时候返回的是个object
+                                        if (typeof item.result[k] === 'object') {
+                                            return h('highlight-code', {
+                                                props: {
+                                                    'lang': 'yaml',
+                                                    'style': 'overflow:auto'
+                                                }
+                                            }, 'Minion: ' + k + '\n' + JSON.stringify(item.result[k]).replace(/,/g, ',\n  ').replace(/{/g, '{\n  ').replace(/}/g, '}\n  '));
+                                        } else {
+                                            return h('highlight-code', {
+                                                props: {
+                                                    'lang': 'yaml',
+                                                    'style': 'overflow:auto'
+                                                }
+                                            }, 'Minion: ' + k + '\n' + item.result[k]);
+                                        }
                                     }))
                                 ]);
                             }));
@@ -78,6 +88,12 @@ export default {
                                 return params.row.value;
                             } else {
                                 return '立即';
+                            }
+                        } else if (params.row.key === '调度') {
+                            if (params.row.value === 'once') {
+                                return '一次';
+                            } else {
+                                return '周期';
                             }
                         } else if (params.row.key === '审计') {
                             return h('ul', params.row.value.map(item => {
@@ -132,12 +148,12 @@ export default {
                                 value: this.period['product_id']
                             },
                             {
-                                key: '周期',
-                                value: this.period['period']
+                                key: '调度',
+                                value: this.period['scheduler']
                             },
                             {
                                 key: '定时时间',
-                                value: this.period['date'].split('T')[0] + ' ' + this.period['time']
+                                value: this.period['once']['date'].split(' ')[0] + ' ' + this.period['once']['time']
                             },
                             {
                                 key: '并行',
@@ -149,7 +165,7 @@ export default {
                             },
                             {
                                 key: '类型',
-                                value: this.period['type']
+                                value: this.period['execute']
                             },
                             {
                                 key: 'SLS',
@@ -160,8 +176,8 @@ export default {
                                 value: this.period['shell']
                             },
                             {
-                                key: 'Cron',
-                                value: this.period['cron']
+                                key: '周期',
+                                value: ''
                             },
                             {
                                 key: '目标组',
@@ -173,11 +189,7 @@ export default {
                             },
                             {
                                 key: '结果',
-                                value: this.period['result'],
-//                                cellClassName: {
-//                                    key: 'demo-table-info-row',
-//                                    value: 'demo-table-info-column'
-//                                }
+                                value: this.period['result']
                             }
                         );
                     } else {
@@ -206,7 +218,7 @@ export default {
     },
     mounted () {
         this.init();
-        this.timer = setInterval(this.getPeriod, 5000);
+        this.timer = setInterval(this.getPeriod, 500000);
     },
     watch: {
         '$route' () {
@@ -219,29 +231,3 @@ export default {
     }
 };
 </script>
-<style>
-    .ivu-table .demo-table-info-row td{
-        background-color: #2db7f5;
-        color: #fff;
-    }
-    .ivu-table .demo-table-error-row td{
-        background-color: #ff6600;
-        color: #fff;
-    }
-    .ivu-table td.demo-table-info-column{
-        background-color: #64d572;
-        color: #fff;
-    }
-    .ivu-table .demo-table-info-cell-name {
-        background-color: #2db7f5;
-        color: #fff;
-    }
-    .ivu-table .demo-table-info-cell-age {
-        background-color: #ff6600;
-        color: #fff;
-    }
-    .ivu-table .demo-table-info-cell-address {
-        background-color: #187;
-        color: #fff;
-    }
-</style>

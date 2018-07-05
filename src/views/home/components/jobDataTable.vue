@@ -55,12 +55,9 @@ export default {
                 },
                 {
                     title: '时间',
-                    key: 'data',
+                    key: 'timestamp',
                     sortable: true,
-                    width: 160,
-                    render: (h, params) => {
-                        return params.row.date.split('T')[0] + ' ' + params.row.time;
-                    }
+                    width: 160
                 },
                 {
                     title: '状态',

@@ -31,38 +31,91 @@
                             </Col>
                          </Row>
                     </FormItem>
-                    <FormItem label="周期">
-                        <RadioGroup v-model="formValidate.period">
+                    <FormItem label="调度">
+                        <RadioGroup v-model="formValidate.scheduler">
                             <Radio label="once">一次</Radio>
                             <Radio label="period">周期性</Radio>
+                            <Radio label="crontab">计划任务</Radio>
                         </RadioGroup>
                     </FormItem>
-                    <FormItem label="时间" v-show="formValidate.period === 'once'">
+                    <FormItem label="时间" v-show="formValidate.scheduler === 'once'">
                         <Row>
                             <Col span="6">
-                                <RadioGroup v-model="formValidate.time_type">
+                                <RadioGroup v-model="formValidate.once.type">
                                     <Radio label="now">立即</Radio>
                                     <Radio label="timing">定时</Radio>
                                 </RadioGroup>
                             </Col>
-                            <Col span="8" v-if="formValidate.time_type === 'timing'">
+                            <Col span="8" v-if="formValidate.once.type === 'timing'">
                                 <FormItem prop="date">
-                                    <DatePicker type="date" :options="optionsDate" placeholder="Select date" v-model="formValidate.date"></DatePicker>
+                                    <DatePicker type="date" :options="optionsDate" placeholder="Select date" v-model="formValidate.once.date"></DatePicker>
                                 </FormItem>
                             </Col>
-                            <Col span="1" style="text-align: center" v-show="formValidate.time_type === 'timing'">-</Col>
-                            <Col span="9" v-if="formValidate.time_type === 'timing'">
+                            <Col span="1" style="text-align: center" v-show="formValidate.once.type === 'timing'">-</Col>
+                            <Col span="9" v-if="formValidate.once.type === 'timing'">
                                 <FormItem prop="time">
-                                    <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>
+                                    <TimePicker type="time" placeholder="Select time" v-model="formValidate.once.time"></TimePicker>
                                 </FormItem>
                             </Col>
                         </Row>
                     </FormItem>
-                    <FormItem label="周期" v-show="formValidate.period === 'period'">
-                        <Input v-model="formValidate.cron"></Input>
+                    <FormItem label="周期" v-show="formValidate.scheduler === 'period'">
+                        <Col span="1">
+                            每
+                        </Col>
+                        <Col span="10" style="padding-right: 20px">
+                            <InputNumber :min="1" v-model="formValidate.period.interval"></InputNumber>
+                        </Col>
+                        <Col span="13">
+                            <RadioGroup v-model="formValidate.period.type">
+                                <Radio label="second">秒</Radio>
+                                <Radio label="minute">分</Radio>
+                                <Radio label="hour">时</Radio>
+                                <Radio label="day">天</Radio>
+                                <Radio label="week">周</Radio>
+                            </RadioGroup>
+                        </Col>
+                    </FormItem>
+                    <FormItem label="计划任务" v-show="formValidate.scheduler === 'crontab'">
+                        <Col span="4">
+                            <span style="padding-right: 3px">秒</span>
+                            <Select v-model="formValidate.crontab.second" style="width:50px">
+                                <Option v-for="item in second" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="4">
+                            <span style="padding-right: 3px">分</span>
+                            <Select v-model="formValidate.crontab.minute" style="width:50px">
+                                <Option v-for="item in minute" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="4">
+                            <span style="padding-right: 3px">时</span>
+                            <Select v-model="formValidate.crontab.hour" style="width:50px">
+                                <Option v-for="item in hour" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="4">
+                            <span style="padding-right: 3px">日</span>
+                            <Select v-model="formValidate.crontab.day" style="width:50px">
+                                <Option v-for="item in day" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="4">
+                            <span style="padding-right: 3px">周</span>
+                            <Select v-model="formValidate.crontab.week" style="width:50px">
+                                <Option v-for="item in week" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="4">
+                            <span style="padding-right: 3px">月</span>
+                            <Select v-model="formValidate.crontab.month" style="width:50px">
+                                <Option v-for="item in month" :value="item" :key="item">{{item}}</Option>
+                            </Select>
+                        </Col>
                     </FormItem>
                     <FormItem label="类型">
-                        <RadioGroup v-model="formValidate.type">
+                        <RadioGroup v-model="formValidate.execute">
                             <span @click="handleSLS()"><Radio label="sls">SLS</Radio></span>
                             <span @click="handleShell()"><Radio label="shell">Shell</Radio></span>
                             <!--<span @click="handleModule()"><Radio label="module">Module</Radio></span>-->
@@ -190,12 +243,12 @@
                     },
                     {
                         title: '类型',
-                        key: 'type',
+                        key: 'execute',
                         sortable: true
                     },
                     {
-                        title: '周期',
-                        key: 'period',
+                        title: '调度',
+                        key: 'scheduler',
                         sortable: true
                     },
                     {
@@ -252,19 +305,26 @@
                                             this.id = params.row.id;
                                             this.formValidate.name = params.row.name;
                                             this.formValidate.description = params.row.description;
-                                            this.formValidate.time_type = params.row.time_type;
-                                            if (this.formValidate.time_type === 'now') {
-                                                this.formValidate.date = '';
-                                                this.formValidate.time = '';
+                                            this.formValidate.once.type = params.row.once.type;
+                                            if (this.formValidate.once.type === 'now') {
+                                                this.formValidate.once.date = '';
+                                                this.formValidate.once.time = '';
                                             } else {
-                                                this.formValidate.date = params.row.date;
-                                                this.formValidate.time = params.row.time;
+                                                // 字符串转成时间格式
+                                                this.formValidate.once.date = new Date(params.row.once.date);
+                                                this.formValidate.once.time = params.row.once.time;
                                             }
-                                            this.formValidate.period = params.row.period;
+                                            this.formValidate.scheduler = params.row.scheduler;
+                                            this.formValidate.crontab.second = params.row.crontab.second;
+                                            this.formValidate.crontab.minute = params.row.crontab.minute;
+                                            this.formValidate.crontab.hour = params.row.crontab.hour;
+                                            this.formValidate.crontab.day = params.row.crontab.day;
+                                            this.formValidate.crontab.week = params.row.crontab.week;
+                                            this.formValidate.crontab.month = params.row.crontab.month;
                                             this.formValidate.concurrent = params.row.concurrent;
                                             this.formValidate.interval = params.row.interval;
-                                            this.formValidate.type = params.row.type;
-                                            if (params.row.type === 'sls') {
+                                            this.formValidate.execute = params.row.execute;
+                                            if (params.row.excute === 'sls') {
                                                 this.handleSLS();
                                             } else {
                                                 this.handleShell();
@@ -384,9 +444,26 @@
                     shell: '',
                     concurrent: 0,
                     interval: 60,
-                    period: 'period',
-                    type: 'sls',
-                    time_type: 'now'
+                    scheduler: 'period',
+                    once: {
+                        type: 'now',
+                        time: '',
+                        date: ''
+                    },
+                    period: {
+                        type: '',
+                        interval: 1
+                    },
+                    crontab: {
+                        type: '',
+                        second: 0,
+                        minute: 0,
+                        hour: 0,
+                        day: 0,
+                        week: 0,
+                        month: 0
+                    },
+                    execute: 'sls'
                 },
                 ruleValidate: {
                     name: [
@@ -401,12 +478,14 @@
                     sls: [
                         { required: true, type: 'string', message: 'State SLS 不能为空', trigger: 'blur' }
                     ],
-                    date: [
-                        { required: true, type: 'date', message: '请选择日期', trigger: 'change' }
-                    ],
-                    time: [
-                        { required: true, type: 'string', message: '请选择时间', trigger: 'change' }
-                    ],
+                    once: {
+                        date: [
+                            { required: true, type: 'date', message: '请选择日期', trigger: 'change' }
+                        ],
+                        time: [
+                            { required: true, type: 'string', message: '请选择时间', trigger: 'change' }
+                        ]
+                    },
                     shell: [
                         { required: true, type: 'string', message: 'Shell 代码不能为空', trigger: 'blur' }
                     ]
@@ -426,6 +505,32 @@
                     }
                 ]
             };
+        },
+        computed: {
+            second: function () {
+                let s = [...Array(60).keys()];
+                return s;
+            },
+            minute: function () {
+                let s = [...Array(60).keys()];
+                return s;
+            },
+            hour: function () {
+                let s = [...Array(25).keys()];
+                return s;
+            },
+            day: function () {
+                let s = [...Array(32).keys()];
+                return s;
+            },
+            week: function () {
+                let s = [...Array(9).keys()];
+                return s;
+            },
+            month: function () {
+                let s = [...Array(13).keys()];
+                return s;
+            }
         },
         watch: {
             // 监控产品线变化
@@ -469,13 +574,13 @@
                 this.optionType = 'add';
                 this.optionTypeName = '创建';
                 this.formView = true;
-                this.formValidate.date = '';
-                this.formValidate.time = '';
+                this.formValidate.once.date = '';
+                this.formValidate.once.time = '';
                 this.formValidate.concurrent = 0;
                 this.formValidate.interval = 60;
-                this.formValidate.time_type = 'now';
-                this.formValidate.period = 'period';
-                this.formValidate.type = 'sls';
+                this.formValidate.once.type = 'now';
+                this.formValidate.scheduler = 'period';
+                this.formValidate.execute = 'sls';
                 this.slsShow = true;
                 this.shellShow = false;
                 // 假如打开编辑，在添加后进行编辑框的内容清除
@@ -748,7 +853,7 @@
         },
         // 定时刷新
         mounted () {
-            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000);
+            this.timer = setInterval(this.$refs.childrenMethods.tableList, 500000);
         },
         // 关闭销毁
         beforeDestroy () {
