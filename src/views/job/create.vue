@@ -282,15 +282,16 @@
                         width: 155,
                         fixed: 'right',
                         render: (h, params) => {
-                            let audit = params.row.audit;
-                            return this.formatTime(audit[audit.length - 1].timestamp);
+                            return params.row.audit.map(item => {
+                                return this.formatTime(item.result.timestamp);
+                            });
                         }
                     },
                     {
                         title: '状态',
                         key: 'status',
                         sortable: true,
-                        width: 140,
+                        width: 120,
                         fixed: 'right',
                         render: (h, params) => {
                             let tagColor = 'green';
@@ -309,7 +310,7 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 330,
+                        width: 310,
                         align: 'center',
                         fixed: 'right',
                         render: (h, params) => {
