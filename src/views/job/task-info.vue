@@ -47,7 +47,7 @@ export default {
                                         props: {
                                             'color': 'green'
                                         }
-                                    }, item.time),
+                                    }, this.formatTime(item.time)),
                                     h('div', Object.keys(item.result).map(k => {
                                         // 执行SLS的时候返回的是个object
                                         if (typeof item.result[k] === 'object') {
@@ -97,19 +97,23 @@ export default {
                             }
                         } else if (params.row.key === '审计') {
                             return h('ul', params.row.value.map(item => {
-                                return h('li', [
-                                    h('Tag', {
-                                        props: {
-                                            'color': 'yellow'
-                                        }
-                                    }, item.timestamp),
-                                    h('Tag', {
-                                        props: {
-                                            'color': 'green'
-                                        }
-                                    }, item.user),
-                                    h('Tag', {}, item.option)
-                                ]);
+                                if (item.timestamp === '') {
+                                    return '.........';
+                                } else {
+                                    return h('li', [
+                                        h('Tag', {
+                                            props: {
+                                                'color': 'yellow'
+                                            }
+                                        }, this.formatTime(item.timestamp)),
+                                        h('Tag', {
+                                            props: {
+                                                'color': 'green'
+                                            }
+                                        }, item.user),
+                                        h('Tag', {}, item.option)
+                                    ]);
+                                }
                             }));
                         } else {
                             return params.row.value;
@@ -177,7 +181,7 @@ export default {
                             },
                             {
                                 key: '周期',
-                                value: ''
+                                value: '*/' + this.period['period']['interval'] + ' ' + this.period['period']['type']
                             },
                             {
                                 key: '目标组',
@@ -215,10 +219,22 @@ export default {
                 duration: 10
             });
         },
+        formatTime (time) {
+            let unixtime = time;
+            let unixTimestamp = new Date(unixtime * 1000);
+            let Y = unixTimestamp.getFullYear();
+            let M = ((unixTimestamp.getMonth() + 1) > 10 ? (unixTimestamp.getMonth() + 1) : '0' + (unixTimestamp.getMonth() + 1));
+            let D = (unixTimestamp.getDate() >= 10 ? unixTimestamp.getDate() : '0' + unixTimestamp.getDate());
+            let h = (unixTimestamp.getHours() >= 10 ? unixTimestamp.getHours() : '0' + unixTimestamp.getHours());
+            let m = (unixTimestamp.getMinutes() >= 10 ? unixTimestamp.getMinutes() : '0' + unixTimestamp.getMinutes());
+            let s = (unixTimestamp.getSeconds() >= 10 ? unixTimestamp.getSeconds() : '0' + unixTimestamp.getSeconds());
+            let toDay = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s;
+            return toDay;
+        }
     },
     mounted () {
         this.init();
-        this.timer = setInterval(this.getPeriod, 500000);
+        this.timer = setInterval(this.getPeriod, 5000);
     },
     watch: {
         '$route' () {

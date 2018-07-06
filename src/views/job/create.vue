@@ -208,6 +208,8 @@
                         title: 'Job 名',
                         key: 'name',
                         sortable: true,
+                        width: 160,
+                        fixed: 'left',
                         render: (h, params) => {
                             return h('div', [
                                 h('Tooltip', {
@@ -223,12 +225,14 @@
                     {
                         title: '描述',
                         key: 'description',
+                        width: 160,
                         sortable: true
                     },
                     {
                         title: '目标',
                         key: 'target',
                         sortable: true,
+                        width: 160,
                         render: (h, params) => {
                             return h('ul', params.row.target.map(item => {
                                 return h('li', {
@@ -244,21 +248,50 @@
                     {
                         title: '类型',
                         key: 'execute',
-                        sortable: true
+                        sortable: true,
+                        width: 100
                     },
                     {
                         title: '调度',
                         key: 'scheduler',
-                        sortable: true
+                        sortable: true,
+                        width: 100,
+                        render: (h, params) => {
+                            if (params.row.scheduler === 'once') {
+                                return '一次';
+                            } else if (params.row.scheduler === 'period') {
+                                return '周期';
+                            } else {
+                                return '计划任务';
+                            }
+                        }
                     },
                     {
                         title: '创建时间',
-                        key: 'timestamp'
+                        key: 'timestamp',
+                        sortable: true,
+                        width: 155,
+                        render: (h, params) => {
+                            return this.formatTime(params.row.timestamp);
+                        }
+                    },
+                    {
+                        title: '更新时间',
+                        key: 'audit',
+                        sortable: true,
+                        width: 155,
+                        fixed: 'right',
+                        render: (h, params) => {
+                            let audit = params.row.audit;
+                            return this.formatTime(audit[audit.length - 1].timestamp);
+                        }
                     },
                     {
                         title: '状态',
                         key: 'status',
                         sortable: true,
+                        width: 140,
+                        fixed: 'right',
                         render: (h, params) => {
                             let tagColor = 'green';
                             if (params.row.status.id === 0) {
@@ -278,6 +311,7 @@
                         key: 'action',
                         width: 330,
                         align: 'center',
+                        fixed: 'right',
                         render: (h, params) => {
                             let pause = true;
                             let play = true;
@@ -323,8 +357,10 @@
                                             this.formValidate.crontab.month = params.row.crontab.month;
                                             this.formValidate.concurrent = params.row.concurrent;
                                             this.formValidate.interval = params.row.interval;
+                                            this.formValidate.period.interval = params.row.period.interval;
+                                            this.formValidate.period.type = params.row.period.type;
                                             this.formValidate.execute = params.row.execute;
-                                            if (params.row.excute === 'sls') {
+                                            if (params.row.execute === 'sls') {
                                                 this.handleSLS();
                                             } else {
                                                 this.handleShell();
@@ -451,7 +487,7 @@
                         date: ''
                     },
                     period: {
-                        type: '',
+                        type: 'minute',
                         interval: 1
                     },
                     crontab: {
@@ -484,6 +520,11 @@
                         ],
                         time: [
                             { required: true, type: 'string', message: '请选择时间', trigger: 'change' }
+                        ]
+                    },
+                    period: {
+                        type: [
+                            { required: true, type: 'string', message: '请选择周期单位', trigger: 'change' }
                         ]
                     },
                     shell: [
@@ -849,11 +890,23 @@
                     this.$refs.vscode.destroyMonaco();
                     this.$refs.vscode.createMonaco();
                 }, 1);
+            },
+            formatTime (time) {
+                let unixtime = time;
+                let unixTimestamp = new Date(unixtime * 1000);
+                let Y = unixTimestamp.getFullYear();
+                let M = ((unixTimestamp.getMonth() + 1) >= 10 ? (unixTimestamp.getMonth() + 1) : '0' + (unixTimestamp.getMonth() + 1));
+                let D = (unixTimestamp.getDate() >= 10 ? unixTimestamp.getDate() : '0' + unixTimestamp.getDate());
+                let h = (unixTimestamp.getHours() >= 10 ? unixTimestamp.getHours() : '0' + unixTimestamp.getHours());
+                let m = (unixTimestamp.getMinutes() >= 10 ? unixTimestamp.getMinutes() : '0' + unixTimestamp.getMinutes());
+                let s = (unixTimestamp.getSeconds() >= 10 ? unixTimestamp.getSeconds() : '0' + unixTimestamp.getSeconds());
+                let toDay = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s;
+                return toDay;
             }
         },
         // 定时刷新
         mounted () {
-            this.timer = setInterval(this.$refs.childrenMethods.tableList, 500000);
+            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000);
         },
         // 关闭销毁
         beforeDestroy () {
