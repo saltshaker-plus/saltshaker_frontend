@@ -73,10 +73,7 @@
                     {
                         title: '时间',
                         key: '_stamp',
-                        sortable: true,
-                        render: (h, params) => {
-                            return this.convertTime(params.row._stamp);
-                        }
+                        sortable: true
                     }
                 ]
             };
