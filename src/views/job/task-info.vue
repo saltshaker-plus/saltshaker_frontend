@@ -83,12 +83,6 @@ export default {
                                     'style': 'overflow:auto'
                                 }
                             }, params.row.value);
-                        } else if (params.row.key === '定时时间') {
-                            if (params.row.value !== ' ') {
-                                return params.row.value;
-                            } else {
-                                return '立即';
-                            }
                         } else if (params.row.key === '调度') {
                             if (params.row.value === 'once') {
                                 return '一次';
@@ -134,6 +128,19 @@ export default {
                     if (res.data['status'] === true) {
                         this.period = res.data['data'];
                         this.task = [];
+                        let timing = '';
+                        let period = '';
+                        if (this.period['scheduler'] !== 'once') {
+                            timing = '';
+                            period = this.period['period']['interval'] + '/' + this.period['period']['type'][0];
+                        } else {
+                            if (this.period['once']['type'] === 'now') {
+                                timing = '立即';
+                            } else {
+                                timing = this.period['once']['date'].split(' ')[0] + ' ' + this.period['once']['time'];
+                            }
+                            period = '';
+                        }
                         this.task.push(
                             {
                                 key: 'ID',
@@ -157,7 +164,11 @@ export default {
                             },
                             {
                                 key: '定时时间',
-                                value: this.period['once']['date'].split(' ')[0] + ' ' + this.period['once']['time']
+                                value: timing
+                            },
+                            {
+                                key: '周期',
+                                value: period
                             },
                             {
                                 key: '并行',
@@ -170,19 +181,24 @@ export default {
                             {
                                 key: '类型',
                                 value: this.period['execute']
-                            },
-                            {
-                                key: 'SLS',
-                                value: this.period['sls']
-                            },
-                            {
-                                key: 'Shell',
-                                value: this.period['shell']
-                            },
-                            {
-                                key: '周期',
-                                value: '*/' + this.period['period']['interval'] + ' ' + this.period['period']['type']
-                            },
+                            }
+                        );
+                        if (this.period['execute'] === 'shell') {
+                            this.task.push(
+                                {
+                                    key: 'Shell',
+                                    value: this.period['shell']
+                                }
+                            );
+                        } else {
+                            this.task.push(
+                                {
+                                    key: 'SLS',
+                                    value: this.period['sls']
+                                }
+                            );
+                        }
+                        this.task.push(
                             {
                                 key: '目标组',
                                 value: this.period['target']

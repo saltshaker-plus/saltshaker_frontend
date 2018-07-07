@@ -316,12 +316,16 @@
                         render: (h, params) => {
                             let pause = true;
                             let play = true;
+                            let reopen = true;
                             if (params.row.concurrent !== 0) {
                                 if (params.row.action === 'play') {
                                     pause = false;
                                 } else {
                                     play = false;
                                 }
+                            }
+                            if (params.row.scheduler === 'once' && params.row.once.type === 'now') {
+                                reopen = false;
                             }
                             return h('div', [
                                 h('Button', {
@@ -436,7 +440,8 @@
                                 h('Button', {
                                     props: {
                                         type: 'default',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled: reopen
                                     },
                                     style: {
                                         marginRight: '5px'

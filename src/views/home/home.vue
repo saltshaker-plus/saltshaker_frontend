@@ -85,18 +85,22 @@
             </Col>
         </Row>
         <Row :gutter="10">
-            <Col :md="12" :lg="6" :style="{marginBottom: '10px'}">
-                <Card dis-hover>
+            <Col :md="12" :lg="7" :style="{marginBottom: '10px'}">
+                <Card :padding="0" dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="android-map"></Icon>
                         服务状态
                     </p>
                     <div class="data-source-row">
-                        <!--<minion-status :productId="productId"></minion-status>-->
+                        <div class="map-con">
+                            <Col span="24">
+                                <service-status height="338" :productId="productId" :style-obj="{margin: '0px 0 0 0px'}"></service-status>
+                            </Col>
+                        </div>
                     </div>
                 </Card>
             </Col>
-            <Col :md="12" :lg="18" :style="{marginBottom: '10px'}">
+            <Col :md="12" :lg="17" :style="{marginBottom: '10px'}">
                 <Card dis-hover>
                     <p slot="title" class="card-title">
                         <Icon type="ios-pulse-strong"></Icon>
@@ -135,7 +139,7 @@
                         </Dropdown>
                     </p>
                     <div class="data-source-row">
-                        <grains-pie :productId="productId" :item="item" :itemName="itemName"></grains-pie>
+                        <grains-pie height="305" :productId="productId" :item="item" :itemName="itemName"></grains-pie>
                     </div>
                 </Card>
             </Col>
@@ -148,6 +152,7 @@ import grainsPie from './components/grainsPie.vue';
 import minionStatus from './components/minionStatus.vue';
 import inforCard from './components/inforCard.vue';
 import jobDataTable from './components/jobDataTable.vue';
+import serviceStatus from './components/serviceStatus.vue';
 
 export default {
     name: 'home',
@@ -155,7 +160,8 @@ export default {
         grainsPie,
         minionStatus,
         inforCard,
-        jobDataTable
+        jobDataTable,
+        serviceStatus
     },
     data () {
         return {

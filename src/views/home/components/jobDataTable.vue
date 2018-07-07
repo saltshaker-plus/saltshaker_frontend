@@ -44,25 +44,43 @@ export default {
                     }
                 },
                 {
-                    title: '类型',
-                    key: 'type',
-                    sortable: true
+                    title: '调度',
+                    key: 'scheduler',
+                    sortable: true,
+                    render: (h, params) => {
+                        if (params.row.scheduler === 'once') {
+                            return '一次';
+                        } else if (params.row.scheduler === 'period') {
+                            return '周期';
+                        } else {
+                            return '计划任务';
+                        }
+                    }
                 },
                 {
-                    title: '并行数',
-                    key: 'concurrent',
-                    sortable: true
+                    title: '周期',
+                    key: 'period',
+                    sortable: true,
+                    render: (h, params) => {
+                        return params.row.period.interval + '/' + params.row.period.type[0];
+                    }
                 },
                 {
-                    title: '时间',
+                    title: '更新时间',
                     key: 'timestamp',
                     sortable: true,
-                    width: 160
+                    width: 160,
+                    render: (h, params) => {
+                        return params.row.audit.map(item => {
+                            return this.formatTime(item.result.timestamp);
+                        });
+                    }
                 },
                 {
                     title: '状态',
                     key: 'status',
                     sortable: true,
+                    width: 120,
                     render: (h, params) => {
                         let tagColor = 'green';
                         if (params.row.status.id === 4) {
@@ -95,7 +113,7 @@ export default {
     },
     methods: {
         tableList () {
-            this.axios.get(this.Global.serverSrc + 'period' + '?product_id=' + this.productId).then(
+            this.axios.get(this.Global.serverSrc + 'period' + '?product_id=' + this.productId + '&scheduler_type=once').then(
                 res => {
                     if (res.data['status'] === true) {
                         this.jobData = res.data['data'];
@@ -126,6 +144,18 @@ export default {
                 desc: info.toString().replace(/<|>/g, ''),
                 duration: 10
             });
+        },
+        formatTime (time) {
+            let unixtime = time;
+            let unixTimestamp = new Date(unixtime * 1000);
+            let Y = unixTimestamp.getFullYear();
+            let M = ((unixTimestamp.getMonth() + 1) > 10 ? (unixTimestamp.getMonth() + 1) : '0' + (unixTimestamp.getMonth() + 1));
+            let D = (unixTimestamp.getDate() >= 10 ? unixTimestamp.getDate() : '0' + unixTimestamp.getDate());
+            let h = (unixTimestamp.getHours() >= 10 ? unixTimestamp.getHours() : '0' + unixTimestamp.getHours());
+            let m = (unixTimestamp.getMinutes() >= 10 ? unixTimestamp.getMinutes() : '0' + unixTimestamp.getMinutes());
+            let s = (unixTimestamp.getSeconds() >= 10 ? unixTimestamp.getSeconds() : '0' + unixTimestamp.getSeconds());
+            let toDay = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s;
+            return toDay;
         }
     }
 };
