@@ -310,7 +310,7 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 310,
+                        width: 220,
                         align: 'center',
                         fixed: 'right',
                         render: (h, params) => {
@@ -408,55 +408,10 @@
                                 h('Button', {
                                     props: {
                                         type: 'default',
-                                        size: 'small',
-                                        disabled: pause
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.id = params.row.id;
-                                            this.handlePause();
-                                        }
-                                    }
-                                }, '暂停'),
-                                h('Button', {
-                                    props: {
-                                        type: 'default',
-                                        size: 'small',
-                                        disabled: play
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.id = params.row.id;
-                                            this.handlePlay();
-                                        }
-                                    }
-                                }, '继续'),
-                                h('Button', {
-                                    props: {
-                                        type: 'default',
-                                        size: 'small',
-                                        disabled: reopen
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.id = params.row.id;
-                                            this.handleReopen();
-                                        }
-                                    }
-                                }, '重开'),
-                                h('Button', {
-                                    props: {
-                                        type: 'default',
                                         size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
                                     },
                                     on: {
                                         click: () => {
@@ -467,7 +422,90 @@
                                             });
                                         }
                                     }
-                                }, '详情')
+                                }, '详情'),
+                                h('Dropdown', {
+                                    props: {
+                                        placement: 'bottom-end',
+                                        transfer: true
+                                    }
+                                }, [
+                                    h('Button', {
+                                        props: {
+                                            type: 'default',
+                                            size: 'small'
+                                        }
+                                    }, '更多'),
+                                    h('DropdownMenu', {
+                                        slot: 'list'
+                                    }, [
+                                        h('DropdownItem', {
+                                            props: {
+                                                disabled: reopen
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handleReopen();
+                                                }
+                                            }
+                                        }, '重开'),
+                                        h('DropdownItem', {
+                                            props: {
+                                                disabled: pause
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handlePause();
+                                                }
+                                            }
+                                        }, '暂停分组'),
+                                        h('DropdownItem', {
+                                            props: {
+                                                disabled: play
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handlePlay();
+                                                }
+                                            }
+                                        }, '继续分组'),
+                                        h('DropdownItem', {
+                                            props: {
+                                                disabled: pause
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handlePause();
+                                                }
+                                            }
+                                        }, '暂停周期'),
+                                        h('DropdownItem', {
+                                            props: {
+                                                disabled: play
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handlePlay();
+                                                }
+                                            }
+                                        }, '继续周期'),
+                                        h('DropdownItem', {
+                                            props: {
+                                                divided: true
+                                            },
+                                            nativeOn: {
+                                                click: () => {
+                                                    this.id = params.row.id;
+                                                    this.handlePlay();
+                                                }
+                                            }
+                                        }, '删除')
+                                    ])
+                                ])
                             ]);
                         }
                     }
@@ -912,7 +950,7 @@
         },
         // 定时刷新
         mounted () {
-            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000);
+            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000000000);
         },
         // 关闭销毁
         beforeDestroy () {
