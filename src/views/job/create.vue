@@ -162,6 +162,11 @@
                     <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
                 </div>
             </Modal>
+            <Modal slot="option" v-model="job" title="删除Job" @on-ok="del()">
+                <div style="text-align:center">
+                    <p>确定删除 <span style="color: red">{{jobName}}</span> 吗？</p>
+                </div>
+            </Modal>
         </common-table>
 </div>
 </template>
@@ -185,6 +190,8 @@
                 // 编辑数据
                 formView: false,
                 id: '',
+                job: false,
+                jobName: '',
                 optionType: '',
                 optionTypeName: '',
                 targetData: [],
@@ -208,8 +215,6 @@
                         title: 'Job 名',
                         key: 'name',
                         sortable: true,
-                        width: 160,
-                        fixed: 'left',
                         render: (h, params) => {
                             return h('div', [
                                 h('Tooltip', {
@@ -225,14 +230,12 @@
                     {
                         title: '描述',
                         key: 'description',
-                        width: 160,
                         sortable: true
                     },
                     {
                         title: '目标',
                         key: 'target',
                         sortable: true,
-                        width: 160,
                         render: (h, params) => {
                             return h('ul', params.row.target.map(item => {
                                 return h('li', {
@@ -244,12 +247,6 @@
                             })
                             );
                         }
-                    },
-                    {
-                        title: '类型',
-                        key: 'execute',
-                        sortable: true,
-                        width: 100
                     },
                     {
                         title: '调度',
@@ -270,7 +267,6 @@
                         title: '创建时间',
                         key: 'timestamp',
                         sortable: true,
-                        width: 155,
                         render: (h, params) => {
                             return this.formatTime(params.row.timestamp);
                         }
@@ -279,8 +275,6 @@
                         title: '更新时间',
                         key: 'audit',
                         sortable: true,
-                        width: 155,
-                        fixed: 'right',
                         render: (h, params) => {
                             return params.row.audit.map(item => {
                                 return this.formatTime(item.result.timestamp);
@@ -292,11 +286,12 @@
                         key: 'status',
                         sortable: true,
                         width: 120,
-                        fixed: 'right',
                         render: (h, params) => {
                             let tagColor = 'green';
                             if (params.row.status.id === 0) {
                                 tagColor = 'red';
+                            } else if (params.row.status.id === 11) {
+                                tagColor = 'yellow';
                             }
                             return h('div', [
                                 h('Tag', {
@@ -310,18 +305,26 @@
                     {
                         title: '操作',
                         key: 'action',
-                        width: 220,
+                        width: 170,
                         align: 'center',
-                        fixed: 'right',
                         render: (h, params) => {
-                            let pause = true;
-                            let play = true;
+                            let concurrentPause = true;
+                            let concurrentPlay = true;
+                            let schedulerPause = true;
+                            let schedulerResume = true;
                             let reopen = true;
                             if (params.row.concurrent !== 0) {
-                                if (params.row.action === 'play') {
-                                    pause = false;
+                                if (params.row.action === 'concurrent_play') {
+                                    concurrentPause = false;
                                 } else {
-                                    play = false;
+                                    concurrentPlay = false;
+                                }
+                            }
+                            if (params.row.scheduler !== 'once') {
+                                if (params.row.action === 'scheduler_resume') {
+                                    schedulerPause = false;
+                                } else if (params.row.action === 'scheduler_pause') {
+                                    schedulerResume = false;
                                 }
                             }
                             if (params.row.scheduler === 'once' && params.row.once.type === 'now') {
@@ -380,31 +383,6 @@
                                         }
                                     }
                                 }, '编辑'),
-                                h('Poptip', {
-                                    props: {
-                                        confirm: true,
-                                        title: '确定要删除 ' + params.row.name + ' 吗?',
-                                        transfer: true,
-                                        placement: 'top-end'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        'on-ok': () => {
-                                            this.delId = params.row.id;
-                                            this.delIndex = params.index;
-                                            this.del();
-                                        }
-                                    }
-                                }, [
-                                    h('Button', {
-                                        props: {
-                                            type: 'error',
-                                            size: 'small'
-                                        }
-                                    }, '删除')
-                                ]),
                                 h('Button', {
                                     props: {
                                         type: 'default',
@@ -451,7 +429,7 @@
                                         }, '重开'),
                                         h('DropdownItem', {
                                             props: {
-                                                disabled: pause
+                                                disabled: concurrentPause
                                             },
                                             nativeOn: {
                                                 click: () => {
@@ -459,10 +437,10 @@
                                                     this.handlePause();
                                                 }
                                             }
-                                        }, '暂停分组'),
+                                        }, '暂停并行'),
                                         h('DropdownItem', {
                                             props: {
-                                                disabled: play
+                                                disabled: concurrentPlay
                                             },
                                             nativeOn: {
                                                 click: () => {
@@ -470,26 +448,26 @@
                                                     this.handlePlay();
                                                 }
                                             }
-                                        }, '继续分组'),
+                                        }, '继续并行'),
                                         h('DropdownItem', {
                                             props: {
-                                                disabled: pause
+                                                disabled: schedulerPause
                                             },
                                             nativeOn: {
                                                 click: () => {
                                                     this.id = params.row.id;
-                                                    this.handlePause();
+                                                    this.handleSchedulerPause();
                                                 }
                                             }
                                         }, '暂停周期'),
                                         h('DropdownItem', {
                                             props: {
-                                                disabled: play
+                                                disabled: schedulerResume
                                             },
                                             nativeOn: {
                                                 click: () => {
                                                     this.id = params.row.id;
-                                                    this.handlePlay();
+                                                    this.handleSchedulerResume();
                                                 }
                                             }
                                         }, '继续周期'),
@@ -499,8 +477,10 @@
                                             },
                                             nativeOn: {
                                                 click: () => {
-                                                    this.id = params.row.id;
-                                                    this.handlePlay();
+                                                    this.delId = params.row.id;
+                                                    this.delIndex = params.index;
+                                                    this.jobName = params.row.name;
+                                                    this.job = true;
                                                 }
                                             }
                                         }, '删除')
@@ -828,7 +808,7 @@
                     });
             },
             handlePause () {
-                this.axios.put(this.Global.serverSrc + 'period/pause/' + this.id + '?product_id=' + this.productId).then(
+                this.axios.put(this.Global.serverSrc + 'period/concurrent/pause/' + this.id + '?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.$Message.success('成功！');
@@ -848,13 +828,53 @@
                     });
             },
             handlePlay () {
-                this.axios.put(this.Global.serverSrc + 'period/play/' + this.id + '?product_id=' + this.productId).then(
+                this.axios.put(this.Global.serverSrc + 'period/concurrent/play/' + this.id + '?product_id=' + this.productId).then(
                     res => {
                         if (res.data['status'] === true) {
                             this.$Message.success('成功！');
                             this.tableList();
                         } else {
                             this.nError('Play Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Play Failure', errInfo);
+                    });
+            },
+            handleSchedulerPause () {
+                this.axios.put(this.Global.serverSrc + 'period/scheduler/pause/' + this.id + '?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                            this.tableList();
+                        } else {
+                            this.nError('Scheduler Pause Failure', res.data['message']);
+                        }
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Play Failure', errInfo);
+                    });
+            },
+            handleSchedulerResume () {
+                this.axios.put(this.Global.serverSrc + 'period/scheduler/resume/' + this.id + '?product_id=' + this.productId).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.$Message.success('成功！');
+                            this.tableList();
+                        } else {
+                            this.nError('Scheduler Resume Failure', res.data['message']);
                         }
                     },
                     err => {
@@ -950,7 +970,7 @@
         },
         // 定时刷新
         mounted () {
-            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000000000);
+            this.timer = setInterval(this.$refs.childrenMethods.tableList, 5000);
         },
         // 关闭销毁
         beforeDestroy () {
