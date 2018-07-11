@@ -91,12 +91,10 @@
                         <Icon type="android-map"></Icon>
                         服务状态
                     </p>
-                    <div class="data-source-row">
-                        <div class="map-con">
-                            <Col span="24">
-                                <service-status height="338" :productId="productId" :style-obj="{margin: '0px 0 0 0px'}"></service-status>
-                            </Col>
-                        </div>
+                    <div class="map-con">
+                        <Col span="24">
+                            <service-status height="333" :productId="productId" :style-obj="{margin: '5px 0 0 0px'}"></service-status>
+                        </Col>
                     </div>
                 </Card>
             </Col>
