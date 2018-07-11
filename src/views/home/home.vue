@@ -91,7 +91,7 @@
                         <Icon type="android-map"></Icon>
                         服务状态
                     </p>
-                    <div class="map-con">
+                    <div class="service-status">
                         <Col span="24">
                             <service-status height="333" :productId="productId" :style-obj="{margin: '5px 0 0 0px'}"></service-status>
                         </Col>
