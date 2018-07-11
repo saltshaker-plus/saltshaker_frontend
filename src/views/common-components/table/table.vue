@@ -284,9 +284,9 @@
                                             for (let s in v) {
                                                 let z = '';
                                                 if (v[s] !== undefined) {
-                                                    z = v[s].toString();
+                                                    z = v[s].toString().toLowerCase();
                                                 }
-                                                if (z.indexOf(searchVal) > -1) {
+                                                if (z.indexOf(searchVal.toLowerCase()) > -1) {
                                                     r = true;
                                                     return r;
                                                 }
@@ -294,9 +294,9 @@
                                         } else {
                                             let y = '';
                                             if (v !== undefined) {
-                                                y = v.toString();
+                                                y = v.toString().toLowerCase();
                                             }
-                                            return y.indexOf(searchVal) > -1;
+                                            return y.indexOf(searchVal.toLowerCase()) > -1;
                                         }
                                     });
                                     return tmp.length > 0;
@@ -304,9 +304,9 @@
                                     // 转换成字符串,数字没有indexOf方法
                                     let x = '';
                                     if (value !== undefined) {
-                                        x = value.toString();
+                                        x = value.toString().toLowerCase();
                                     }
-                                    return x.indexOf(searchVal) > -1;
+                                    return x.indexOf(searchVal.toLowerCase()) > -1;
                                 }
                             });
                             searchResult = searchResult.concat(res);
