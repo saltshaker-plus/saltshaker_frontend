@@ -93,7 +93,7 @@
                     </p>
                     <div class="service-status">
                         <Col span="24">
-                            <service-status height="333" :productId="productId" :style-obj="{margin: '5px 0 0 0px'}"></service-status>
+                            <service-status height="328" :productId="productId" :style-obj="{margin: '5px 0 5px 0px'}"></service-status>
                         </Col>
                     </div>
                 </Card>
