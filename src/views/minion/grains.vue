@@ -78,6 +78,9 @@
                         width: 130,
                         sortable: true,
                         render: (h, params) => {
+                            if (params.row.ipv4 === undefined) {
+                                return '';
+                            }
                             return h('ul', params.row.ipv4.map(item => {
                                 return h('li', {
                                     style: {
@@ -143,9 +146,7 @@
                         width: 130,
                         sortable: true,
                         render: (h, params) => {
-                            console.log(params.row.dns.nameservers)
-                            console.log(params.row.dns)
-                            if (params.row.dns.nameservers === undefined) {
+                            if (params.row.dns === undefined) {
                                 return '';
                             }
                             return h('ul', params.row.dns.nameservers.map(item => {
@@ -165,6 +166,9 @@
                         width: 145,
                         sortable: true,
                         render: (h, params) => {
+                            if (params.row.selinux === undefined) {
+                                return '';
+                            }
                             let selinux = [];
                             for (let k in params.row.selinux) {
                                 selinux.push(k + ' : ' + params.row.selinux[k]);
@@ -186,6 +190,9 @@
                         width: 190,
                         sortable: true,
                         render: (h, params) => {
+                            if (params.row.locale_info === undefined) {
+                                return '';
+                            }
                             let localeInfo = [];
                             for (let k in params.row.locale_info) {
                                 localeInfo.push(k + ' : ' + params.row.locale_info[k]);
