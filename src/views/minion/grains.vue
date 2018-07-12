@@ -143,6 +143,11 @@
                         width: 130,
                         sortable: true,
                         render: (h, params) => {
+                            console.log(params.row.dns.nameservers)
+                            console.log(params.row.dns)
+                            if (params.row.dns.nameservers === undefined) {
+                                return '';
+                            }
                             return h('ul', params.row.dns.nameservers.map(item => {
                                 return h('li', {
                                     style: {
