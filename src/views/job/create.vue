@@ -35,7 +35,7 @@
                         <RadioGroup v-model="formValidate.scheduler">
                             <Radio label="once">一次</Radio>
                             <Radio label="period">周期性</Radio>
-                            <Radio label="crontab">计划任务</Radio>
+                            <Radio label="crontab" disabled>计划任务</Radio>
                         </RadioGroup>
                     </FormItem>
                     <FormItem label="时间" v-show="formValidate.scheduler === 'once'">

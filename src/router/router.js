@@ -167,7 +167,7 @@ export const appRouter = [
             { path: 'role', title: '角色管理', name: 'role', access: 101, component: () => import('@/views/role/role.vue') },
             { path: 'token', title: 'Token管理', name: 'token', access: 102, component: () => import('@/views/error-page/error-page.vue') },
             { path: 'log', title: '操作日志', name: 'log', access: 103, component: () => import('@/views/audit_log/audit_log.vue') },
-            { path: 'tools', title: '系统工具', name: 'tools', access: 104, component: () => import('@/views/error-page/error-page.vue') }
+            { path: 'tools', title: '系统工具', name: 'tools', access: 104, component: () => import('@/views/system/tool.vue') }
         ]
     }
 ];
