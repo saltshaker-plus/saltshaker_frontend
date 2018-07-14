@@ -67,9 +67,9 @@ export const appRouter = [
         access: 1,
         component: Main,
         children: [
-            { path: 'create', title: 'Job创建', name: 'create', access: 1, component: () => import('@/views/job/create.vue') },
-            { path: 'history', title: 'Job历史', name: 'history', access: 1, component: () => import('@/views/job/history.vue') },
-            { path: 'manager', title: 'Job管理', name: 'manager', access: 1, component: () => import('@/views/job/manager.vue') }
+            { path: 'create', title: 'Job创建', name: 'create', access: 10, component: () => import('@/views/job/create.vue') },
+            { path: 'history', title: 'Job历史', name: 'history', access: 11, component: () => import('@/views/job/history.vue') },
+            { path: 'manager', title: 'Job管理', name: 'manager', access: 12, component: () => import('@/views/job/manager.vue') }
         ]
     },
     {
@@ -77,12 +77,12 @@ export const appRouter = [
         icon: 'ios-keypad',
         name: 'minion',
         title: 'Minion管理',
-        access: 1,
+        access: 2,
         component: Main,
         children: [
-            { path: 'status', title: '状态信息', name: 'status', access: 1, component: () => import('@/views/minion/status.vue') },
-            { path: 'key', title: 'Key管理', name: 'key', access: 111, component: () => import('@/views/minion/key.vue') },
-            { path: 'grains', title: 'Grains', name: 'grains', access: 1, component: () => import('@/views/minion/grains.vue') }
+            { path: 'status', title: '状态信息', name: 'status', access: 20, component: () => import('@/views/minion/status.vue') },
+            { path: 'key', title: 'Key管理', name: 'key', access: 21, component: () => import('@/views/minion/key.vue') },
+            { path: 'grains', title: 'Grains', name: 'grains', access: 22, component: () => import('@/views/minion/grains.vue') }
         ]
     },
     {
@@ -90,10 +90,10 @@ export const appRouter = [
         icon: 'ios-barcode',
         name: 'host',
         title: '主机管理',
-        access: 1,
+        access: 3,
         component: Main,
         children: [
-            { path: 'index', title: '主机管理', name: 'host_index', access: 1, component: () => import('@/views/host/host.vue') }
+            { path: 'index', title: '主机管理', name: 'host_index', access: 30, component: () => import('@/views/host/host.vue') }
         ]
     },
     {
@@ -101,10 +101,10 @@ export const appRouter = [
         icon: 'social-buffer',
         name: 'group',
         title: '分组管理',
-        access: 2,
+        access: 4,
         component: Main,
         children: [
-            { path: 'index', title: '分组管理', name: 'group_index', access: 2, component: () => import('@/views/groups/groups.vue') }
+            { path: 'index', title: '分组管理', name: 'group_index', access: 40, component: () => import('@/views/groups/groups.vue') }
         ]
     },
     {
@@ -112,11 +112,11 @@ export const appRouter = [
         icon: 'document-text',
         name: 'file',
         title: '文件服务',
-        access: 1,
+        access: 5,
         component: Main,
         children: [
             // { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
-            { path: 'index', title: '文件服务', name: 'file_index', access: 1, component: () => import('@/views/fileserver/gitlab.vue') }
+            { path: 'index', title: '文件服务', name: 'file_index', access: 50, component: () => import('@/views/fileserver/gitlab.vue') }
         ]
     },
     {
@@ -124,13 +124,13 @@ export const appRouter = [
         icon: 'ios-play',
         name: 'execute',
         title: '执行命令',
-        access: 1,
+        access: 6,
         component: Main,
         children: [
-            { path: 'shell', title: 'Shell', name: 'shell', access: 1, component: () => import('@/views/execute/shell.vue') },
-            { path: 'state', title: 'State', name: 'state', access: 1, component: () => import('@/views/execute/state.vue') },
-            { path: 'module', title: 'Module', name: 'module', access: 1, component: () => import('@/views/execute/module.vue') },
-            { path: 'pillar', title: 'Pillar', name: 'pillar', access: 1, component: () => import('@/views/execute/pillar.vue') }
+            { path: 'shell', title: 'Shell', name: 'shell', access: 60, component: () => import('@/views/execute/shell.vue') },
+            { path: 'state', title: 'State', name: 'state', access: 61, component: () => import('@/views/execute/state.vue') },
+            { path: 'module', title: 'Module', name: 'module', access: 62, component: () => import('@/views/execute/module.vue') },
+            { path: 'pillar', title: 'Pillar', name: 'pillar', access: 63, component: () => import('@/views/execute/pillar.vue') }
         ]
     },
     {
@@ -138,10 +138,10 @@ export const appRouter = [
         icon: 'person-stalker',
         name: 'product',
         title: '产品线管理',
-        access: 2,
+        access: 7,
         component: Main,
         children: [
-            { path: 'index', title: '产品线管理', name: 'product_index', icon: 'social-dropbox', access: 2, component: () => import('@/views/product/product.vue') }
+            { path: 'index', title: '产品线管理', name: 'product_index', icon: 'social-dropbox', access: 70, component: () => import('@/views/product/product.vue') }
         ]
     },
     {
@@ -149,10 +149,10 @@ export const appRouter = [
         icon: 'person-stalker',
         name: 'acl',
         title: 'ACL管理',
-        access: 2,
+        access: 8,
         component: Main,
         children: [
-            { path: 'index', title: 'ACL管理', name: 'acl_index', icon: 'funnel', access: 2, component: () => import('@/views/acl/acl.vue') }
+            { path: 'index', title: 'ACL管理', name: 'acl_index', icon: 'funnel', access: 80, component: () => import('@/views/acl/acl.vue') }
         ]
     },
     {
@@ -160,7 +160,7 @@ export const appRouter = [
         icon: 'settings',
         title: '系统管理',
         name: 'system',
-        access: 0,
+        access: 100,
         component: Main,
         children: [
             { path: 'user', title: '用户管理', name: 'user', access: 100, component: () => import('@/views/user/user.vue') },
