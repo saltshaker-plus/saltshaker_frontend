@@ -67,7 +67,28 @@
                                                     <Button type="error" :disabled="deleteDisabled">删除</Button>
                                                 </Poptip>
                                             </TabPane>
-                                            <TabPane label="封装SLS" disabled name="sls">
+                                            <TabPane label="封装SLS" name="sls">
+                                                <Row :gutter="0">
+                                                    <Col span="3">
+                                                        <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('file_managed')">文件管理</Button></p>
+                                                        <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('file_directory')">目录管理</Button></p>
+                                                        <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('cmd_run')">执行命令</Button></p>
+                                                    </Col>
+                                                    <Col span="1">
+                                                        <hr style="border:1px dashed #eee; height: 620px; width: 0px;"></hr>
+                                                    </Col>
+                                                    <Col span="20">
+                                                        <Timeline>
+                                                            <TimelineItem color="blue">
+                                                                <p class="time">开始</p>
+                                                                <li v-for="(item, index) in steps">
+                                                                    <Tag closable color="blue" :name="item.state_name" @on-close="handleDelStep"><a @click="handleSLS(item.state_name, index)">{{ item.show_name }}</a></Tag>
+                                                                </li>
+                                                            </TimelineItem>
+                                                            <TimelineItem color="green">结束</TimelineItem>
+                                                        </Timeline>
+                                                    </Col>
+                                                </Row>
                                             </TabPane>
                                             <TabPane label="从文件创建" name="upload" :disabled="uploadDisabled">
                                                 <div style="padding: 1px">
@@ -96,6 +117,110 @@
                 </Card>
             </Col>
         </Row>
+        <!--<Modal v-model="formView"  title="封装SLS" width="800px">-->
+            <!--<Row :gutter="0">-->
+                <!--<Col span="8">-->
+                    <!--<Timeline>-->
+                        <!--<TimelineItem color="green">-->
+                            <!--<p class="time">开始</p>-->
+                            <!--<li v-for="item in steps">-->
+                                <!--<Tag closable color="blue" :name="item" @on-close="handleDelStep">{{ item }}</Tag>-->
+                            <!--</li>-->
+                        <!--</TimelineItem>-->
+                        <!--<TimelineItem color="green">结束</TimelineItem>-->
+                    <!--</Timeline>-->
+                <!--</Col>-->
+                <!--<Col span="1">-->
+                    <!--<hr style="border:1px dashed #eee; height: 480px; width: 0px;"></hr>-->
+                <!--</Col>-->
+                <!--<Col span="15">-->
+                    <!--<Form ref="fileManagerFormValidate" :model="fileManagerFormValidate" :rules="fileManagerRuleValidate" :label-width="70">-->
+                        <!--&lt;!&ndash;<FormItem label="模块" prop="state">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<Select v-model="fileManagerFormValidate.state">&ndash;&gt;-->
+                                <!--&lt;!&ndash;<Option value="file_managed">文件管理</Option>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<Option value="file_directory">目录管理</Option>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<Option value="cmd_run">执行命令</Option>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</Select>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</FormItem>&ndash;&gt;-->
+                        <!--<FormItem label="名称" prop="name">-->
+                            <!--<Input v-model="fileManagerFormValidate.name" placeholder="输入名称"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="源文件" prop="source">-->
+                            <!--<Input v-model="fileManagerFormValidate.source" placeholder="输入源文件"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="目标文件" prop="destination">-->
+                            <!--<Input v-model="fileManagerFormValidate.destination" placeholder="输入目标文件"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="用户" prop="user">-->
+                            <!--<Input v-model="fileManagerFormValidate.user" placeholder="输入用户"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="组" prop="group">-->
+                            <!--<Input v-model="fileManagerFormValidate.group" placeholder="输入组"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="权限位" prop="mode">-->
+                            <!--<Input v-model="fileManagerFormValidate.mode" placeholder="输入权限位，如：644"></Input>-->
+                        <!--</FormItem>-->
+                        <!--<FormItem label="附加属性" prop="attrs">-->
+                            <!--<Input v-model="fileManagerFormValidate.attrs" placeholder="输入附加属性，如：i"></Input>-->
+                        <!--</FormItem>-->
+                    <!--</Form>-->
+                    <!--<Button type="primary" @click="handleAddStep()">添加</Button>-->
+                <!--</Col>-->
+            <!--</Row>-->
+            <!--<div slot="footer">-->
+                <!--<Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>-->
+                <!--<Button type="primary" @click="handleSubmit('slsFormValidate')">提交</Button>-->
+            <!--</div>-->
+        <!--</Modal>-->
+        <Modal v-model="fileManagedFormView"  title="封装文件管理">
+            <Form ref="fileManagedFormValidate" :model="fileManagedFormValidate" :rules="fileManagedRuleValidate" :label-width="70">
+                <FormItem label="名称" prop="name">
+                    <Input v-model="fileManagedFormValidate.name" placeholder="输入名称"></Input>
+                </FormItem>
+                <FormItem label="源文件" prop="source">
+                    <Input v-model="fileManagedFormValidate.source" placeholder="输入源文件"></Input>
+                </FormItem>
+                <FormItem label="目标文件" prop="destination">
+                    <Input v-model="fileManagedFormValidate.destination" placeholder="输入目标文件"></Input>
+                </FormItem>
+                <FormItem label="用户" prop="user">
+                    <Input v-model="fileManagedFormValidate.user" placeholder="输入用户"></Input>
+                </FormItem>
+                <FormItem label="组" prop="group">
+                    <Input v-model="fileManagedFormValidate.group" placeholder="输入组"></Input>
+                </FormItem>
+                <FormItem label="权限位" prop="mode">
+                    <Input v-model="fileManagedFormValidate.mode" placeholder="输入权限位，如：644"></Input>
+                </FormItem>
+                <FormItem label="附加属性" prop="attrs">
+                    <Input v-model="fileManagedFormValidate.attrs" placeholder="输入附加属性，如：i"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="ghost" @click="handleReset('fileManagedFormValidate')" style="margin-left: 8px">重置</Button>
+                <Button type="primary" @click="handleFileManagedSubmit('fileManagedFormValidate')">添加</Button>
+            </div>
+        </Modal>
+        <Modal v-model="cmdRunFormView"  title="封装执行命令">
+            <Form ref="cmdRunFormValidate" :model="cmdRunFormValidate" :rules="cmdRunRuleValidate" :label-width="70">
+                <FormItem label="名称" prop="name">
+                    <Input v-model="cmdRunFormValidate.name" placeholder="输入名称"></Input>
+                </FormItem>
+                <FormItem label="命令" prop="cmd">
+                    <Input v-model="cmdRunFormValidate.cmd" placeholder="输入命令"></Input>
+                </FormItem>
+                <FormItem label="环境变量" prop="env">
+                    <Input v-model="cmdRunFormValidate.env" placeholder="输入目标环境变量"></Input>
+                </FormItem>
+                <FormItem label="依赖" prop="require">
+                    <Input v-model="cmdRunFormValidate.require" placeholder="输入依赖"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="ghost" @click="handleReset('cmdRunFormValidate')" style="margin-left: 8px">重置</Button>
+                <Button type="primary" @click="handleCmdRunSubmit('cmdRunFormValidate')">添加</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -153,11 +278,58 @@
                         { required: true, message: '点击左侧树型结构获取目录，创建请输入文件名、上传请输入文件路径', trigger: 'blur' }
                     ]
                 },
+                steps: [],
+                stepIndex: 0,
+                fileManagedFormValidate: {
+                    name: '',
+                    source: '',
+                    destination: '',
+                    user: '',
+                    group: '',
+                    mode: '',
+                    attrs: ''
+                },
+                fileManagedRuleValidate: {
+                    name: [
+                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                    ],
+                    source: [
+                        { required: true, message: '源文件不能为空', trigger: 'blur' }
+                    ],
+                    destination: [
+                        { required: true, message: '目标文件不能为空', trigger: 'blur' }
+                    ],
+                    user: [
+                        { required: true, message: '用户不能为空', trigger: 'blur' }
+                    ],
+                    group: [
+                        { required: true, message: '组不能为空', trigger: 'blur' }
+                    ],
+                    mode: [
+                        { required: true, message: '权限位不能为空', trigger: 'blur' }
+                    ]
+                },
+                cmdRunFormValidate: {
+                    name: '',
+                    cmd: '',
+                    env: '',
+                    require: ''
+                },
+                cmdRunRuleValidate: {
+                    name: [
+                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                    ],
+                    cmd: [
+                        { required: true, message: '命令不能为空', trigger: 'blur' }
+                    ]
+                },
                 title: '',
                 tab: 'text',
                 h: {
                     height: '620px'
-                }
+                },
+                fileManagedFormView: false,
+                cmdRunFormView: false
             };
         },
         props: {
@@ -245,7 +417,7 @@
                 if (this.tab === 'text') {
                     this.h.height = '620px';
                 } else if (this.tab === 'sls') {
-                    this.h.height = '320px';
+                    this.h.height = '620px';
                 }
             }
         },
@@ -559,6 +731,68 @@
             // 表单重置
             handleReset (name) {
                 this.$refs[name].resetFields();
+            },
+            handleSLS (item, index) {
+                if (item === 'file_managed') {
+                    this.fileManagedFormView = true;
+                    this.stepIndex = index;
+                } else if (item === 'file_directory') {
+                    this.fileManagedFormView = true;
+                    this.stepIndex = index;
+                } else if (item === 'cmd_run') {
+                    this.cmdRunFormView = true;
+                    this.stepIndex = index;
+                }
+            },
+            handleAddStep (state) {
+                let step = {
+                    'state_name': '',
+                    'id_name': '',
+                    'show_name': ''
+                };
+                if (state === 'file_managed') {
+                    step = {
+                        'state_name': 'file_managed',
+                        'id_name': '',
+                        'show_name': '文件管理'
+                    };
+                } else if (state === 'file_directory') {
+                    step = {
+                        'state_name': 'file_directory',
+                        'id_name': '',
+                        'show_name': '目录管理'
+                    };
+                } else if (state === 'cmd_run') {
+                    step = {
+                        'state_name': 'cmd_run',
+                        'id_name': '',
+                        'show_name': '执行命令'
+                    };
+                }
+                //let step = state + '：' + this.fileManagerFormValidate.name;
+                this.steps.push(step);
+            },
+            handleDelStep (event, name) {
+                const index = this.steps.indexOf(name);
+                this.steps.splice(index, 1);
+            },
+            handleFileManagedSubmit (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        let showName = this.steps[this.stepIndex].show_name;
+                        this.steps[this.stepIndex].show_name = showName + '：' + this.fileManagedFormValidate.name;
+                        this.fileManagedFormView = false;
+                    }
+                });
+            },
+            handleCmdRunSubmit (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        let showName = this.steps[this.stepIndex].show_name;
+                        this.steps[this.stepIndex].show_name = showName + '：' + this.cmdRunFormValidate.name;
+                        this.cmdRunFormView = false;
+                    }
+                });
             }
         }
     };
