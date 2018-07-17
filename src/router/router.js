@@ -129,7 +129,7 @@ export const appRouter = [
         children: [
             { path: 'shell', title: 'Shell', name: 'shell', access: 60, component: () => import('@/views/execute/shell.vue') },
             { path: 'state', title: 'State', name: 'state', access: 61, component: () => import('@/views/execute/state.vue') },
-            { path: 'module', title: 'Module', name: 'module', access: 62, component: () => import('@/views/execute/module.vue') },
+            // { path: 'module', title: 'Module', name: 'module', access: 62, component: () => import('@/views/execute/module.vue') },
             { path: 'pillar', title: 'Pillar', name: 'pillar', access: 63, component: () => import('@/views/execute/pillar.vue') }
         ]
     },
@@ -165,7 +165,7 @@ export const appRouter = [
         children: [
             { path: 'user', title: '用户管理', name: 'user', access: 100, component: () => import('@/views/user/user.vue') },
             { path: 'role', title: '角色管理', name: 'role', access: 101, component: () => import('@/views/role/role.vue') },
-            { path: 'token', title: 'Token管理', name: 'token', access: 102, component: () => import('@/views/error-page/error-page.vue') },
+            // { path: 'token', title: 'Token管理', name: 'token', access: 102, component: () => import('@/views/error-page/error-page.vue') },
             { path: 'log', title: '操作日志', name: 'log', access: 103, component: () => import('@/views/audit_log/audit_log.vue') },
             { path: 'tools', title: '系统工具', name: 'tools', access: 104, component: () => import('@/views/system/tool.vue') }
         ]
