@@ -73,6 +73,7 @@
                                                         <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('file_managed')">文件管理</Button></p>
                                                         <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('file_directory')">目录管理</Button></p>
                                                         <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('cmd_run')">执行命令</Button></p>
+                                                        <p><Button type="primary" shape="circle" size="small" @click="handleAddStep('pkg_installed')">安装软件包</Button></p>
                                                     </Col>
                                                     <Col span="1">
                                                         <hr style="border:1px dashed #eee; height: 620px; width: 0px;"></hr>
@@ -82,11 +83,20 @@
                                                             <TimelineItem color="blue">
                                                                 <p class="time">开始</p>
                                                                 <li v-for="(item, index) in steps">
-                                                                    <Tag closable color="blue" :name="item.state_name" @on-close="handleDelStep"><a @click="handleSLS(item.state_name, index)">{{ item.show_name }}</a></Tag>
+                                                                    <Tag closable color="blue" :name="item" @on-close="handleDelStep"><a @click="handleSLS(item.id, item.state_name, index)">{{ item.show_name }}</a></Tag>
                                                                 </li>
                                                             </TimelineItem>
                                                             <TimelineItem color="green">结束</TimelineItem>
                                                         </Timeline>
+                                                        <Button type="primary" @click="handleSLSCreate('formValidate')" :disabled="createDisabled">创建</Button>
+                                                        <Button type="primary" @click="handleEdit('formValidate')" :disabled="editDisabled">更新</Button>
+                                                        <Poptip
+                                                            confirm
+                                                            :title="title"
+                                                            @on-popper-show="PopperShow()"
+                                                            @on-ok="handleDelete('formValidate')">
+                                                            <Button type="error" :disabled="deleteDisabled">删除</Button>
+                                                        </Poptip>
                                                     </Col>
                                                 </Row>
                                             </TabPane>
@@ -117,61 +127,6 @@
                 </Card>
             </Col>
         </Row>
-        <!--<Modal v-model="formView"  title="封装SLS" width="800px">-->
-            <!--<Row :gutter="0">-->
-                <!--<Col span="8">-->
-                    <!--<Timeline>-->
-                        <!--<TimelineItem color="green">-->
-                            <!--<p class="time">开始</p>-->
-                            <!--<li v-for="item in steps">-->
-                                <!--<Tag closable color="blue" :name="item" @on-close="handleDelStep">{{ item }}</Tag>-->
-                            <!--</li>-->
-                        <!--</TimelineItem>-->
-                        <!--<TimelineItem color="green">结束</TimelineItem>-->
-                    <!--</Timeline>-->
-                <!--</Col>-->
-                <!--<Col span="1">-->
-                    <!--<hr style="border:1px dashed #eee; height: 480px; width: 0px;"></hr>-->
-                <!--</Col>-->
-                <!--<Col span="15">-->
-                    <!--<Form ref="fileManagerFormValidate" :model="fileManagerFormValidate" :rules="fileManagerRuleValidate" :label-width="70">-->
-                        <!--&lt;!&ndash;<FormItem label="模块" prop="state">&ndash;&gt;-->
-                            <!--&lt;!&ndash;<Select v-model="fileManagerFormValidate.state">&ndash;&gt;-->
-                                <!--&lt;!&ndash;<Option value="file_managed">文件管理</Option>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<Option value="file_directory">目录管理</Option>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<Option value="cmd_run">执行命令</Option>&ndash;&gt;-->
-                            <!--&lt;!&ndash;</Select>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</FormItem>&ndash;&gt;-->
-                        <!--<FormItem label="名称" prop="name">-->
-                            <!--<Input v-model="fileManagerFormValidate.name" placeholder="输入名称"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="源文件" prop="source">-->
-                            <!--<Input v-model="fileManagerFormValidate.source" placeholder="输入源文件"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="目标文件" prop="destination">-->
-                            <!--<Input v-model="fileManagerFormValidate.destination" placeholder="输入目标文件"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="用户" prop="user">-->
-                            <!--<Input v-model="fileManagerFormValidate.user" placeholder="输入用户"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="组" prop="group">-->
-                            <!--<Input v-model="fileManagerFormValidate.group" placeholder="输入组"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="权限位" prop="mode">-->
-                            <!--<Input v-model="fileManagerFormValidate.mode" placeholder="输入权限位，如：644"></Input>-->
-                        <!--</FormItem>-->
-                        <!--<FormItem label="附加属性" prop="attrs">-->
-                            <!--<Input v-model="fileManagerFormValidate.attrs" placeholder="输入附加属性，如：i"></Input>-->
-                        <!--</FormItem>-->
-                    <!--</Form>-->
-                    <!--<Button type="primary" @click="handleAddStep()">添加</Button>-->
-                <!--</Col>-->
-            <!--</Row>-->
-            <!--<div slot="footer">-->
-                <!--<Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>-->
-                <!--<Button type="primary" @click="handleSubmit('slsFormValidate')">提交</Button>-->
-            <!--</div>-->
-        <!--</Modal>-->
         <Modal v-model="fileManagedFormView"  title="封装文件管理">
             <Form ref="fileManagedFormValidate" :model="fileManagedFormValidate" :rules="fileManagedRuleValidate" :label-width="70">
                 <FormItem label="名称" prop="name">
@@ -192,13 +147,39 @@
                 <FormItem label="权限位" prop="mode">
                     <Input v-model="fileManagedFormValidate.mode" placeholder="输入权限位，如：644"></Input>
                 </FormItem>
-                <FormItem label="附加属性" prop="attrs">
+                <FormItem label="附加属性">
                     <Input v-model="fileManagedFormValidate.attrs" placeholder="输入附加属性，如：i"></Input>
+                </FormItem>
+                <FormItem label="模板">
+                    <Input v-model="fileManagedFormValidate.template" placeholder="输入模板，如：jinja"></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
                 <Button type="ghost" @click="handleReset('fileManagedFormValidate')" style="margin-left: 8px">重置</Button>
                 <Button type="primary" @click="handleFileManagedSubmit('fileManagedFormValidate')">添加</Button>
+            </div>
+        </Modal>
+        <Modal v-model="fileDirectoryFormView"  title="封装目录管理">
+            <Form ref="fileDirectoryFormValidate" :model="fileDirectoryFormValidate" :rules="fileDirectoryRuleValidate" :label-width="70">
+                <FormItem label="名称" prop="name">
+                    <Input v-model="fileDirectoryFormValidate.name" placeholder="输入名称"></Input>
+                </FormItem>
+                <FormItem label="目标文件" prop="destination">
+                    <Input v-model="fileDirectoryFormValidate.destination" placeholder="输入目标文件"></Input>
+                </FormItem>
+                <FormItem label="用户" prop="user">
+                    <Input v-model="fileDirectoryFormValidate.user" placeholder="输入用户"></Input>
+                </FormItem>
+                <FormItem label="组" prop="group">
+                    <Input v-model="fileDirectoryFormValidate.group" placeholder="输入组"></Input>
+                </FormItem>
+                <FormItem label="权限位" prop="mode">
+                    <Input v-model="fileDirectoryFormValidate.mode" placeholder="输入权限位，如：644"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="ghost" @click="handleReset('fileDirectoryFormValidate')" style="margin-left: 8px">重置</Button>
+                <Button type="primary" @click="handleFileDirectorySubmit('fileDirectoryFormValidate')">添加</Button>
             </div>
         </Modal>
         <Modal v-model="cmdRunFormView"  title="封装执行命令">
@@ -207,12 +188,15 @@
                     <Input v-model="cmdRunFormValidate.name" placeholder="输入名称"></Input>
                 </FormItem>
                 <FormItem label="命令" prop="cmd">
-                    <Input v-model="cmdRunFormValidate.cmd" placeholder="输入命令"></Input>
+                    <Input v-model="cmdRunFormValidate.cmd" type="textarea" :autosize="true" placeholder="输入命令"></Input>
                 </FormItem>
                 <FormItem label="环境变量" prop="env">
-                    <Input v-model="cmdRunFormValidate.env" placeholder="输入目标环境变量"></Input>
+                    <Input v-model="cmdRunFormValidate.env" type="textarea" :autosize="true"  placeholder="输入目标环境变量"></Input>
                 </FormItem>
-                <FormItem label="依赖" prop="require">
+                <FormItem label="除非">
+                    <Input v-model="cmdRunFormValidate.unless" type="textarea" :autosize="true" placeholder="输入目标环境变量"></Input>
+                </FormItem>
+                <FormItem label="依赖">
                     <Input v-model="cmdRunFormValidate.require" placeholder="输入依赖"></Input>
                 </FormItem>
             </Form>
@@ -221,10 +205,27 @@
                 <Button type="primary" @click="handleCmdRunSubmit('cmdRunFormValidate')">添加</Button>
             </div>
         </Modal>
+        <Modal v-model="pkgInstalledFormView"  title="封装安装软件包">
+            <Form ref="pkgInstalledFormValidate" :model="pkgInstalledFormValidate" :rules="pkgInstalledRuleValidate" :label-width="70">
+                <FormItem label="名称" prop="name">
+                    <Input v-model="pkgInstalledFormValidate.name" placeholder="输入名称"></Input>
+                </FormItem>
+                <FormItem label="包名" prop="pkgs">
+                    <Input v-model="pkgInstalledFormValidate.pkgs" type="textarea" :autosize="{minRows: 5}" placeholder="输入包名，多个软件包请换行"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="ghost" @click="handleReset('pkgInstalledFormValidate')" style="margin-left: 8px">重置</Button>
+                <Button type="primary" @click="handlePkgInstalledSubmit('pkgInstalledFormValidate')">添加</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script>
+    function nCopy (data) {
+        return JSON.parse(JSON.stringify(data));
+    };
     import MonacoEditor from 'vue-monaco-editor';
     export default {
         components: {
@@ -287,7 +288,8 @@
                     user: '',
                     group: '',
                     mode: '',
-                    attrs: ''
+                    attrs: '',
+                    template: ''
                 },
                 fileManagedRuleValidate: {
                     name: [
@@ -309,10 +311,35 @@
                         { required: true, message: '权限位不能为空', trigger: 'blur' }
                     ]
                 },
+                fileDirectoryFormValidate: {
+                    name: '',
+                    destination: '',
+                    user: '',
+                    group: '',
+                    mode: ''
+                },
+                fileDirectoryRuleValidate: {
+                    name: [
+                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                    ],
+                    destination: [
+                        { required: true, message: '目录地址不能为空', trigger: 'blur' }
+                    ],
+                    user: [
+                        { required: true, message: '用户不能为空', trigger: 'blur' }
+                    ],
+                    group: [
+                        { required: true, message: '组不能为空', trigger: 'blur' }
+                    ],
+                    mode: [
+                        { required: true, message: '权限位不能为空', trigger: 'blur' }
+                    ]
+                },
                 cmdRunFormValidate: {
                     name: '',
                     cmd: '',
                     env: '',
+                    unless: '',
                     require: ''
                 },
                 cmdRunRuleValidate: {
@@ -323,13 +350,31 @@
                         { required: true, message: '命令不能为空', trigger: 'blur' }
                     ]
                 },
+                pkgInstalledFormValidate: {
+                    name: '',
+                    pkgs: ''
+                },
+                pkgInstalledRuleValidate: {
+                    name: [
+                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                    ],
+                    pkgs: [
+                        { required: true, message: '软件包不能为空', trigger: 'blur' }
+                    ]
+                },
                 title: '',
                 tab: 'text',
                 h: {
                     height: '620px'
                 },
+                fileManaged: [],
+                cmdRun: [],
+                fileDirectory: [],
+                pkgInstalled: [],
                 fileManagedFormView: false,
-                cmdRunFormView: false
+                cmdRunFormView: false,
+                fileDirectoryFormView: false,
+                pkgInstalledFormView: false
             };
         },
         props: {
@@ -732,65 +777,223 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             },
-            handleSLS (item, index) {
+            handleSLS (id, item, index) {
+                console.log(id)
+                console.log(this.fileManaged)
                 if (item === 'file_managed') {
+                    // id 为空说明是新增步骤，还没添加内容
+                    if (id === '') {
+                        // 清空fileManagedFormValidate表单里面的数据
+                        this.handleReset('fileManagedFormValidate');
+                    } else {
+                        // 说明已经存在在fileManaged 这个list里面查找对应fileManagedFormValidate， 并赋值给现在的fileManagedFormValidate
+                        this.fileManaged.map(item => {
+                            if (item.name === id) {
+                                this.fileManagedFormValidate = item;
+                            }
+                        });
+                    }
                     this.fileManagedFormView = true;
                     this.stepIndex = index;
                 } else if (item === 'file_directory') {
-                    this.fileManagedFormView = true;
+                    this.fileDirectoryFormView = true;
                     this.stepIndex = index;
                 } else if (item === 'cmd_run') {
                     this.cmdRunFormView = true;
+                    this.stepIndex = index;
+                } else if (item === 'pkg_installed') {
+                    this.pkgInstalledFormView = true;
                     this.stepIndex = index;
                 }
             },
             handleAddStep (state) {
                 let step = {
                     'state_name': '',
-                    'id_name': '',
+                    'id': '',
                     'show_name': ''
                 };
                 if (state === 'file_managed') {
                     step = {
                         'state_name': 'file_managed',
-                        'id_name': '',
+                        'another_name': '文件管理',
+                        'id': '',
                         'show_name': '文件管理'
                     };
                 } else if (state === 'file_directory') {
                     step = {
                         'state_name': 'file_directory',
-                        'id_name': '',
+                        'another_name': '目录管理',
+                        'id': '',
                         'show_name': '目录管理'
                     };
                 } else if (state === 'cmd_run') {
                     step = {
                         'state_name': 'cmd_run',
-                        'id_name': '',
+                        'another_name': '执行命令',
+                        'id': '',
                         'show_name': '执行命令'
                     };
+                } else if (state === 'pkg_installed') {
+                    step = {
+                        'state_name': 'pkg_installed',
+                        'another_name': '安装软件包',
+                        'id': '',
+                        'show_name': '安装软件包'
+                    };
                 }
-                //let step = state + '：' + this.fileManagerFormValidate.name;
                 this.steps.push(step);
             },
-            handleDelStep (event, name) {
-                const index = this.steps.indexOf(name);
+            handleDelStep (event, item) {
+                // 删除流程里面的
+                const index = this.steps.indexOf(item.state_name);
                 this.steps.splice(index, 1);
+                // 删除post里面对应的模块值
+                this.fileManaged.map((items, index) => {
+                    if (items.name === item.id) {
+                        this.fileManaged.splice(index, 1);
+                    }
+                });
+                this.cmdRun.map((items, index) => {
+                    if (items.name === item.id) {
+                        this.cmdRun.splice(index, 1);
+                    }
+                });
+                this.pkgInstalled.map((items, index) => {
+                    if (items.name === item.id) {
+                        this.pkgInstalled.splice(index, 1);
+                    }
+                });
+                this.fileDirectory.map((items, index) => {
+                    if (items.name === item.id) {
+                        this.fileDirectory.splice(index, 1);
+                    }
+                });
             },
             handleFileManagedSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        let showName = this.steps[this.stepIndex].show_name;
-                        this.steps[this.stepIndex].show_name = showName + '：' + this.fileManagedFormValidate.name;
+                        this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.fileManagedFormValidate.name;
+                        this.steps[this.stepIndex].id = this.fileManagedFormValidate.name;
                         this.fileManagedFormView = false;
+                        // 添加完成后,添加一次文件管理
+                        let tmp = nCopy(this.fileManagedFormValidate);
+                        // 如果存在，再编辑，直接修改内容
+                        let status = true;
+                        this.fileManaged.map((item, index) => {
+                            if (item.name === tmp.name) {
+                                this.fileManaged[index] = tmp;
+                                status = false;
+                            }
+                        });
+                        // status 说明首次添加
+                        if (status) {
+                            this.fileManaged.push(tmp);
+                        }
                     }
                 });
             },
             handleCmdRunSubmit (name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        let showName = this.steps[this.stepIndex].show_name;
-                        this.steps[this.stepIndex].show_name = showName + '：' + this.cmdRunFormValidate.name;
+                        this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.cmdRunFormValidate.name;
                         this.cmdRunFormView = false;
+                        let tmp = nCopy(this.cmdRunFormValidate);
+                        let status = true;
+                        this.cmdRun.map((item, index) => {
+                            if (item.name === tmp.name) {
+                                this.cmdRun[index] = tmp;
+                                status = false;
+                            }
+                        });
+                        // status 说明首次添加
+                        if (status) {
+                            this.cmdRun.push(tmp);
+                        }
+                    }
+                });
+            },
+            handlePkgInstalledSubmit (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.pkgInstalledFormValidate.name;
+                        this.pkgInstalledFormView = false;
+                        let tmp = nCopy(this.pkgInstalledFormValidate);
+                        let status = true;
+                        this.pkgInstalled.map((item, index) => {
+                            if (item.name === tmp.name) {
+                                this.pkgInstalled[index] = tmp;
+                                status = false;
+                            }
+                        });
+                        // status 说明首次添加
+                        if (status) {
+                            this.pkgInstalled.push(tmp);
+                        }
+                    }
+                });
+            },
+            handleFileDirectorySubmit (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.fileDirectoryFormValidate.name;
+                        this.fileDirectoryFormView = false;
+                        let tmp = nCopy(this.fileDirectoryFormValidate);
+                        let status = true;
+                        this.fileDirectory.map((item, index) => {
+                            if (item.name === tmp.name) {
+                                this.fileDirectory[index] = tmp;
+                                status = false;
+                            }
+                        });
+                        // status 说明首次添加
+                        if (status) {
+                            this.fileDirectory.push(tmp);
+                        }
+                    }
+                });
+            },
+            handleSLSCreate (name) {
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        let postData = {
+                            'path': this.formValidate.fileDir,
+                            'project_type': this.projectType,
+                            'branch': this.branchName,
+                            'action': 'create',
+                            'file_managed': this.fileManaged,
+                            'file_directory': this.fileDirectory,
+                            'cmd_run': this.cmdRun,
+                            'pkg_installed': this.pkgInstalled
+                        };
+                        this.axios.post(this.Global.serverSrc + 'sls/create?product_id=' + this.productId, postData).then(
+                            res => {
+                                if (res.data['status'] === true) {
+                                    this.result = res.data['data'];
+                                    this.$Message.success('创建成功！');
+                                    // 刷新gitlab file list
+                                    this.fileList();
+                                    this.filePath = [];
+                                    this.formValidate.fileDir = '';
+                                    this.steps = [];
+                                    this.handleReset('fileManagedFormValidate');
+                                    this.handleReset('fileDirectoryFormValidate');
+                                    this.handleReset('cmdRunFormValidate');
+                                    this.handleReset('pkgInstalledFormValidate');
+                                } else {
+                                    this.nError('Create Failure', res.data['message']);
+                                }
+                            },
+                            err => {
+                                let errInfo = '';
+                                try {
+                                    errInfo = err.response.data['message'];
+                                } catch (error) {
+                                    errInfo = err;
+                                }
+                                this.nError('Create Failure', errInfo);
+                            });
+                    } else {
+                        this.$Message.error('请检查表单数据！');
                     }
                 });
             }
