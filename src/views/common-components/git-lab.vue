@@ -148,9 +148,6 @@
                 <FormItem label="权限位" prop="mode">
                     <Input v-model="fileManagedFormValidate.mode" placeholder="输入权限位，如：644"></Input>
                 </FormItem>
-                <FormItem label="附加属性">
-                    <Input v-model="fileManagedFormValidate.attrs" placeholder="输入附加属性，如：i"></Input>
-                </FormItem>
                 <FormItem label="模板">
                     <Input v-model="fileManagedFormValidate.template" placeholder="输入模板，如：jinja"></Input>
                 </FormItem>
@@ -161,7 +158,7 @@
             </div>
         </Modal>
         <Modal v-model="fileDirectoryFormView"  title="封装目录管理">
-            <Form ref="fileDirectoryFormValidate" :model="fileDirectoryFormValidate" :rules="fileDirectoryRuleValidate" :label-width="70">
+            <Form ref="fileDirectoryFormValidate" :model="fileDirectoryFormValidate" :rules="fileDirectoryRuleValidate" :label-width="80">
                 <FormItem label="名称" prop="name">
                     <Input v-model="fileDirectoryFormValidate.name" placeholder="输入名称"></Input>
                 </FormItem>
@@ -176,6 +173,12 @@
                 </FormItem>
                 <FormItem label="权限位" prop="mode">
                     <Input v-model="fileDirectoryFormValidate.mode" placeholder="输入权限位，如：644"></Input>
+                </FormItem>
+                <FormItem label="创建父目录">
+                    <RadioGroup v-model="fileDirectoryFormValidate.makedirs">
+                        <Radio label="True">是</Radio>
+                        <Radio label="False">否</Radio>
+                    </RadioGroup>
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -309,8 +312,7 @@
                     user: '',
                     group: '',
                     mode: '',
-                    attrs: '',
-                    template: ''
+                    template: 'jinja'
                 },
                 fileManagedRuleValidate: {
                     name: [
@@ -337,7 +339,8 @@
                     destination: '',
                     user: '',
                     group: '',
-                    mode: ''
+                    mode: '',
+                    makedirs: 'True'
                 },
                 fileDirectoryRuleValidate: {
                     name: [
