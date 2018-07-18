@@ -83,7 +83,8 @@
                                                             <TimelineItem color="blue">
                                                                 <p class="time">开始</p>
                                                                 <li v-for="(item, index) in steps">
-                                                                    <Tag closable color="blue" :name="item" @on-close="handleDelStep"><a @click="handleSLS(item.id, item.state_name, index)">{{ item.show_name }}</a></Tag>
+                                                                    <Tag v-if="item.id !== ''" closable color="blue" :name="item.id" @on-close="handleDelStep"><a @click="handleSLS(item.id, item.state_name, index)">{{ item.show_name }}</a></Tag>
+                                                                    <Tag v-if="item.id === ''" closable color="yellow" :name="item.id" @on-close="handleDelStep"><a @click="handleSLS(item.id, item.state_name, index)">{{ item.show_name }}</a></Tag>
                                                                 </li>
                                                             </TimelineItem>
                                                             <TimelineItem color="green">结束</TimelineItem>
@@ -223,16 +224,36 @@
 </template>
 
 <script>
+    import MonacoEditor from 'vue-monaco-editor';
     function nCopy (data) {
         return JSON.parse(JSON.stringify(data));
     };
-    import MonacoEditor from 'vue-monaco-editor';
     export default {
         components: {
             MonacoEditor
         },
         name: 'GitLab',
         data () {
+            const validateName = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('名称不能为空'));
+                } else {
+                    // 进行中文的验证
+                    if (/[\u4E00-\u9FA5]/i.test(value)) {
+                        callback(new Error('名称不能为中文'));
+                    }
+                    let status = true;
+                    this.steps.map(item => {
+                        if (value === item.id) {
+                            callback(new Error('同一个SLS文件,名称不能重复'));
+                            status = false;
+                        }
+                    });
+                    if (status) {
+                        callback();
+                    }
+                }
+            };
             return {
                 productData: this.productList(),
                 productId: '',
@@ -293,7 +314,7 @@
                 },
                 fileManagedRuleValidate: {
                     name: [
-                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                        { required: true, validator: validateName, trigger: 'blur' }
                     ],
                     source: [
                         { required: true, message: '源文件不能为空', trigger: 'blur' }
@@ -320,7 +341,7 @@
                 },
                 fileDirectoryRuleValidate: {
                     name: [
-                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                        { required: true, validator: validateName, trigger: 'blur' }
                     ],
                     destination: [
                         { required: true, message: '目录地址不能为空', trigger: 'blur' }
@@ -344,7 +365,7 @@
                 },
                 cmdRunRuleValidate: {
                     name: [
-                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                        { required: true, validator: validateName, trigger: 'blur' }
                     ],
                     cmd: [
                         { required: true, message: '命令不能为空', trigger: 'blur' }
@@ -356,7 +377,7 @@
                 },
                 pkgInstalledRuleValidate: {
                     name: [
-                        { required: true, message: '名称不能为空', trigger: 'blur' }
+                        { required: true, validator: validateName, trigger: 'blur' }
                     ],
                     pkgs: [
                         { required: true, message: '软件包不能为空', trigger: 'blur' }
@@ -778,8 +799,6 @@
                 this.$refs[name].resetFields();
             },
             handleSLS (id, item, index) {
-                console.log(id)
-                console.log(this.fileManaged)
                 if (item === 'file_managed') {
                     // id 为空说明是新增步骤，还没添加内容
                     if (id === '') {
@@ -796,12 +815,39 @@
                     this.fileManagedFormView = true;
                     this.stepIndex = index;
                 } else if (item === 'file_directory') {
+                    if (id === '') {
+                        this.handleReset('fileManagedFormValidate');
+                    } else {
+                        this.fileManaged.map(item => {
+                            if (item.name === id) {
+                                this.fileDirectoryFormValidate = item;
+                            }
+                        });
+                    }
                     this.fileDirectoryFormView = true;
                     this.stepIndex = index;
                 } else if (item === 'cmd_run') {
+                    if (id === '') {
+                        this.handleReset('fileManagedFormValidate');
+                    } else {
+                        this.fileManaged.map(item => {
+                            if (item.name === id) {
+                                this.cmdRunFormValidate = item;
+                            }
+                        });
+                    }
                     this.cmdRunFormView = true;
                     this.stepIndex = index;
                 } else if (item === 'pkg_installed') {
+                    if (id === '') {
+                        this.handleReset('fileManagedFormValidate');
+                    } else {
+                        this.fileManaged.map(item => {
+                            if (item.name === id) {
+                                this.pkgInstalledFormValidate = item;
+                            }
+                        });
+                    }
                     this.pkgInstalledFormView = true;
                     this.stepIndex = index;
                 }
@@ -843,28 +889,31 @@
                 }
                 this.steps.push(step);
             },
-            handleDelStep (event, item) {
+            handleDelStep (event, id) {
                 // 删除流程里面的
-                const index = this.steps.indexOf(item.state_name);
-                this.steps.splice(index, 1);
+                this.steps.map((item, index) => {
+                    if (item.id === id) {
+                        this.steps.splice(index, 1);
+                    }
+                });
                 // 删除post里面对应的模块值
-                this.fileManaged.map((items, index) => {
-                    if (items.name === item.id) {
+                this.fileManaged.map((item, index) => {
+                    if (item.name === id) {
                         this.fileManaged.splice(index, 1);
                     }
                 });
                 this.cmdRun.map((items, index) => {
-                    if (items.name === item.id) {
+                    if (items.name === id) {
                         this.cmdRun.splice(index, 1);
                     }
                 });
                 this.pkgInstalled.map((items, index) => {
-                    if (items.name === item.id) {
+                    if (items.name === id) {
                         this.pkgInstalled.splice(index, 1);
                     }
                 });
                 this.fileDirectory.map((items, index) => {
-                    if (items.name === item.id) {
+                    if (items.name === id) {
                         this.fileDirectory.splice(index, 1);
                     }
                 });
@@ -896,6 +945,7 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.cmdRunFormValidate.name;
+                        this.steps[this.stepIndex].id = this.cmdRunFormValidate.name;
                         this.cmdRunFormView = false;
                         let tmp = nCopy(this.cmdRunFormValidate);
                         let status = true;
@@ -916,6 +966,7 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.pkgInstalledFormValidate.name;
+                        this.steps[this.stepIndex].id = this.pkgInstalledFormValidate.name;
                         this.pkgInstalledFormView = false;
                         let tmp = nCopy(this.pkgInstalledFormValidate);
                         let status = true;
@@ -936,6 +987,7 @@
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.steps[this.stepIndex].show_name = this.steps[this.stepIndex].another_name + '：' + this.fileDirectoryFormValidate.name;
+                        this.steps[this.stepIndex].id = this.fileDirectoryFormValidate.name;
                         this.fileDirectoryFormView = false;
                         let tmp = nCopy(this.fileDirectoryFormValidate);
                         let status = true;
@@ -960,6 +1012,7 @@
                             'project_type': this.projectType,
                             'branch': this.branchName,
                             'action': 'create',
+                            'steps': this.steps,
                             'file_managed': this.fileManaged,
                             'file_directory': this.fileDirectory,
                             'cmd_run': this.cmdRun,
