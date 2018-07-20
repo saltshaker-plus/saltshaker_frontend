@@ -285,7 +285,7 @@
                         title: '状态',
                         key: 'status',
                         sortable: true,
-                        width: 120,
+                        width: 140,
                         render: (h, params) => {
                             let tagColor = 'green';
                             if (params.row.status.id === 0) {
@@ -293,13 +293,35 @@
                             } else if (params.row.status.id === 11) {
                                 tagColor = 'yellow';
                             }
-                            return h('div', [
-                                h('Tag', {
-                                    props: {
-                                        'color': tagColor
-                                    }
-                                }, params.row.status.name)
-                            ]);
+                            if (params.row.action === 'concurrent_pause') {
+                                return h('div', [
+                                    h('Tag', {
+                                        props: {
+                                            'color': tagColor
+                                        }
+                                    }, params.row.status.name),
+                                    h('Tag', {
+                                        props: {
+                                            'color': 'yellow'
+                                        }
+                                    }, '并行暂停')
+//                                    h('Icon', {
+//                                        props: {
+//                                            'type': 'arrow-right-b',
+//                                            'size': 30,
+//                                            'color': '#ff9900'
+//                                        }
+//                                    })
+                                ]);
+                            } else {
+                                return h('div', [
+                                    h('Tag', {
+                                        props: {
+                                            'color': tagColor
+                                        }
+                                    }, params.row.status.name)
+                                ]);
+                            }
                         }
                     },
                     {
@@ -313,7 +335,7 @@
                             let schedulerPause = true;
                             let schedulerResume = true;
                             let reopen = true;
-                            if (params.row.concurrent !== 0) {
+                            if (params.row.concurrent !== 0 && params.row.status.id !== 3) {
                                 if (params.row.action === 'concurrent_play') {
                                     concurrentPause = false;
                                 } else {
@@ -327,7 +349,7 @@
                                     schedulerResume = false;
                                 }
                             }
-                            if (params.row.scheduler === 'once' && params.row.once.type === 'now') {
+                            if (params.row.scheduler === 'once' && params.row.once.type === 'now' && params.row.status.id === 3) {
                                 reopen = false;
                             }
                             return h('div', [
@@ -793,6 +815,7 @@
                     res => {
                         if (res.data['status'] === true) {
                             this.$Message.success('成功！');
+                            this.tableList();
                         } else {
                             this.nError('Reopen Failure', res.data['message']);
                         }
