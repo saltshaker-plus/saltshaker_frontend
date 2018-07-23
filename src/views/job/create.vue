@@ -338,7 +338,7 @@
                             if (params.row.concurrent !== 0 && params.row.status.id !== 3) {
                                 if (params.row.action === 'concurrent_play') {
                                     concurrentPause = false;
-                                } else {
+                                } else if (params.row.scheduler !== 'period') {
                                     concurrentPlay = false;
                                 }
                             }
