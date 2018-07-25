@@ -37,12 +37,6 @@ export const page500 = {
     component: () => import('@/views/error-page/500.vue')
 };
 
-export const locking = {
-    path: '/locking',
-    name: 'locking',
-    component: () => import('@/views/main-components/lockscreen/components/locking-page.vue')
-};
-
 // 作为Main组件的子页面展示但是不在左侧菜单显示的路由写在otherRouter里
 export const otherRouter = {
     path: '/',
@@ -176,7 +170,6 @@ export const appRouter = [
 export const routers = [
     loginRouter,
     otherRouter,
-    locking,
     ...appRouter,
     page500,
     page403,
