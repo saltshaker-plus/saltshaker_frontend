@@ -57,7 +57,7 @@ export const appRouter = [
         path: '/job',
         icon: 'arrow-swap',
         name: 'job',
-        title: 'Job管理',
+        title: 'Job',
         access: 1,
         component: Main,
         children: [
