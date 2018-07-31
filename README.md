@@ -4,14 +4,17 @@
 
 ````
 1. 安装依赖
+
     #npm install
 ````
 ````
 2. 部署
+
     #npm run dev
 ````
 ````
 3. 编译
+
     修改 src/config/Global.vue 下serverSrc参数,对应自己的服务器域名或地址
     
     修改 build/webpack.prod.config.js 下serverSrc参数,对应自己的服务器域名或地址
