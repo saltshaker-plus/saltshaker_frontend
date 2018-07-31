@@ -22,7 +22,7 @@ export default {
                     sortable: true,
                     render: (h, params) => {
                         let tagColor = 'green';
-                        if (params.row.status === false || params.row.status === 0) {
+                        if (params.row.status === false || params.row.status === 'Down') {
                             tagColor = 'red';
                         }
                         return h('div', [
@@ -85,18 +85,6 @@ export default {
                 desc: info.toString().replace(/<|>/g, ''),
                 duration: 10
             });
-        },
-        formatTime (time) {
-            let unixtime = time;
-            let unixTimestamp = new Date(unixtime * 1000);
-            let Y = unixTimestamp.getFullYear();
-            let M = ((unixTimestamp.getMonth() + 1) > 10 ? (unixTimestamp.getMonth() + 1) : '0' + (unixTimestamp.getMonth() + 1));
-            let D = (unixTimestamp.getDate() >= 10 ? unixTimestamp.getDate() : '0' + unixTimestamp.getDate());
-            let h = (unixTimestamp.getHours() >= 10 ? unixTimestamp.getHours() : '0' + unixTimestamp.getHours());
-            let m = (unixTimestamp.getMinutes() >= 10 ? unixTimestamp.getMinutes() : '0' + unixTimestamp.getMinutes());
-            let s = (unixTimestamp.getSeconds() >= 10 ? unixTimestamp.getSeconds() : '0' + unixTimestamp.getSeconds());
-            let toDay = Y + '-' + M + '-' + D + ' ' + h + ':' + m + ':' + s;
-            return toDay;
         }
     }
 };
