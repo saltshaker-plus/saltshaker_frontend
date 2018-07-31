@@ -5,7 +5,7 @@
                 <p slot="title">
                     系统工具
                 </p>
-                <Table :columns="columns1" :data="data1" :border="true"></Table>
+                <Table :columns="columns" :data="jobData" :border="true"></Table>
             </Card>
         </Row>
     </div>
@@ -14,7 +14,8 @@
     export default {
         data () {
             return {
-                columns1: [
+                jobData: this.tableList(),
+                columns: [
                     {
                         title: '服务',
                         key: 'service'
@@ -24,29 +25,64 @@
                         key: 'status',
                         render: (h, params) => {
                             let tagColor = 'green';
-                            if (params.row.status.id === 0) {
+                            let info = '';
+                            if (params.row.status === 'Down') {
                                 tagColor = 'red';
-                            } else if (params.row.status.id === 11) {
+                                info = '失败';
+                            }
+                            if (params.row.status === 'Up') {
+                                tagColor = 'green';
+                                info = '正常';
+                            }
+                            if (params.row.status === 'Missing') {
                                 tagColor = 'yellow';
+                                info = '缺失';
+                            }
+                            if (params.row.status === 'More') {
+                                tagColor = 'yellow';
+                                info = '过多';
                             }
                             return h('div', [
                                 h('Tag', {
                                     props: {
                                         'color': tagColor
                                     }
-                                }, 'UP')
+                                }, info)
                             ]);
+                        }
+                    },
+                    {
+                        title: 'Pid',
+                        key: 'status',
+                        render: (h, params) => {
+                            return h('ul', params.row.pid.map(item => {
+                                return h('li', {
+                                    style: {
+                                        textAlign: 'left',
+                                        padding: '0px'
+                                    }
+                                }, item);
+                            })
+                            );
                         }
                     },
                     {
                         title: '操作',
                         key: 'option',
                         render: (h, params) => {
+                            let start = true;
+                            let stop = false;
+                            if (params.row.status === 'Up' || params.row.status === 'More') {
+                                start = true;
+                            } else {
+                                start = false;
+                            }
                             return h('div', [
                                 h('Button', {
                                     props: {
                                         type: 'primary',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled: start
                                     },
                                     style: {
                                         marginRight: '5px'
@@ -60,7 +96,8 @@
                                 h('Button', {
                                     props: {
                                         type: 'error',
-                                        size: 'small'
+                                        size: 'small',
+                                        disabled: stop
                                     },
                                     style: {
                                         marginRight: '5px'
@@ -70,35 +107,39 @@
                                             this.handleEvent('stop');
                                         }
                                     }
-                                }, '停止'),
-                                h('Button', {
-                                    props: {
-                                        type: 'default',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.handleEvent('restart');
-                                        }
-                                    }
-                                }, '重启')
+                                }, '停止')
                             ]);
                         }
-                    }
-                ],
-                data1: [
-                    {
-                        service: 'Event',
-                        status: 0,
-                        address: 'New York No. 1 Lake Park'
                     }
                 ]
             };
         },
         methods: {
+            tableList () {
+                this.axios.get(this.Global.serverSrc + 'sse/status').then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.jobData = res.data['data'];
+                        } else {
+                            this.nError('Get Info Failure', res.data['message']);
+                        };
+                    },
+                    err => {
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                            if (err.response.status === 404) {
+                                this.jobData = [];
+                            } else {
+                                this.nError('Get Info Failure', errInfo);
+                            }
+                        } catch (error) {
+                            errInfo = err;
+                            this.nError('Get Info Failure', errInfo);
+                        }
+                        this.jobData = [];
+                    });
+            },
             handleEvent (action) {
                 this.axios.get(this.Global.serverSrc + 'sse?action=' + action).then(
                     res => {
