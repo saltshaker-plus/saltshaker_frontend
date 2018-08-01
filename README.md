@@ -17,7 +17,7 @@
 
     修改 src/config/Global.vue 下serverSrc参数,对应自己的服务器域名或地址
     
-    修改 build/webpack.prod.config.js 下serverSrc参数,对应自己的服务器域名或地址
+    修改 build/webpack.prod.config.js 下publicPath参数,对应自己的服务器域名或地址
     
     #npm run build
 ````
