@@ -1,6 +1,7 @@
 ### Saltshaker_plus Frontend
 
 #### **要求 Vue.js > 2.0**
+#### **要求 Node = 8.11.3 LTS**
 
 ````
 1. 安装依赖
