@@ -312,7 +312,7 @@
                     width: '250px',
                     height: '200px'
                 },
-                access: localStorage.menu.includes(-1)
+                access: localStorage.menu.includes(101)
             };
         },
         methods: {
