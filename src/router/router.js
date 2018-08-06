@@ -44,10 +44,10 @@ export const otherRouter = {
     redirect: '/home',
     component: Main,
     children: [
-        { path: 'home', title: {i18n: 'home'}, name: 'home_index', component: () => import('@/views/home/home.vue') },
-        { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
-        { path: 'task', title: '任务', name: 'task', component: () => import('@/views/job/task-info.vue') },
-        { path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') }
+        { path: 'home', title: {i18n: 'home'}, name: 'home_index', meta: {cached: true}, component: () => import('@/views/home/home.vue') },
+        { path: 'ownspace', title: '个人中心', name: 'ownspace_index', meta: {cached: true}, component: () => import('@/views/own-space/own-space.vue') },
+        { path: 'task', title: '任务', name: 'task', meta: {cached: true}, component: () => import('@/views/job/task-info.vue') },
+        { path: 'message', title: '消息中心', name: 'message_index', meta: {cached: true}, component: () => import('@/views/message/message.vue') }
     ]
 };
 
@@ -61,9 +61,9 @@ export const appRouter = [
         access: 1,
         component: Main,
         children: [
-            { path: 'create', title: 'Job创建', name: 'create', access: 10, component: () => import('@/views/job/create.vue') },
-            { path: 'history', title: 'Job历史', name: 'history', access: 11, component: () => import('@/views/job/history.vue') },
-            { path: 'manager', title: 'Job管理', name: 'manager', access: 12, component: () => import('@/views/job/manager.vue') }
+            { path: 'create', title: 'Job创建', name: 'create', access: 10, meta: {cached: true}, component: () => import('@/views/job/create.vue') },
+            { path: 'history', title: 'Job历史', name: 'history', access: 11, meta: {cached: true}, component: () => import('@/views/job/history.vue') },
+            { path: 'manager', title: 'Job管理', name: 'manager', access: 12, meta: {cached: true}, component: () => import('@/views/job/manager.vue') }
         ]
     },
     {
@@ -74,9 +74,9 @@ export const appRouter = [
         access: 2,
         component: Main,
         children: [
-            { path: 'status', title: '状态信息', name: 'status', access: 20, component: () => import('@/views/minion/status.vue') },
-            { path: 'key', title: 'Key管理', name: 'key', access: 21, component: () => import('@/views/minion/key.vue') },
-            { path: 'grains', title: 'Grains', name: 'grains', access: 22, component: () => import('@/views/minion/grains.vue') }
+            { path: 'status', title: '状态信息', name: 'status', access: 20, meta: {cached: true}, component: () => import('@/views/minion/status.vue') },
+            { path: 'key', title: 'Key管理', name: 'key', access: 21, meta: {cached: true}, component: () => import('@/views/minion/key.vue') },
+            { path: 'grains', title: 'Grains', name: 'grains', access: 22, meta: {cached: true}, component: () => import('@/views/minion/grains.vue') }
         ]
     },
     {
@@ -87,7 +87,7 @@ export const appRouter = [
         access: 3,
         component: Main,
         children: [
-            { path: 'index', title: '主机管理', name: 'host_index', access: 30, component: () => import('@/views/host/host.vue') }
+            { path: 'index', title: '主机管理', name: 'host_index', access: 30,  meta: {cached: true}, meta: {cached: true}, component: () => import('@/views/host/host.vue') }
         ]
     },
     {
@@ -98,7 +98,7 @@ export const appRouter = [
         access: 4,
         component: Main,
         children: [
-            { path: 'index', title: '分组管理', name: 'group_index', access: 40, component: () => import('@/views/groups/groups.vue') }
+            { path: 'index', title: '分组管理', name: 'group_index', access: 40, meta: {cached: true}, meta: {cached: true}, component: () => import('@/views/groups/groups.vue') }
         ]
     },
     {
@@ -110,7 +110,7 @@ export const appRouter = [
         component: Main,
         children: [
             // { path: 'pillar_sls', title: 'Pillar SLS', name: 'pillar sls', component: () => import('@/views/my-components/draggable-list/draggable-list.vue') },
-            { path: 'index', title: '文件服务', name: 'file_index', access: 50, component: () => import('@/views/fileserver/gitlab.vue') }
+            { path: 'index', title: '文件服务', name: 'file_index', access: 50, meta: {cached: true}, component: () => import('@/views/fileserver/gitlab.vue') }
         ]
     },
     {
@@ -121,10 +121,10 @@ export const appRouter = [
         access: 6,
         component: Main,
         children: [
-            { path: 'shell', title: 'Shell', name: 'shell', access: 60, component: () => import('@/views/execute/shell.vue') },
-            { path: 'state', title: 'State', name: 'state', access: 61, component: () => import('@/views/execute/state.vue') },
+            { path: 'shell', title: 'Shell', name: 'shell', access: 60, meta: {cached: true}, component: () => import('@/views/execute/shell.vue') },
+            { path: 'state', title: 'State', name: 'state', access: 61, meta: {cached: true}, component: () => import('@/views/execute/state.vue') },
             // { path: 'module', title: 'Module', name: 'module', access: 62, component: () => import('@/views/execute/module.vue') },
-            { path: 'pillar', title: 'Pillar', name: 'pillar', access: 63, component: () => import('@/views/execute/pillar.vue') }
+            { path: 'pillar', title: 'Pillar', name: 'pillar', access: 63, meta: {cached: true}, component: () => import('@/views/execute/pillar.vue') }
         ]
     },
     {
@@ -135,7 +135,7 @@ export const appRouter = [
         access: 7,
         component: Main,
         children: [
-            { path: 'index', title: '产品线管理', name: 'product_index', icon: 'social-dropbox', access: 70, component: () => import('@/views/product/product.vue') }
+            { path: 'index', title: '产品线管理', name: 'product_index', icon: 'social-dropbox', access: 70, meta: {cached: true}, component: () => import('@/views/product/product.vue') }
         ]
     },
     {
@@ -146,7 +146,7 @@ export const appRouter = [
         access: 8,
         component: Main,
         children: [
-            { path: 'index', title: 'ACL管理', name: 'acl_index', icon: 'funnel', access: 80, component: () => import('@/views/acl/acl.vue') }
+            { path: 'index', title: 'ACL管理', name: 'acl_index', icon: 'funnel', access: 80, meta: {cached: true}, component: () => import('@/views/acl/acl.vue') }
         ]
     },
     {
@@ -157,11 +157,11 @@ export const appRouter = [
         access: 100,
         component: Main,
         children: [
-            { path: 'user', title: '用户管理', name: 'user', access: 100, component: () => import('@/views/user/user.vue') },
-            { path: 'role', title: '角色管理', name: 'role', access: 101, component: () => import('@/views/role/role.vue') },
+            { path: 'user', title: '用户管理', name: 'user', access: 100, meta: {cached: true}, component: () => import('@/views/user/user.vue') },
+            { path: 'role', title: '角色管理', name: 'role', access: 101, meta: {cached: true}, component: () => import('@/views/role/role.vue') },
             // { path: 'token', title: 'Token管理', name: 'token', access: 102, component: () => import('@/views/error-page/error-page.vue') },
-            { path: 'log', title: '操作日志', name: 'log', access: 103, component: () => import('@/views/audit_log/audit_log.vue') },
-            { path: 'tools', title: '系统工具', name: 'tools', access: 104, component: () => import('@/views/system/tool.vue') }
+            { path: 'log', title: '操作日志', name: 'log', access: 103, meta: {cached: true}, component: () => import('@/views/audit_log/audit_log.vue') },
+            { path: 'tools', title: '系统工具', name: 'tools', access: 104, meta: {cached: true}, component: () => import('@/views/system/tool.vue') }
         ]
     }
 ];

@@ -58,9 +58,13 @@
         </div>
         <div class="single-page-con" :style="{left: shrink?'60px':'200px'}">
             <div class="single-page">
-                <keep-alive :include="cachePage">
-                    <router-view></router-view>
+                <!--<keep-alive :include="cachePage">-->
+                    <!--<router-view></router-view>-->
+                <!--</keep-alive>-->
+                <keep-alive>
+                    <router-view v-if="$route.meta.cached"></router-view>
                 </keep-alive>
+                    <router-view v-if="!$route.meta.cached"></router-view>
             </div>
         </div>
     </div>
