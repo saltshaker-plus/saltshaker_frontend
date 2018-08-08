@@ -12,7 +12,7 @@
                             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="47">
                                 <FormItem label="目标" prop="target">
                                     <CheckboxGroup v-model="formValidate.target">
-                                        <Table size="small" width="100%" height="215" border :columns="columnsTarget" :data="targetData"></Table>
+                                        <Table size="small" width="100%" height="615" border :columns="columnsTarget" :data="targetData"></Table>
                                     </CheckboxGroup>
                                 </FormItem>
                                 <slot name="command"></slot>
