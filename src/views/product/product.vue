@@ -27,6 +27,12 @@
                     <FormItem label="Master API 密码" prop="salt_master_password">
                         <Input v-model="formValidate.salt_master_password" placeholder="输入Master API 密码"></Input>
                     </FormItem>
+                    <FormItem label="" prop="check_salt_api">
+                        <Button type="primary" :loading="salt_api_loading" @click="handleCheckAPI('salt_api')">
+                            <span v-if="!salt_api_loading">测试 Salt API</span>
+                            <span v-else>测试 Salt API</span>
+                        </Button>
+                    </FormItem>
                     <FormItem label="文件服务器">
                         <RadioGroup v-model="formValidate.file_server">
                             <Radio label="gitfs">GitLab</Radio>
@@ -47,6 +53,12 @@
                     </FormItem>
                     <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="GitLab Pillar 项目" prop="pillar_project">
                         <Input v-model="formValidate.pillar_project" placeholder="输入GitLab Pillar 项目"></Input>
+                    </FormItem>
+                    <FormItem v-if="this.formValidate.file_server === 'gitfs'" label="" prop="check_gitlab_api">
+                        <Button type="primary" :loading="gitlab_api_loading" @click="handleCheckAPI('gitlab_api')">
+                            <span v-if="!gitlab_api_loading">测试 GitLab API</span>
+                            <span v-else>测试 GitLab API</span>
+                        </Button>
                     </FormItem>
                 </Form>
                 <div slot="footer">
@@ -74,6 +86,8 @@
                 delIndex: '',
                 // 编辑数据
                 formView: false,
+                salt_api_loading: false,
+                gitlab_api_loading: false,
                 id: '',
                 optionType: '',
                 optionTypeName: '',
@@ -288,6 +302,44 @@
                 this.optionType = 'add';
                 this.optionTypeName = '添加';
                 this.formView = true;
+            },
+            // 检查salt api 可用性
+            handleCheckAPI (name) {
+                if (name === 'salt_api') {
+                    this.salt_api_loading = true;
+                } else {
+                    this.gitlab_api_loading = true;
+                }
+                this.axios.post(this.Global.serverSrc + this.apiService + '/check/' + name,
+                    this.formValidate).then(
+                    res => {
+                        if (res.data['status'] === true) {
+                            this.formView = true;
+                            this.$Message.success('成功！');
+                        } else {
+                            this.nError('Check Failure', res.data['message']);
+                        }
+                        if (name === 'salt_api') {
+                            this.salt_api_loading = false;
+                        } else {
+                            this.gitlab_api_loading = false;
+                        }
+                    },
+                    err => {
+                        this.formView = true;
+                        let errInfo = '';
+                        try {
+                            errInfo = err.response.data['message'];
+                        } catch (error) {
+                            errInfo = err;
+                        }
+                        this.nError('Check Failure', errInfo);
+                        if (name === 'salt_api') {
+                            this.salt_api_loading = false;
+                        } else {
+                            this.gitlab_api_loading = false;
+                        }
+                    });
             },
             // 表单提
             handleSubmit (name) {
