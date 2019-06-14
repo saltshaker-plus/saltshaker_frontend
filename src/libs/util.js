@@ -7,7 +7,7 @@ let util = {
 
 };
 util.title = function (title) {
-    title = title || 'Saltshaker Plus';
+    title = title || 'LuyaOps';
     window.document.title = title;
 };
 

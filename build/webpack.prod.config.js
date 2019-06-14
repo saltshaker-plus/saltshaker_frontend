@@ -76,7 +76,7 @@ module.exports = merge(webpackBaseConfig, {
             ]
         }),
         new HtmlWebpackPlugin({
-            title: 'Saltshaker Plus ' + package.version,
+            title: 'LuyaOps ' + package.version,
             favicon: 'src/images/icon.ico',
             filename: '../index.html',
             template: '!!ejs-loader!./src/template/index.ejs',
