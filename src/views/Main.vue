@@ -14,7 +14,7 @@
                 <div slot="top" class="logo-con">
                     <img v-show="!shrink"  src="../images/logo.png" key="max-logo" />
                     <img v-show="shrink" src="../images/logo-min.png" key="min-logo" />
-                    <font color="#a9a9a9">V1.11</font>
+                    <font color="#a9a9a9">V1.12</font>
                 </div>
             </shrinkable-menu>
         </div>
