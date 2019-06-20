@@ -35,3 +35,7 @@ https://github.com/yueyongyue/saltshaker_api
 
 ### Saltshaker 交流学习QQ群:622806083
 ![image](https://github.com/yueyongyue/saltshaker_api/blob/master/screenshots/qq.png)
+### 运维架构技术 交流学习QQ群:991904631
+![image](https://github.com/yueyongyue/saltshaker_api/blob/master/screenshots/qq01.JPG)
+### Saltshaker 论坛
+http://project-help.cn/forum-4.htm
