@@ -31,7 +31,7 @@
 ````
 
 ### 后端saltshaker_api项目，使用时请确保版本一一对应
-https://github.com/yueyongyue/saltshaker_api
+https://github.com/saltshaker-plus/saltshaker_api
 
 ### Saltshaker 交流学习QQ群:622806083
 ![image](https://github.com/yueyongyue/saltshaker_api/blob/master/screenshots/qq.png)
