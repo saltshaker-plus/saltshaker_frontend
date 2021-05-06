@@ -34,7 +34,7 @@
     "rasterizehtml": "^1.2.4",
     "sortablejs": "^1.7.0",
     "sshpk": "^1.13.2",
-    "url-parse": "^1.4.3",
+    "url-parse": "^1.5.0",
     "vue": "^2.5.13",
     "vue-axios": "^2.1.1",
     "vue-highlight.js": "^2.2.0",
